@@ -1,9 +1,10 @@
 <script lang="ts">
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
-	import IconButton from '@smui/icon-button';
+	import IconButton, { Icon } from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
 
 	import './header.css';
+	import logo from './assets/logo.png';
 
 	interface Props {
 		user?: { name: string };
@@ -16,36 +17,35 @@
 	const { user, onLogin, onLogout, onCreateAccount, isDarkMode }: Props = $props();
 </script>
 
-<header class={isDarkMode ? 'dark' : 'light'}>
-	<TopAppBar variant="static" color="primary">
-		<Row>
-			<Section>
-				<Title>What-To-Do Atelier</Title>
-			</Section>
-			<Section align="end" toolbar>
-				{#if user}
-					<Wrapper>
-						<IconButton class="material-icons" aria-label="Notifications">notifications</IconButton>
-						<Tooltip>No notification is received</Tooltip>
-					</Wrapper>
-					<Wrapper>
-						<IconButton class="material-icons" aria-label="Direct Messages">forum</IconButton>
-						<Tooltip>No direct message is received</Tooltip>
-					</Wrapper>
-					<Wrapper>
-						<IconButton class="material-icons" aria-label="User Menu">account_circle</IconButton>
-						<Tooltip>{user.name}</Tooltip>
-					</Wrapper>
-				{:else}
-					<Wrapper>
-						<IconButton class="material-icons" aria-label="Login">login</IconButton>
-						<Tooltip>Login</Tooltip>
-					</Wrapper>
-				{/if}
-			</Section>
-		</Row>
-	</TopAppBar>
-</header>
+<TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
+	<Row>
+		<Section>
+			<img class="logo" src={logo} alt="Logo" />
+			<Title>What-To-Do Atelier</Title>
+		</Section>
+		<Section align="end" toolbar>
+			{#if user}
+				<Wrapper>
+					<IconButton class="material-icons" aria-label="Notifications">notifications</IconButton>
+					<Tooltip>No notification is received</Tooltip>
+				</Wrapper>
+				<Wrapper>
+					<IconButton class="material-icons" aria-label="Direct Messages">forum</IconButton>
+					<Tooltip>No direct message is received</Tooltip>
+				</Wrapper>
+				<Wrapper>
+					<IconButton class="material-icons" aria-label="User Menu">account_circle</IconButton>
+					<Tooltip>{user.name}</Tooltip>
+				</Wrapper>
+			{:else}
+				<Wrapper>
+					<IconButton class="material-icons" aria-label="Login">login</IconButton>
+					<Tooltip>Login</Tooltip>
+				</Wrapper>
+			{/if}
+		</Section>
+	</Row>
+</TopAppBar>
 
 <svelte:head>
 	<style>
@@ -57,9 +57,6 @@
 			--mdc-theme-on-primary: black;
 			--mdc-theme-on-secondary: black;
 			--mdc-theme-on-surface: black;
-		}
-
-		header.light .mdc-top-app-bar {
 			color: black;
 		}
 
@@ -71,10 +68,15 @@
 			--mdc-theme-on-primary: white;
 			--mdc-theme-on-secondary: white;
 			--mdc-theme-on-surface: white;
+			color: white;
 		}
 
-		header.dark .mdc-top-app-bar {
-			color: white;
+		header img.logo {
+			height: 24px;
+			width: 24px;
+			padding: 12px;
+			background-color: white;
+			border-radius: 36px;
 		}
 	</style>
 </svelte:head>
