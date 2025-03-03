@@ -2,6 +2,7 @@
 	import 'svelte-material-ui/bare.css';
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
 	import IconButton from '@smui/icon-button';
+	import Tooltip, { Wrapper } from '@smui/tooltip';
 
 	import './header.css';
 
@@ -31,16 +32,27 @@
 	<TopAppBar variant="static" color="primary">
 		<Row>
 			<Section>
-				<IconButton class="material-icons">menu</IconButton>
-				<Title>Flex Static</Title>
+				<Title>What-To-Do Atelier</Title>
 			</Section>
 			<Section align="end" toolbar>
 				{#if user}
-					<IconButton class="material-icons" aria-label={user.name}>file_download</IconButton>
-					<IconButton class="material-icons" aria-label="Download">file_download</IconButton>
+					<Wrapper>
+						<IconButton class="material-icons" aria-label="Notifications">notifications</IconButton>
+						<Tooltip>No notification is received</Tooltip>
+					</Wrapper>
+					<Wrapper>
+						<IconButton class="material-icons" aria-label="Direct Messages">forum</IconButton>
+						<Tooltip>No direct message is received</Tooltip>
+					</Wrapper>
+					<Wrapper>
+						<IconButton class="material-icons" aria-label="User Menu">account_circle</IconButton>
+						<Tooltip>{user.name}</Tooltip>
+					</Wrapper>
 				{:else}
-					<IconButton class="material-icons" aria-label="Download">file_download</IconButton>
-					<IconButton class="material-icons" aria-label="Download">file_download</IconButton>
+					<Wrapper>
+						<IconButton class="material-icons" aria-label="Login">login</IconButton>
+						<Tooltip>Login</Tooltip>
+					</Wrapper>
 				{/if}
 			</Section>
 		</Row>
