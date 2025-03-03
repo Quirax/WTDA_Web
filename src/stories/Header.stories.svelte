@@ -5,7 +5,7 @@
 
 	// More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 	const { Story } = defineMeta({
-		title: 'Header',
+		title: 'Components/Header',
 		component: Header,
 		// This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
 		tags: ['autodocs'],
@@ -15,8 +15,7 @@
 		},
 		args: {
 			onLogin: fn(),
-			onLogout: fn(),
-			onCreateAccount: fn()
+			onLogout: fn()
 		}
 	});
 </script>

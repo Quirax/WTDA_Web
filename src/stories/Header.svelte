@@ -21,7 +21,6 @@
 
 	const registerTooltips: Action = (node: HTMLElement) => {
 		tooltips.push(node);
-		console.log(tooltips);
 	};
 
 	$effect.pre(() => {
@@ -31,8 +30,6 @@
 			node.parentElement?.removeChild(node);
 		});
 	});
-
-	$inspect(tooltips);
 </script>
 
 <TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
@@ -62,8 +59,9 @@
 		{:else}
 			<Section align="end" toolbar>
 				<Wrapper>
-					<IconButton class="material-icons" aria-label="Login" onclick={onLogin}>login</IconButton>
-					<Tooltip use={[registerTooltips]}>Login</Tooltip>
+					<IconButton class="material-icons" aria-label="Log in" onclick={onLogin}>login</IconButton
+					>
+					<Tooltip use={[registerTooltips]}>Log in</Tooltip>
 				</Wrapper>
 			</Section>
 		{/if}
