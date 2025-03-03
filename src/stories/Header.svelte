@@ -10,12 +10,13 @@
 		onLogin?: () => void;
 		onLogout?: () => void;
 		onCreateAccount?: () => void;
+		isDarkMode?: boolean;
 	}
 
-	const { user, onLogin, onLogout, onCreateAccount }: Props = $props();
+	const { user, onLogin, onLogout, onCreateAccount, isDarkMode }: Props = $props();
 </script>
 
-<header>
+<header class={isDarkMode ? 'dark' : 'light'}>
 	<TopAppBar variant="static" color="primary">
 		<Row>
 			<Section>
@@ -45,3 +46,35 @@
 		</Row>
 	</TopAppBar>
 </header>
+
+<svelte:head>
+	<style>
+		header.light {
+			--mdc-theme-primary: white;
+			--mdc-theme-secondary: #fff;
+			--mdc-theme-background: #fff;
+			--mdc-theme-surface: #fff;
+			--mdc-theme-on-primary: black;
+			--mdc-theme-on-secondary: black;
+			--mdc-theme-on-surface: black;
+		}
+
+		header.light .mdc-top-app-bar {
+			color: black;
+		}
+
+		header.dark {
+			--mdc-theme-primary: #000;
+			--mdc-theme-secondary: #676778;
+			--mdc-theme-background: #000;
+			--mdc-theme-surface: #999;
+			--mdc-theme-on-primary: white;
+			--mdc-theme-on-secondary: white;
+			--mdc-theme-on-surface: white;
+		}
+
+		header.dark .mdc-top-app-bar {
+			color: white;
+		}
+	</style>
+</svelte:head>

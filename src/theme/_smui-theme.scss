@@ -11,7 +11,7 @@
 	$error: color-palette.$red-900
 );
 
-@import '@material/theme/styles';
+@use '@material/theme/styles';
 
 html,
 body {
