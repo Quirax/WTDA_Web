@@ -1,49 +1,18 @@
+<svelte:options runes />
+
 <script lang="ts">
-	import 'svelte-material-ui/bare.css';
-
-	import Card, { Content } from '@smui/card';
-
 	import './MainPage.css';
 	import Header from './Header.svelte';
 
 	let user = $state<{ name: string }>();
 </script>
 
-<svelte:head>
-	<!-- Material Icons -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-	<!-- Roboto -->
-	<link
-		rel="stylesheet"
-		href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700"
-	/>
-	<!-- Roboto Mono -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" />
-</svelte:head>
-
 <article>
 	<Header
 		{user}
 		onLogin={() => (user = { name: 'Jane Doe' })}
 		onLogout={() => (user = undefined)}
-		onCreateAccount={() => (user = { name: 'Jane Doe' })}
 	/>
-
-	<div class="card-display" style:font-family="Roboto" style:font-weight="400">
-		<div class="card-container">
-			<Card padded>A simple padded card.</Card>
-		</div>
-
-		<div class="card-container">
-			<Card>
-				<Content>You can also use <code>Content</code>.</Content>
-			</Card>
-		</div>
-
-		<div class="card-container">
-			<Card variant="outlined" padded>An outlined, padded card.</Card>
-		</div>
-	</div>
 
 	<section class="storybook-page">
 		<h2>Pages in Storybook</h2>

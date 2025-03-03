@@ -5,16 +5,34 @@
 
 	import './header.css';
 	import logo from './assets/logo.png';
+	import { onMount } from 'svelte';
+	import type { Action } from 'svelte/action';
 
 	interface Props {
 		user?: { name: string };
 		onLogin?: () => void;
 		onLogout?: () => void;
-		onCreateAccount?: () => void;
 		isDarkMode?: boolean;
 	}
 
-	const { user, onLogin, onLogout, onCreateAccount, isDarkMode }: Props = $props();
+	const { user, onLogin, onLogout, isDarkMode }: Props = $props();
+
+	const tooltips: HTMLElement[] = [];
+
+	const registerTooltips: Action = (node: HTMLElement) => {
+		tooltips.push(node);
+		console.log(tooltips);
+	};
+
+	$effect.pre(() => {
+		user?.name;
+
+		tooltips.splice(0).forEach((node) => {
+			node.parentElement?.removeChild(node);
+		});
+	});
+
+	$inspect(tooltips);
 </script>
 
 <TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
@@ -23,27 +41,32 @@
 			<img class="logo" src={logo} alt="Logo" />
 			<Title>What-To-Do Atelier</Title>
 		</Section>
-		<Section align="end" toolbar>
-			{#if user}
+
+		{#if user}
+			<Section align="end" toolbar>
 				<Wrapper>
 					<IconButton class="material-icons" aria-label="Notifications">notifications</IconButton>
-					<Tooltip>No notification is received</Tooltip>
+					<Tooltip use={[registerTooltips]}>No notification is received</Tooltip>
 				</Wrapper>
 				<Wrapper>
 					<IconButton class="material-icons" aria-label="Direct Messages">forum</IconButton>
-					<Tooltip>No direct message is received</Tooltip>
+					<Tooltip use={[registerTooltips]}>No direct message is received</Tooltip>
 				</Wrapper>
 				<Wrapper>
-					<IconButton class="material-icons" aria-label="User Menu">account_circle</IconButton>
-					<Tooltip>{user.name}</Tooltip>
+					<IconButton class="material-icons" aria-label="User Menu" onclick={onLogout}
+						>account_circle</IconButton
+					>
+					<Tooltip use={[registerTooltips]}>{user.name}</Tooltip>
 				</Wrapper>
-			{:else}
+			</Section>
+		{:else}
+			<Section align="end" toolbar>
 				<Wrapper>
-					<IconButton class="material-icons" aria-label="Login">login</IconButton>
-					<Tooltip>Login</Tooltip>
+					<IconButton class="material-icons" aria-label="Login" onclick={onLogin}>login</IconButton>
+					<Tooltip use={[registerTooltips]}>Login</Tooltip>
 				</Wrapper>
-			{/if}
-		</Section>
+			</Section>
+		{/if}
 	</Row>
 </TopAppBar>
 
