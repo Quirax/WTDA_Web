@@ -1,5 +1,4 @@
 <script lang="ts">
-	import 'svelte-material-ui/bare.css';
 	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
 	import IconButton from '@smui/icon-button';
 	import Tooltip, { Wrapper } from '@smui/tooltip';
@@ -15,18 +14,6 @@
 
 	const { user, onLogin, onLogout, onCreateAccount }: Props = $props();
 </script>
-
-<svelte:head>
-	<!-- Material Icons -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-	<!-- Roboto -->
-	<link
-		rel="stylesheet"
-		href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700"
-	/>
-	<!-- Roboto Mono -->
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono" />
-</svelte:head>
 
 <header>
 	<TopAppBar variant="static" color="primary">
