@@ -7,9 +7,6 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "npm run smui-theme-light && npm run smui-theme-dark && svelte-kit sync || echo ''",
-		"smui-theme-light": "smui-theme compile static/smui.css -i src/theme",
-		"smui-theme-dark": "smui-theme compile static/smui-dark.css -i src/theme/dark",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
@@ -27,13 +24,7 @@
 		"@chromatic-com/storybook": "^3.2.5",
 		"@eslint/compat": "^1.2.5",
 		"@eslint/js": "^9.18.0",
-		"@material/dom": "^14.0.0",
-		"@material/theme": "^14.0.0",
 		"@playwright/test": "^1.49.1",
-		"@smui/card": "^8.0.0-beta.3",
-		"@smui/icon-button": "^8.0.0-beta.3",
-		"@smui/tooltip": "^8.0.0-beta.3",
-		"@smui/top-app-bar": "^8.0.0-beta.3",
 		"@storybook/addon-essentials": "^8.6.3",
 		"@storybook/addon-svelte-csf": "^5.0.0-next.27",
 		"@storybook/blocks": "^8.6.3",
@@ -58,7 +49,6 @@
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"sass-embedded": "^1.85.1",
-		"smui-theme": "^8.0.0-beta.3",
 		"storybook": "^8.6.3",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
@@ -73,7 +63,6 @@
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"drizzle-orm": "^0.40.0",
-		"postgres": "^3.4.5",
-		"svelte-material-ui": "^8.0.0-beta.3"
+		"postgres": "^3.4.5"
 	}
 }
