@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import { paraglide } from '@inlang/paraglide-sveltekit/vite';
 import { svelteTesting } from '@testing-library/svelte/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
@@ -15,7 +16,8 @@ export default defineConfig({
 		paraglide({
 			project: './project.inlang',
 			outdir: './src/lib/paraglide'
-		})
+		}),
+		tailwindcss()
 	],
 	test: {
 		workspace: [
