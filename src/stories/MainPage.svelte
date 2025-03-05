@@ -9,6 +9,8 @@
 	import './MainPage.css';
 	import Header from './Header.svelte';
 
+	import DocsImage from './assets/docs.png';
+
 	let user = $state<{ name: string }>();
 	let userMode = $state<string>('requester');
 </script>
@@ -32,7 +34,6 @@
 			</Tabs.List>
 		</Tabs.Root>
 
-		<!-- placeholder="커미션 타입 또는 의뢰 찾기" -->
 		<Input
 			type="search"
 			placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
@@ -49,6 +50,22 @@
 			{/if}
 		</h2>
 		<!-- Card list of opened commission types -->
+
+		<section
+			id="contents-list"
+			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+		>
+			{#each Array(15) as _, i (i)}
+				<Card.Root>
+					<img src={DocsImage} alt="커미션 {i + 1}" class="aspect-video w-full object-cover" />
+					<Card.Header>
+						<Card.Title>커미션 {i + 1}</Card.Title>
+						<Card.Description>{i + 1}번째로 개장한 커미션입니다.</Card.Description>
+					</Card.Header>
+					<Card.Content>뭘 넣지?</Card.Content>
+				</Card.Root>
+			{/each}
+		</section>
 	</section>
 
 	{#if userMode === 'requester'}
