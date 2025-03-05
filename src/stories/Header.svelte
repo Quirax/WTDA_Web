@@ -3,17 +3,14 @@
 
 	import './header.css';
 	import logo from './assets/logo.png';
-	import { onMount } from 'svelte';
-	import type { Action } from 'svelte/action';
 
 	interface Props {
 		user?: { name: string };
 		onLogin?: () => void;
 		onLogout?: () => void;
-		isDarkMode?: boolean;
 	}
 
-	const { user, onLogin, onLogout, isDarkMode }: Props = $props();
+	const { user, onLogin, onLogout }: Props = $props();
 </script>
 
 <div class="border-b">

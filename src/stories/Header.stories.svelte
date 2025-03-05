@@ -23,7 +23,3 @@
 <Story name="Logged In" args={{ user: { name: 'Jane Doe' } }} />
 
 <Story name="Logged Out" args={{}} />
-
-<Story name="Logged In (Dark Mode)" args={{ user: { name: 'Jane Doe' }, isDarkMode: true }} />
-
-<Story name="Logged Out (Dark Mode)" args={{ isDarkMode: true }} />
