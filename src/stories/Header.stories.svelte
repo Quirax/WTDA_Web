@@ -23,3 +23,5 @@
 <Story name="Logged In" args={{ user: { name: 'Jane Doe' } }} />
 
 <Story name="Logged Out" args={{}} />
+
+<Story name="Custom Title" args={{ title: '커미션 찾기' }} />

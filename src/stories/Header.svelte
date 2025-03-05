@@ -6,11 +6,12 @@
 
 	interface Props {
 		user?: { name: string };
+		title?: string;
 		onLogin?: () => void;
 		onLogout?: () => void;
 	}
 
-	const { user, onLogin, onLogout }: Props = $props();
+	const { user, onLogin, onLogout, title = 'What-To-Do Atelier' }: Props = $props();
 </script>
 
 <div class="border-b">
@@ -20,7 +21,7 @@
 			<Avatar.Image src={logo} alt="What-To-Do Atelier logo" />
 			<Avatar.Fallback>WTDA</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">What-To-Do Atelier</div>
+		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">{title}</div>
 		<div class="ml-auto flex items-center space-x-4">
 			<!-- <Search /> -->
 			<!-- <UserNav /> -->
