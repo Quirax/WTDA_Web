@@ -22,10 +22,10 @@
 		<h1 class="text-center text-3xl font-bold tracking-tight break-keep">
 			뭐하지공방에 오신 것을 환영합니다
 		</h1>
-		<Input type="search" placeholder="검색..." class="h-9 sm:w-full md:w-md" />
+		<Input type="search" placeholder="커미션 타입 또는 의뢰 찾기" class="h-9 sm:w-full md:w-md" />
 	</section>
 
-	<section id="advertising" class="relative flex justify-center px-17">
+	<section id="introducing" class="relative flex justify-center px-17">
 		<Carousel.Root class="align-center aspect-video max-h-[30vh] max-w-full" opts={{ loop: true }}>
 			<Carousel.Previous />
 			<Carousel.Content class="w-full">
