@@ -5,6 +5,7 @@
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Input } from '$lib/components/ui/input';
+	import * as Avatar from '$lib/components/ui/avatar';
 
 	import './MainPage.css';
 	import Header from './Header.svelte';
@@ -57,10 +58,20 @@
 		>
 			{#each Array(15) as _, i (i)}
 				<Card.Root>
-					<img src={DocsImage} alt="커미션 {i + 1}" class="aspect-video w-full object-cover" />
+					<img
+						src={DocsImage}
+						alt="{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}"
+						class="aspect-video w-full object-cover"
+					/>
 					<Card.Header>
-						<Card.Title>커미션 {i + 1}</Card.Title>
-						<Card.Description>{i + 1}번째로 개장한 커미션입니다.</Card.Description>
+						<Card.Title>{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}</Card.Title>
+						<Card.Description class="text-right"
+							>by
+							<Avatar.Root class="inline-block h-6 w-6 align-middle">
+								<Avatar.Image src="/avatars/01.png" alt="@quiraxical" />
+								<Avatar.Fallback>QR</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+							</Avatar.Root> Quirax Lee
+						</Card.Description>
 					</Card.Header>
 					<Card.Content>뭘 넣지?</Card.Content>
 				</Card.Root>
