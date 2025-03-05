@@ -86,12 +86,15 @@
 	</section>
 
 	{#if userMode === 'requester'}
-		<section id="suggestion" class="m-10 flex flex-col items-center justify-center space-y-8">
+		<section
+			id="suggestion"
+			class="m-10 flex flex-col items-center justify-center space-y-8 text-center"
+		>
 			<h2 class="text-2xl font-bold tracking-tight break-keep">
 				원하는 커미션 타입을 찾지 못하셨나요?
 			</h2>
 			<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
-			<div class="space-y-1 text-center">
+			<div class="space-y-1">
 				<p>의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.</p>
 				<p>물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다.</p>
 			</div>
