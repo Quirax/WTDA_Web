@@ -1,7 +1,5 @@
 <script lang="ts">
-	import TopAppBar, { Row, Section, Title } from '@smui/top-app-bar';
-	import IconButton, { Icon } from '@smui/icon-button';
-	import Tooltip, { Wrapper } from '@smui/tooltip';
+	import * as Avatar from '$lib/components/ui/avatar';
 
 	import './header.css';
 	import logo from './assets/logo.png';
@@ -16,23 +14,30 @@
 	}
 
 	const { user, onLogin, onLogout, isDarkMode }: Props = $props();
-
-	const tooltips: HTMLElement[] = [];
-
-	const registerTooltips: Action = (node: HTMLElement) => {
-		tooltips.push(node);
-	};
-
-	$effect.pre(() => {
-		user?.name;
-
-		tooltips.splice(0).forEach((node) => {
-			node.parentElement?.removeChild(node);
-		});
-	});
 </script>
 
-<TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
+<div class="border-b">
+	<div class="flex h-16 items-center px-4">
+		<!-- <TeamSwitcher /> -->
+		<Avatar.Root class="bg-white p-1">
+			<Avatar.Image src={logo} alt="What-To-Do Atelier logo" />
+			<Avatar.Fallback>WTDA</Avatar.Fallback>
+		</Avatar.Root>
+		What-To-Do Atelier
+		<!-- <DashboardMainNav class="mx-6" /> -->
+		<div class="ml-auto flex items-center space-x-4">
+			<!-- <Search /> -->
+			<!-- <UserNav /> -->
+			{#if user}
+				{user.name}
+			{:else}
+				로그인
+			{/if}
+		</div>
+	</div>
+</div>
+
+<!-- <TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
 	<Row>
 		<Section>
 			<img class="logo" src={logo} alt="Logo" />
@@ -66,38 +71,4 @@
 			</Section>
 		{/if}
 	</Row>
-</TopAppBar>
-
-<svelte:head>
-	<style>
-		header.light {
-			--mdc-theme-primary: white;
-			--mdc-theme-secondary: #fff;
-			--mdc-theme-background: #fff;
-			--mdc-theme-surface: #fff;
-			--mdc-theme-on-primary: black;
-			--mdc-theme-on-secondary: black;
-			--mdc-theme-on-surface: black;
-			color: black;
-		}
-
-		header.dark {
-			--mdc-theme-primary: #000;
-			--mdc-theme-secondary: #676778;
-			--mdc-theme-background: #000;
-			--mdc-theme-surface: #999;
-			--mdc-theme-on-primary: white;
-			--mdc-theme-on-secondary: white;
-			--mdc-theme-on-surface: white;
-			color: white;
-		}
-
-		header img.logo {
-			height: 24px;
-			width: 24px;
-			padding: 12px;
-			background-color: white;
-			border-radius: 36px;
-		}
-	</style>
-</svelte:head>
+</TopAppBar> -->
