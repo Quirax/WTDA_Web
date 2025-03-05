@@ -94,7 +94,7 @@
 		</section>
 	{/if}
 
-	<section id="introducing" class="relative my-10 flex justify-center px-17">
+	<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
 		<Carousel.Root class="align-center aspect-video max-h-[30vh] max-w-full" opts={{ loop: true }}>
 			<Carousel.Previous />
 			<Carousel.Content class="w-full">
