@@ -22,7 +22,11 @@
 		<h1 class="text-center text-3xl font-bold tracking-tight break-keep">
 			뭐하지공방에 오신 것을 환영합니다
 		</h1>
-		<Input type="search" placeholder="커미션 타입 또는 의뢰 찾기" class="h-9 sm:w-full md:w-md" />
+		<Input
+			type="search"
+			placeholder="커미션 타입 또는 의뢰 찾기"
+			class="h-xl text-xl sm:w-full md:w-md"
+		/>
 	</section>
 
 	<section id="introducing" class="relative flex justify-center px-17">
