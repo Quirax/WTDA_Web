@@ -3,6 +3,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import * as Carousel from '$lib/components/ui/carousel';
+	import { Input } from '$lib/components/ui/input';
 
 	import './MainPage.css';
 	import Header from './Header.svelte';
@@ -16,6 +17,13 @@
 		onLogin={() => (user = { name: 'Jane Doe' })}
 		onLogout={() => (user = undefined)}
 	/>
+
+	<section id="search" class="flex h-[50vh] flex-col items-center justify-center space-y-10 p-6">
+		<h1 class="text-center text-3xl font-bold tracking-tight break-keep">
+			뭐하지공방에 오신 것을 환영합니다
+		</h1>
+		<Input type="search" placeholder="검색..." class="h-9 sm:w-full md:w-md" />
+	</section>
 
 	<!-- Advertising Carousel -->
 	<div class="relative flex justify-center px-17">
