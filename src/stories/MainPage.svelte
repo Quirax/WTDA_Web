@@ -6,6 +6,7 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Input } from '$lib/components/ui/input';
 	import * as Avatar from '$lib/components/ui/avatar';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	import './MainPage.css';
 	import Header from './Header.svelte';
@@ -54,7 +55,7 @@
 
 		<section
 			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 		>
 			{#each Array(15) as _, i (i)}
 				<Card.Root>
@@ -73,7 +74,12 @@
 							</Avatar.Root> Quirax Lee
 						</Card.Description>
 					</Card.Header>
-					<Card.Content>뭘 넣지?</Card.Content>
+					<Card.Content>
+						<Badge class="m-1">#그림</Badge>
+						<Badge class="m-1" variant="secondary">#이런 태그</Badge>
+						<Badge class="m-1" variant="secondary">#저런 태그</Badge>
+						<Badge class="m-1" variant="secondary">#요런 태그</Badge>
+					</Card.Content>
 				</Card.Root>
 			{/each}
 		</section>
