@@ -38,7 +38,7 @@
 		</Tabs.Root>
 
 		<form
-			class="flex w-full max-w-sm flex-col items-center space-y-2 space-x-2 sm:flex-row"
+			class="flex w-full max-w-sm flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
 			onsubmit={(e) => {
 				e.preventDefault();
 			}}
