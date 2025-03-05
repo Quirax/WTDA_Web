@@ -52,7 +52,6 @@
 				새로 지원을 기다리는 의뢰들입니다
 			{/if}
 		</h2>
-		<!-- Card list of opened commission types -->
 
 		<section
 			id="contents-list"
@@ -71,7 +70,7 @@
 							>by
 							<Avatar.Root class="inline-block h-6 w-6 align-middle">
 								<Avatar.Image src="/avatars/01.png" alt="@quiraxical" />
-								<Avatar.Fallback>QR</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+								<Avatar.Fallback>QR</Avatar.Fallback>
 							</Avatar.Root> Quirax Lee
 						</Card.Description>
 					</Card.Header>
