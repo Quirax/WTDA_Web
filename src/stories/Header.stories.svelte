@@ -1,3 +1,5 @@
+<svelte:options runes />
+
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import Header from './Header.svelte';

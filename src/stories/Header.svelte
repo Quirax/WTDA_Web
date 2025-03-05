@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Avatar from '$lib/components/ui/avatar';
+	import { Input } from '$lib/components/ui/input';
 
 	import './header.css';
 	import logo from './assets/logo.png';
@@ -16,14 +17,13 @@
 
 <div class="border-b">
 	<div class="flex h-16 items-center px-4">
-		<!-- <TeamSwitcher /> -->
 		<Avatar.Root class="bg-white p-1">
 			<Avatar.Image src={logo} alt="What-To-Do Atelier logo" />
 			<Avatar.Fallback>WTDA</Avatar.Fallback>
 		</Avatar.Root>
 		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">{title}</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<!-- <Search /> -->
+			<Input type="search" placeholder="Search..." class="h-9 md:w-[100px] lg:w-[300px]" />
 			<!-- <UserNav /> -->
 			{#if user}
 				{user.name}
