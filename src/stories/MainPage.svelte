@@ -37,11 +37,19 @@
 			</Tabs.List>
 		</Tabs.Root>
 
-		<Input
-			type="search"
-			placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
-			class="h-xl text-xl sm:w-full md:w-md"
-		/>
+		<form
+			class="flex w-full max-w-sm flex-col items-center space-y-2 space-x-2 sm:flex-row"
+			onsubmit={(e) => {
+				e.preventDefault();
+			}}
+		>
+			<Input
+				type="search"
+				placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
+				class="h-xl text-xl sm:w-full md:w-md"
+			/>
+			<Button type="submit">검색</Button>
+		</form>
 	</section>
 
 	<section id="recently-added" class="m-10">
