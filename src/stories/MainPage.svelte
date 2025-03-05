@@ -25,8 +25,7 @@
 		<Input type="search" placeholder="검색..." class="h-9 sm:w-full md:w-md" />
 	</section>
 
-	<!-- Advertising Carousel -->
-	<div class="relative flex justify-center px-17">
+	<section id="advertising" class="relative flex justify-center px-17">
 		<Carousel.Root class="align-center aspect-video max-h-[30vh] max-w-full" opts={{ loop: true }}>
 			<Carousel.Previous />
 			<Carousel.Content class="w-full">
@@ -35,7 +34,10 @@
 						<div class="aspect-video p-1">
 							<Card.Root class="aspect-video">
 								<Card.Content class="flex aspect-video items-center justify-center p-6">
-									<span class="text-4xl font-semibold">소개 또는 광고 이미지 {i + 1}</span>
+									<span class="text-4xl font-semibold">
+										<span class="hidden sm:inline">소개 또는 광고 </span>
+										{i + 1}
+									</span>
 								</Card.Content>
 							</Card.Root>
 						</div>
@@ -44,7 +46,7 @@
 			</Carousel.Content>
 			<Carousel.Next />
 		</Carousel.Root>
-	</div>
+	</section>
 
 	<!-- Card list of opened commission types -->
 	<!-- Card list of opened requests -->
