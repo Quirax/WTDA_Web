@@ -29,8 +29,8 @@
 			뭐하지공방에 오신 것을 환영합니다
 		</h1>
 
-		<Tabs.Root bind:value={userMode} class="w-[400px]">
-			<Tabs.List class="grid w-full grid-cols-2">
+		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
+			<Tabs.List class="grid h-full! w-full md:grid-cols-2">
 				<Tabs.Trigger value="requester">저는 의뢰주입니다</Tabs.Trigger>
 				<Tabs.Trigger value="comissioner">저는 커미션주입니다</Tabs.Trigger>
 			</Tabs.List>
