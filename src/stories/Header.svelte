@@ -20,8 +20,7 @@
 			<Avatar.Image src={logo} alt="What-To-Do Atelier logo" />
 			<Avatar.Fallback>WTDA</Avatar.Fallback>
 		</Avatar.Root>
-		What-To-Do Atelier
-		<!-- <DashboardMainNav class="mx-6" /> -->
+		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">What-To-Do Atelier</div>
 		<div class="ml-auto flex items-center space-x-4">
 			<!-- <Search /> -->
 			<!-- <UserNav /> -->
