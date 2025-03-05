@@ -24,9 +24,15 @@
 			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
 			<Avatar.Fallback>WA</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">{title}</div>
+		<div class="mx-6 flex hidden items-center space-x-4 font-bold sm:block lg:space-x-6">
+			{title}
+		</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<Input type="search" placeholder="검색..." class="h-9 md:w-[100px] lg:w-[300px]" />
+			<Input
+				type="search"
+				placeholder="검색..."
+				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]"
+			/>
 			{#if user}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger asChild let:builder>
