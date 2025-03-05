@@ -25,7 +25,7 @@
 		</Avatar.Root>
 		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">{title}</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<Input type="search" placeholder="Search..." class="h-9 md:w-[100px] lg:w-[300px]" />
+			<Input type="search" placeholder="검색..." class="h-9 md:w-[100px] lg:w-[300px]" />
 			{#if user}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger asChild let:builder>
@@ -55,21 +55,9 @@
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			{:else}
-				로그인
+				<Button class="h-8 w-[6em]">로그인</Button>
+				<Button class="h-8 w-[6em]">회원가입</Button>
 			{/if}
 		</div>
 	</div>
 </header>
-
-<!-- 
-			
-		{:else}
-			<Section align="end" toolbar>
-				<Wrapper>
-					<IconButton class="material-icons" aria-label="Log in" onclick={onLogin}>login</IconButton
-					>
-					<Tooltip use={[registerTooltips]}>Log in</Tooltip>
-				</Wrapper>
-			</Section>
-		{/if}
-		 -->
