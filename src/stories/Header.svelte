@@ -14,13 +14,13 @@
 		onLogout?: () => void;
 	}
 
-	const { user, onLogin, onLogout, title = 'What-To-Do Atelier' }: Props = $props();
+	const { user, onLogin, onLogout, title = '뭐하지공방' }: Props = $props();
 </script>
 
 <header class="border-b">
 	<div class="flex h-16 items-center px-4">
 		<Avatar.Root class="bg-white p-1">
-			<Avatar.Image src={logo} alt="What-To-Do Atelier logo" />
+			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
 			<Avatar.Fallback>WA</Avatar.Fallback>
 		</Avatar.Root>
 		<div class="mx-6 flex items-center space-x-4 font-bold lg:space-x-6">{title}</div>
@@ -46,25 +46,12 @@
 						</DropdownMenu.Label>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Group>
-							<DropdownMenu.Item>
-								Profile
-								<DropdownMenu.Shortcut>⇧⌘P</DropdownMenu.Shortcut>
-							</DropdownMenu.Item>
-							<DropdownMenu.Item>
-								Billing
-								<DropdownMenu.Shortcut>⌘B</DropdownMenu.Shortcut>
-							</DropdownMenu.Item>
-							<DropdownMenu.Item>
-								Settings
-								<DropdownMenu.Shortcut>⌘S</DropdownMenu.Shortcut>
-							</DropdownMenu.Item>
-							<DropdownMenu.Item>New Team</DropdownMenu.Item>
+							<DropdownMenu.Item>알림</DropdownMenu.Item>
+							<DropdownMenu.Item>대화</DropdownMenu.Item>
+							<DropdownMenu.Item>설정</DropdownMenu.Item>
 						</DropdownMenu.Group>
 						<DropdownMenu.Separator />
-						<DropdownMenu.Item>
-							Log out
-							<DropdownMenu.Shortcut>⇧⌘Q</DropdownMenu.Shortcut>
-						</DropdownMenu.Item>
+						<DropdownMenu.Item>로그아웃</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			{:else}
@@ -74,30 +61,8 @@
 	</div>
 </header>
 
-<!-- <TopAppBar class={isDarkMode ? 'dark' : 'light'} variant="static" color="primary">
-	<Row>
-		<Section>
-			<img class="logo" src={logo} alt="Logo" />
-			<Title>What-To-Do Atelier</Title>
-		</Section>
-
-		{#if user}
-			<Section align="end" toolbar>
-				<Wrapper>
-					<IconButton class="material-icons" aria-label="Notifications">notifications</IconButton>
-					<Tooltip use={[registerTooltips]}>No notification is received</Tooltip>
-				</Wrapper>
-				<Wrapper>
-					<IconButton class="material-icons" aria-label="Direct Messages">forum</IconButton>
-					<Tooltip use={[registerTooltips]}>No direct message is received</Tooltip>
-				</Wrapper>
-				<Wrapper>
-					<IconButton class="material-icons" aria-label="User Menu" onclick={onLogout}
-						>account_circle</IconButton
-					>
-					<Tooltip use={[registerTooltips]}>{user.name}</Tooltip>
-				</Wrapper>
-			</Section>
+<!-- 
+			
 		{:else}
 			<Section align="end" toolbar>
 				<Wrapper>
@@ -107,5 +72,4 @@
 				</Wrapper>
 			</Section>
 		{/if}
-	</Row>
-</TopAppBar> -->
+		 -->
