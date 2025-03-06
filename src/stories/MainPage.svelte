@@ -35,7 +35,10 @@
 		onLogout={() => (user = undefined)}
 	/>
 
-	<section id="search" class="flex flex-col items-center justify-center space-y-10 p-20">
+	<section
+		id="search"
+		class="flex flex-col items-center justify-center space-y-10 bg-radial-[at_50%_100%] from-stone-50 from-10% to-stone-600 p-20"
+	>
 		<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
 		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
