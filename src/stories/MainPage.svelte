@@ -104,7 +104,7 @@
 	{#if userMode === 'requester'}
 		<section
 			id="suggestion"
-			class="my-10 flex flex-col items-center justify-center space-y-8 bg-zinc-300 p-10 text-center"
+			class="my-10 flex flex-col items-center justify-center space-y-8 bg-[hsl(var(--accent))] p-10 text-center text-[hsl(var(--accent-foreground))]"
 		>
 			<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
 			<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
