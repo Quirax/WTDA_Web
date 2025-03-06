@@ -9,6 +9,8 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 
+	import { H1, H2, P } from '$lib/components/typo';
+
 	import './MainPage.css';
 	import Header from './Header.svelte';
 
@@ -26,9 +28,7 @@
 	/>
 
 	<section id="search" class="flex h-[50vh] flex-col items-center justify-center space-y-10 p-6">
-		<h1 class="text-center text-3xl font-bold tracking-tight break-keep">
-			뭐하지공방에 오신 것을 환영합니다
-		</h1>
+		<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
 		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
 			<Tabs.List class="grid h-full! w-full md:grid-cols-2">
@@ -53,13 +53,13 @@
 	</section>
 
 	<section id="recently-added" class="m-10">
-		<h2 class="text-2xl font-bold tracking-tight break-keep">
+		<H2 class="break-keep">
 			{#if userMode === 'requester'}
 				새로 개장한 커미션 타입들입니다
 			{:else}
 				새로 지원을 기다리는 의뢰들입니다
 			{/if}
-		</h2>
+		</H2>
 
 		<section
 			id="contents-list"
@@ -96,15 +96,13 @@
 	{#if userMode === 'requester'}
 		<section
 			id="suggestion"
-			class="m-10 flex flex-col items-center justify-center space-y-8 text-center"
+			class="m-10 flex flex-col items-center justify-center space-y-8 p-10 text-center"
 		>
-			<h2 class="text-2xl font-bold tracking-tight break-keep">
-				원하는 커미션 타입을 찾지 못하셨나요?
-			</h2>
+			<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
 			<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
-			<div class="space-y-1">
-				<p>의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.</p>
-				<p>물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다.</p>
+			<div class="space-y-0">
+				<P>의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.</P>
+				<P>물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다.</P>
 			</div>
 		</section>
 	{/if}
