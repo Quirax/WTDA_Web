@@ -17,13 +17,6 @@
 	import DocsImage from './assets/docs.png';
 	import ProfileImage from './assets/profile_example.png';
 
-	// Introducing images example
-	import Intro1 from './assets/accessibility.png';
-	import Intro2 from './assets/docs.png';
-	import Intro3 from './assets/figma-plugin.png';
-	import Intro4 from './assets/share.png';
-	import Intro5 from './assets/testing.png';
-
 	let user = $state<{ name: string }>();
 	let userMode = $state<string>('requester');
 </script>
@@ -122,11 +115,16 @@
 		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
 			<Carousel.Previous />
 			<Carousel.Content class="w-full">
-				{#each [Intro1, Intro2, Intro3, Intro4, Intro5] as img, i (i)}
+				{#each Array(5) as _, i (i)}
 					<Carousel.Item>
 						<div class="aspect-video p-1">
 							<Card.Root class="aspect-video">
-								<img src={img} alt="Intro image #{i + 1}" class="size-full" />
+								<Card.Content class="flex aspect-video items-center justify-center p-6">
+									<span class="text-4xl font-semibold">
+										<span class="hidden sm:inline">소개 또는 광고 </span>
+										{i + 1}
+									</span>
+								</Card.Content>
 							</Card.Root>
 						</div>
 					</Carousel.Item>
