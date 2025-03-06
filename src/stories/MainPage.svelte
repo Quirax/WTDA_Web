@@ -13,6 +13,7 @@
 
 	import './MainPage.css';
 	import Header from './Header.svelte';
+	import Footer from './Footer.svelte';
 
 	import DocsImage from './assets/docs.png';
 	import ProfileImage from './assets/profile_example.png';
@@ -133,4 +134,6 @@
 			<Carousel.Next />
 		</Carousel.Root>
 	</section>
+
+	<Footer />
 </article>
