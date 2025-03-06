@@ -65,7 +65,7 @@
 			id="contents-list"
 			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 		>
-			{#each Array(15) as _, i (i)}
+			{#each Array(10) as _, i (i)}
 				<Card.Root>
 					<img
 						src={DocsImage}
