@@ -31,8 +31,7 @@
 			<Input
 				type="search"
 				placeholder="검색..."
-				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]"
-			/>
+				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]" />
 			{#if user}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger asChild let:builder>
@@ -40,11 +39,10 @@
 							variant="ghost"
 							builders={[builder]}
 							class="relative h-8 w-8 rounded-full"
-							aria-label="User Menu"
-						>
+							aria-label="User Menu">
 							<Avatar.Root class="h-8 w-8">
 								<Avatar.Image src="/avatars/01.png" alt="@{user.name}" />
-								<Avatar.Fallback>??</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+								<Avatar.Fallback>JD</Avatar.Fallback><!-- TODO: auto-generate fallback -->
 							</Avatar.Root>
 						</Button>
 					</DropdownMenu.Trigger>
