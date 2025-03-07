@@ -7,7 +7,7 @@
 	import logo from './assets/logo.png';
 </script>
 
-<footer class="bg-[hsl(var(--muted))] p-10 text-sm text-[hsl(var(--muted-foreground))]">
+<footer class="bg-muted text-muted-foreground p-10 text-sm">
 	<P class="text-base"
 		>공지사항 고객센터 이용약관 개인정보처리방침 사업자정보확인 트위터 마스토돈 블루스카이</P
 	>
