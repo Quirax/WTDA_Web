@@ -4,7 +4,6 @@
 	import { P } from '$lib/components/typo';
 
 	import './Footer.css';
-	import logo from './assets/logo.png';
 
 	const anchorProps = {
 		class: 'hover:text-primary font-medium',
