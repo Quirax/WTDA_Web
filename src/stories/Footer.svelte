@@ -5,11 +5,22 @@
 
 	import './Footer.css';
 	import logo from './assets/logo.png';
+
+	const anchorProps = {
+		class: 'hover:text-primary font-medium',
+	};
 </script>
 
 <footer class="bg-muted text-muted-foreground p-10 text-sm">
-	<P class="text-base">
-		공지사항 고객센터 이용약관 개인정보처리방침 사업자정보확인 트위터 마스토돈 블루스카이
+	<P class="flex space-x-4 text-base">
+		<a href="." {...anchorProps}>공지사항</a>
+		<a href="." {...anchorProps}>고객센터</a>
+		<a href="." {...anchorProps}>이용약관</a>
+		<a href="." {...anchorProps}>개인정보처리방침</a>
+		<a href="." {...anchorProps}>사업자정보확인</a>
+		<a href="." {...anchorProps}>트위터</a>
+		<a href="." {...anchorProps}>마스토돈</a>
+		<a href="." {...anchorProps}>블루스카이</a>
 	</P>
 	<P>
 		상호: 뭐하지공방 | 대표: 홍길동 | 개인정보관리책임자: 홍길동 | 사업자등록번호: 123-45-67890 |
