@@ -1,6 +1,9 @@
 <svelte:options runes />
 
 <script lang="ts">
+	import { SIIcon } from '@willingtonortiz/svelte-simple-icons';
+	import { siX, siMastodon, siBluesky } from 'simple-icons';
+
 	import { P } from '$lib/components/typo';
 
 	import './Footer.css';
@@ -8,18 +11,29 @@
 	const anchorProps = {
 		class: 'hover:text-primary font-medium',
 	};
+
+	const iconProps = {
+		class: 'size-[1em]',
+		color: 'currentColor',
+	};
 </script>
 
-<footer class="bg-muted text-muted-foreground p-10 text-sm">
-	<P class="flex flex-wrap space-x-4 text-base">
+<footer class="bg-muted text-muted-foreground p-10 text-sm leading-none">
+	<P class="flex flex-wrap items-center space-x-4 text-base">
 		<a href="." {...anchorProps}>공지사항</a>
 		<a href="." {...anchorProps}>고객센터</a>
 		<a href="." {...anchorProps}>이용약관</a>
 		<a href="." {...anchorProps}>개인정보처리방침</a>
 		<a href="." {...anchorProps}>사업자정보확인</a>
-		<a href="." {...anchorProps}>트위터</a>
-		<a href="." {...anchorProps}>마스토돈</a>
-		<a href="." {...anchorProps}>블루스카이</a>
+		<a href="." {...anchorProps}>
+			<SIIcon icon={siX} {...iconProps} title="X(구 트위터) 공식 계정" />
+		</a>
+		<a href="." {...anchorProps}>
+			<SIIcon icon={siMastodon} {...iconProps} title="마스토돈 공식 계정" />
+		</a>
+		<a href="." {...anchorProps}>
+			<SIIcon icon={siBluesky} {...iconProps} title="블루스카이 공식 계정" />
+		</a>
 	</P>
 	<P class="flex flex-wrap items-center space-x-4">
 		<span>상호: 뭐하지공방</span>
