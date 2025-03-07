@@ -9,7 +9,7 @@
 	import './Footer.css';
 
 	const anchorProps = {
-		class: 'hover:text-primary font-medium',
+		class: 'hover:text-primary font-medium mb-1',
 	};
 
 	const iconProps = {
@@ -18,23 +18,25 @@
 	};
 </script>
 
-<footer class="bg-muted text-muted-foreground p-10 text-sm leading-none">
+<footer class="bg-muted text-muted-foreground p-10 text-sm">
 	<P class="flex flex-wrap items-center space-x-4 text-base">
 		<a href="." {...anchorProps}>공지사항</a>
 		<a href="." {...anchorProps}>고객센터</a>
 		<a href="." {...anchorProps}>이용약관</a>
 		<a href="." {...anchorProps}>개인정보처리방침</a>
-		<a href="." {...anchorProps}>
-			<SIIcon icon={siX} {...iconProps} title="X(구 트위터) 공식 계정" />
-		</a>
-		<a href="." {...anchorProps}>
-			<SIIcon icon={siMastodon} {...iconProps} title="마스토돈 공식 계정" />
-		</a>
-		<a href="." {...anchorProps}>
-			<SIIcon icon={siBluesky} {...iconProps} title="블루스카이 공식 계정" />
-		</a>
+		<div class="inline-flex flex-nowrap space-x-4">
+			<a href="." {...anchorProps}>
+				<SIIcon icon={siX} {...iconProps} title="X(구 트위터) 공식 계정" />
+			</a>
+			<a href="." {...anchorProps}>
+				<SIIcon icon={siMastodon} {...iconProps} title="마스토돈 공식 계정" />
+			</a>
+			<a href="." {...anchorProps}>
+				<SIIcon icon={siBluesky} {...iconProps} title="블루스카이 공식 계정" />
+			</a>
+		</div>
 	</P>
-	<P class="flex flex-wrap items-center space-x-4">
+	<P class="flex flex-wrap items-center space-y-1 space-x-4">
 		<span>상호: 뭐하지공방</span>
 		<span>대표: 홍길동</span>
 		<span>개인정보관리책임자: 홍길동</span>
