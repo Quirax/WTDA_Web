@@ -1,45 +1,73 @@
 <script lang="ts">
-  import './header.css';
-  import Button from './Button.svelte';
+	import * as Avatar from '$lib/components/ui/avatar';
+	import { Input } from '$lib/components/ui/input';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Button } from '$lib/components/ui/button';
 
-  interface Props {
-    user?: { name: string };
-    onLogin?: () => void;
-    onLogout?: () => void;
-    onCreateAccount?: () => void;
-  }
+	import './header.css';
+	import logo from './assets/logo.png';
+	import { fn } from '@storybook/test';
 
-  const { user, onLogin, onLogout, onCreateAccount }: Props = $props();
+	interface Props {
+		user?: { name: string };
+		title?: string;
+		onLogin?: () => void;
+		onLogout?: () => void;
+	}
+
+	const { user, onLogin = fn(), onLogout = fn(), title = '뭐하지공방' }: Props = $props();
 </script>
 
-<header>
-  <div class="storybook-header">
-    <div>
-      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" fill-rule="evenodd">
-          <path
-            d="M10 0h12a10 10 0 0110 10v12a10 10 0 01-10 10H10A10 10 0 010 22V10A10 10 0 0110 0z"
-            fill="#FFF"
-          />
-          <path
-            d="M5.3 10.6l10.4 6v11.1l-10.4-6v-11zm11.4-6.2l9.7 5.5-9.7 5.6V4.4z"
-            fill="#555AB9"
-          />
-          <path d="M27.2 10.6v11.2l-10.5 6V16.5l10.5-6zM15.7 4.4v11L6 10l9.7-5.5z" fill="#91BAF8" />
-        </g>
-      </svg>
-      <h1>Acme</h1>
-    </div>
-    <div>
-      {#if user}
-        <span class="welcome">
-          Welcome, <b>{user.name}</b>!
-        </span>
-        <Button size="small" onClick={onLogout} label="Log out" />
-      {:else}
-        <Button size="small" onClick={onLogin} label="Log in" />
-        <Button primary size="small" onClick={onCreateAccount} label="Sign up" />
-      {/if}
-    </div>
-  </div>
+<header class="border-b">
+	<div class="flex h-16 items-center px-4">
+		<Avatar.Root class="bg-white p-1">
+			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
+			<Avatar.Fallback>WA</Avatar.Fallback>
+		</Avatar.Root>
+		<div class="mx-6 flex hidden items-center space-x-4 font-bold sm:block lg:space-x-6">
+			{title}
+		</div>
+		<div class="ml-auto flex items-center space-x-4">
+			<Input
+				type="search"
+				placeholder="검색..."
+				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]" />
+			{#if user}
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger asChild let:builder>
+						<Button
+							variant="ghost"
+							builders={[builder]}
+							class="relative h-8 w-8 rounded-full"
+							aria-label="User Menu">
+							<Avatar.Root class="h-8 w-8">
+								<Avatar.Image src="/avatars/01.png" alt="@{user.name}" />
+								<Avatar.Fallback>JD</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+							</Avatar.Root>
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content class="w-56" align="end">
+						<DropdownMenu.Label class="font-normal">
+							<div class="flex flex-col space-y-1">
+								<p class="text-sm leading-none font-medium">{user.name}</p>
+								<p class="text-muted-foreground text-xs leading-none">m@example.com</p>
+								<!-- TODO: email? -->
+							</div>
+						</DropdownMenu.Label>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Group>
+							<DropdownMenu.Item>알림</DropdownMenu.Item>
+							<DropdownMenu.Item>대화</DropdownMenu.Item>
+							<DropdownMenu.Item>설정</DropdownMenu.Item>
+						</DropdownMenu.Group>
+						<DropdownMenu.Separator />
+						<DropdownMenu.Item on:click={onLogout}>로그아웃</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			{:else}
+				<Button class="h-8 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
+				<Button class="h-8 w-[6em]" aria-label="Sign up">회원가입</Button>
+			{/if}
+		</div>
+	</div>
 </header>
