@@ -33,7 +33,7 @@
 		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 p-20">
 		<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
-		<Tabs.Root bind:value={userMode} class="md:w-[400px]" variant="secondary">
+		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
 			<Tabs.List class="grid h-full! w-full md:grid-cols-2">
 				<Tabs.Trigger value="requester">저는 의뢰주입니다</Tabs.Trigger>
 				<Tabs.Trigger value="comissioner">저는 커미션주입니다</Tabs.Trigger>
