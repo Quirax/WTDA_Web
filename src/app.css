@@ -53,5 +53,10 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+		background-image: url('/background-pattern-light.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
+	}
+
+	body.dark {
+		background-image: url('/background-pattern-dark.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
 	}
 }
