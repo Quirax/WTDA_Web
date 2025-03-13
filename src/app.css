@@ -23,7 +23,8 @@
 	:root {
 		--background: var(--hsl-white);
 		--foreground: var(--hsl-stone-950);
-		--card: var(--hsl-white);
+		--card: var(--hsl-stone-200);
+		--card-border: hsl(var(--hsl-stone-400));
 		--card-foreground: var(--hsl-stone-950);
 		--popover: var(--hsl-white);
 		--popover-foreground: var(--hsl-stone-950);
@@ -37,7 +38,7 @@
 		--accent-foreground: var(--hsl-stone-800);
 		--destructive: var(--hsl-red-600);
 		--destructive-foreground: var(--hsl-stone-50);
-		--border: var(--hsl-stone-200);
+		--border: var(--hsl-stone-400);
 		--input: var(--hsl-stone-200);
 		--ring: var(--hsl-light-primary);
 		--radius: 0rem;
@@ -45,8 +46,8 @@
 	.dark {
 		--background: var(--hsl-stone-950);
 		--foreground: var(--hsl-stone-50);
-		--card: var(--hsl-stone-950);
-		--card-foreground: var(--hsl-stone-50);
+		--card: var(--hsl-stone-50);
+		--card-foreground: var(--hsl-stone-950);
 		--popover: var(--hsl-stone-950);
 		--popover-foreground: var(--hsl-stone-50);
 		--primary: var(--hsl-dark-primary);
