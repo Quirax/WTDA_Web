@@ -24,7 +24,6 @@
 		--background: var(--hsl-white);
 		--foreground: var(--hsl-stone-950);
 		--card: var(--hsl-stone-200);
-		--card-border: hsl(var(--hsl-stone-400));
 		--card-foreground: var(--hsl-stone-950);
 		--popover: var(--hsl-white);
 		--popover-foreground: var(--hsl-stone-950);
@@ -60,7 +59,7 @@
 		--accent-foreground: var(--hsl-stone-50);
 		--destructive: var(--hsl-red-600);
 		--destructive-foreground: var(--hsl-stone-50);
-		--border: var(--hsl-stone-800);
+		--border: var(--hsl-stone-400);
 		--input: var(--hsl-stone-800);
 		--ring: var(--hsl-dark-primary);
 	}
