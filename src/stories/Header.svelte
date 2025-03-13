@@ -65,8 +65,8 @@
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			{:else}
-				<Button class="h-8 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
-				<Button class="h-8 w-[6em]" aria-label="Sign up">회원가입</Button>
+				<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
+				<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
 			{/if}
 		</div>
 	</div>
