@@ -30,10 +30,10 @@
 			{title}
 		</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<Input
-				type="search"
-				placeholder="검색..."
-				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]" />
+			<div class="hidden space-x-2 sm:flex">
+				<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
+				<Button class="h-9" aria-label="Search">검색</Button>
+			</div>
 			{#if user}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger asChild let:builder>
