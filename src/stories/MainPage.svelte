@@ -48,7 +48,7 @@
 			<Input
 				type="search"
 				placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
-				class="h-xl border-stone-200 bg-stone-50 text-xl sm:w-full md:w-md" />
+				class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
 			<Button type="submit" variant="secondary">검색</Button>
 		</form>
 	</section>
