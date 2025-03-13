@@ -15,14 +15,14 @@
 
 	import './MainPage.css';
 
-	import DocsImage from './assets/docs.png';
-	import ProfileImage from './assets/profile_example.png';
 	import Layout from './Layout.svelte';
 
 	interface Props {
 		user?: App.User;
 		onLogin?: () => void;
 		onLogout?: () => void;
+		commissionTypes?: App.CommisionType[];
+		requests?: App.Request[];
 	}
 
 	const enum UserMode {
@@ -30,7 +30,13 @@
 		commisioner = 'commisioner',
 	}
 
-	const { user, onLogin = fn(), onLogout = fn() }: Props = $props();
+	const {
+		user,
+		onLogin = fn(),
+		onLogout = fn(),
+		commissionTypes = [],
+		requests = [],
+	}: Props = $props();
 
 	let userMode = $state<UserMode>(UserMode.requester);
 </script>
@@ -73,27 +79,30 @@
 		<section
 			id="contents-list"
 			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-			{#each Array(10) as _, i (i)}
+			{#each userMode === UserMode.requester ? commissionTypes : requests as article}
 				<Card.Root>
 					<img
-						src={DocsImage}
-						alt="{userMode === UserMode.requester ? '커미션' : '의뢰'} {i + 1}"
+						src={article?.thumbnail}
+						alt={article?.title}
 						class="aspect-video w-full object-cover" />
 					<Card.Header>
-						<Card.Title>{userMode === UserMode.requester ? '커미션' : '의뢰'} {i + 1}</Card.Title>
+						<Card.Title>{article?.title}</Card.Title>
 						<Card.Description class="text-right">
 							by
 							<Avatar.Root class="inline-block h-6 w-6 align-middle">
-								<Avatar.Image src={ProfileImage} alt="@quiraxical" />
-								<Avatar.Fallback>QR</Avatar.Fallback>
-							</Avatar.Root> Quirax Lee
+								<Avatar.Image
+									src={article?.author.profileImage}
+									alt="{article?.author.username} (@{article?.author.id})" />
+								<Avatar.Fallback>{article?.author.fallbackInitial}</Avatar.Fallback>
+							</Avatar.Root>
+							{article?.author.username}
 						</Card.Description>
 					</Card.Header>
 					<Card.Content>
-						<Badge class="m-1">#그림</Badge>
-						<Badge class="m-1" variant="secondary">#이런 태그</Badge>
-						<Badge class="m-1" variant="secondary">#저런 태그</Badge>
-						<Badge class="m-1" variant="secondary">#요런 태그</Badge>
+						<Badge class="m-1">#{article?.category}</Badge>
+						{#each article?.tags?.slice(0, 3) || [] as tag}
+							<Badge class="m-1" variant="secondary">#{tag}</Badge>
+						{/each}
 					</Card.Content>
 				</Card.Root>
 			{/each}
