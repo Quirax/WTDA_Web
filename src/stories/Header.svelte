@@ -41,8 +41,8 @@
 							class="relative h-8 w-8 rounded-full"
 							aria-label="User Menu">
 							<Avatar.Root class="h-8 w-8">
-								<Avatar.Image src="/avatars/01.png" alt="@{user.username}" />
-								<Avatar.Fallback>JD</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+								<Avatar.Image src={user.profileImage} alt="@{user.username}" />
+								<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
 							</Avatar.Root>
 						</Button>
 					</DropdownMenu.Trigger>
@@ -50,7 +50,7 @@
 						<DropdownMenu.Label class="font-normal">
 							<div class="flex flex-col space-y-1">
 								<p class="text-sm leading-none font-medium">{user.username}</p>
-								<p class="text-muted-foreground text-xs leading-none">m@example.com</p>
+								<p class="text-muted-foreground text-xs leading-none">@{user.username}</p>
 								<!-- TODO: email? -->
 							</div>
 						</DropdownMenu.Label>
