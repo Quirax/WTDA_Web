@@ -18,7 +18,7 @@
 	};
 </script>
 
-<footer class="bg-muted text-muted-foreground p-10 text-sm">
+<footer class="bg-stone-400 p-10 text-sm text-stone-800 dark:bg-stone-800 dark:text-stone-400">
 	<P class="flex flex-wrap items-center space-x-4 text-base">
 		<a href="." {...anchorProps}>공지사항</a>
 		<a href="." {...anchorProps}>고객센터</a>
