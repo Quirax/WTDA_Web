@@ -14,8 +14,8 @@
 		--hsl-stone-100: 60 4.8% 95.9%;
 		--hsl-stone-50: 60 9.1% 97.8%;
 
-		--hsl-light-primary: 12.88 85% 14%;
-		--hsl-dark-primary: 15.99 83% 27%;
+		--hsl-light-primary: 29.52 83% 25%;
+		--hsl-dark-primary: 29.52 83% 25%;
 	}
 }
 
@@ -33,8 +33,8 @@
 		--secondary-foreground: var(--hsl-stone-900);
 		--muted: var(--hsl-stone-100);
 		--muted-foreground: var(--hsl-stone-500);
-		--accent: var(--hsl-stone-100);
-		--accent-foreground: var(--hsl-stone-900);
+		--accent: var(--hsl-stone-50);
+		--accent-foreground: var(--hsl-stone-800);
 		--destructive: var(--hsl-red-600);
 		--destructive-foreground: var(--hsl-stone-50);
 		--border: var(--hsl-stone-200);
