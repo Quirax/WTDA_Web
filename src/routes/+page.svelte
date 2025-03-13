@@ -1,10 +1,10 @@
 <script lang="ts">
 	import MainPage from '../stories/MainPage.svelte';
 
-	let user = $state<{ name: string }>();
+	let user = $state<App.User>();
 </script>
 
 <MainPage
 	{user}
-	onLogin={() => (user = { name: 'Jane Doe' })}
+	onLogin={() => (user = { id: 'quiraxical', username: 'Quirax Lee' })}
 	onLogout={() => (user = undefined)} />

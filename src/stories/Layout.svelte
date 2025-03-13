@@ -9,7 +9,7 @@
 	import type { HTMLSlotAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLSlotAttributes {
-		user?: { name: string };
+		user?: App.User;
 		onLogin?: () => void;
 		onLogout?: () => void;
 	}

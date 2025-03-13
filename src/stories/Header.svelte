@@ -9,7 +9,7 @@
 	import { fn } from '@storybook/test';
 
 	interface Props {
-		user?: { name: string };
+		user?: App.User;
 		title?: string;
 		onLogin?: () => void;
 		onLogout?: () => void;
@@ -41,7 +41,7 @@
 							class="relative h-8 w-8 rounded-full"
 							aria-label="User Menu">
 							<Avatar.Root class="h-8 w-8">
-								<Avatar.Image src="/avatars/01.png" alt="@{user.name}" />
+								<Avatar.Image src="/avatars/01.png" alt="@{user.username}" />
 								<Avatar.Fallback>JD</Avatar.Fallback><!-- TODO: auto-generate fallback -->
 							</Avatar.Root>
 						</Button>
@@ -49,7 +49,7 @@
 					<DropdownMenu.Content class="w-56" align="end">
 						<DropdownMenu.Label class="font-normal">
 							<div class="flex flex-col space-y-1">
-								<p class="text-sm leading-none font-medium">{user.name}</p>
+								<p class="text-sm leading-none font-medium">{user.username}</p>
 								<p class="text-muted-foreground text-xs leading-none">m@example.com</p>
 								<!-- TODO: email? -->
 							</div>

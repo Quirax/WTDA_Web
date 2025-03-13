@@ -20,7 +20,7 @@
 	import Layout from './Layout.svelte';
 
 	interface Props {
-		user?: { name: string };
+		user?: App.User;
 		onLogin?: () => void;
 		onLogout?: () => void;
 	}
