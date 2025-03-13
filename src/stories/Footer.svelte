@@ -51,6 +51,11 @@
 		<span>전화: 031-1234-5678</span>
 	</P>
 	<P>
+		<!-- prettier-ignore -->
+		<span><a href="http://www.freepik.com/" target="_blank" {...anchorProps}>Freepik</a>에서</span>
+		디자인한 이미지 요소가 사용되었습니다.
+	</P>
+	<P>
 		뭐하지공방은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에 관한
 		의무와 책임은 계약 당사자 각자에게 있습니다.
 	</P>
