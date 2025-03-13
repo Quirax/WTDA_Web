@@ -8,6 +8,6 @@
 	export { className as class };
 </script>
 
-<div class={cn('bg-card text-card-foreground border-4', className)} {...$$restProps}>
+<div class={cn('bg-card text-card-foreground border-2', className)} {...$$restProps}>
 	<slot />
 </div>

@@ -18,7 +18,7 @@
 	const { user, onLogin = fn(), onLogout = fn(), title = '뭐하지공방' }: Props = $props();
 </script>
 
-<header class="bg-background border-b">
+<header class="bg-background border-b-2">
 	<div class="flex h-16 items-center px-4">
 		<Avatar.Root class="bg-white p-1">
 			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
