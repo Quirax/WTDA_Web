@@ -23,7 +23,7 @@
 		onLogout?: () => void;
 		recentCommissionTypes?: App.CommisionType[];
 		recentRequests?: App.Request[];
-		introductions?: HTMLElement[];
+		introductions?: { src: string; alt: string }[];
 	}
 
 	const enum UserMode {
@@ -137,9 +137,7 @@
 						<Carousel.Item>
 							<div class="aspect-video p-1">
 								<Card.Root class="aspect-video">
-									<Card.Content class="flex aspect-video items-center justify-center p-6">
-										{intro}
-									</Card.Content>
+									<img class="size-full" src={intro.src} alt={intro.alt} />
 								</Card.Root>
 							</div>
 						</Carousel.Item>
