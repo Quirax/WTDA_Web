@@ -20,10 +20,12 @@
 
 <header class="bg-background border-b-2">
 	<div class="flex h-16 items-center px-4">
-		<Avatar.Root class="bg-white p-1">
-			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
-			<Avatar.Fallback>WA</Avatar.Fallback>
-		</Avatar.Root>
+		<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
+			<Avatar.Root class="bg-white p-1">
+				<Avatar.Image src={logo} alt="뭐하지공방 로고" />
+				<Avatar.Fallback>WA</Avatar.Fallback>
+			</Avatar.Root>
+		</a>
 		<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 			{title}
 		</div>
