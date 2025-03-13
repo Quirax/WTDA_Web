@@ -38,9 +38,9 @@
 						<Button
 							variant="ghost"
 							builders={[builder]}
-							class="relative h-8 w-8 rounded-full"
+							class="relative size-9 rounded-full"
 							aria-label="User Menu">
-							<Avatar.Root class="h-8 w-8">
+							<Avatar.Root class="size-9">
 								<Avatar.Image src={user.profileImage} alt="@{user.username}" />
 								<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
 							</Avatar.Root>
