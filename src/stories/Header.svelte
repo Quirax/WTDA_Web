@@ -24,7 +24,7 @@
 			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
 			<Avatar.Fallback>WA</Avatar.Fallback>
 		</Avatar.Root>
-		<div class="mx-6 flex hidden items-center space-x-4 font-bold sm:block lg:space-x-6">
+		<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 			{title}
 		</div>
 		<div class="ml-auto flex items-center space-x-4">
