@@ -6,5 +6,11 @@
 
 <MainPage
 	{user}
-	onLogin={() => (user = { id: 'quiraxical', username: 'Quirax Lee' })}
+	onLogin={() =>
+		(user = {
+			id: 'quiraxical',
+			username: 'Quirax Lee',
+			fallbackInitial: 'QR',
+			profileImage: null,
+		})}
 	onLogout={() => (user = undefined)} />
