@@ -8,6 +8,7 @@
 		--hsl-stone-950: 20 14.3% 4.1%;
 		--hsl-stone-900: 24 9.8% 10%;
 		--hsl-stone-800: 12 6.5% 15.1%;
+		--hsl-stone-600: 33.35 6% 32%;
 		--hsl-stone-500: 25 5.3% 44.7%;
 		--hsl-stone-400: 24 5.4% 63.9%;
 		--hsl-stone-200: 20 5.9% 90%;
@@ -45,8 +46,8 @@
 	.dark {
 		--background: var(--hsl-stone-950);
 		--foreground: var(--hsl-stone-50);
-		--card: var(--hsl-stone-50);
-		--card-foreground: var(--hsl-stone-950);
+		--card: var(--hsl-stone-950);
+		--card-foreground: var(--hsl-stone-50);
 		--popover: var(--hsl-stone-950);
 		--popover-foreground: var(--hsl-stone-50);
 		--primary: var(--hsl-dark-primary);
@@ -59,7 +60,7 @@
 		--accent-foreground: var(--hsl-stone-50);
 		--destructive: var(--hsl-red-600);
 		--destructive-foreground: var(--hsl-stone-50);
-		--border: var(--hsl-stone-400);
+		--border: var(--hsl-stone-600);
 		--input: var(--hsl-stone-800);
 		--ring: var(--hsl-dark-primary);
 	}
