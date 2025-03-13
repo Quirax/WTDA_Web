@@ -11,23 +11,31 @@
 
 	import { H1, H2, P } from '$lib/components/typo';
 
+	import { fn } from '@storybook/test';
+
 	import './MainPage.css';
-	import Header from './Header.svelte';
-	import Footer from './Footer.svelte';
 
 	import DocsImage from './assets/docs.png';
 	import ProfileImage from './assets/profile_example.png';
+	import Layout from './Layout.svelte';
 
-	let user = $state<{ name: string }>();
-	let userMode = $state<string>('requester');
+	interface Props {
+		user?: { name: string };
+		onLogin?: () => void;
+		onLogout?: () => void;
+	}
+
+	const enum UserMode {
+		requester = 'requester',
+		commisioner = 'commisioner',
+	}
+
+	const { user, onLogin = fn(), onLogout = fn() }: Props = $props();
+
+	let userMode = $state<UserMode>(UserMode.requester);
 </script>
 
-<article>
-	<Header
-		{user}
-		onLogin={() => (user = { name: 'Jane Doe' })}
-		onLogout={() => (user = undefined)} />
-
+<Layout {user} {onLogin} {onLogout}>
 	<section
 		id="search"
 		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 p-20">
@@ -47,7 +55,7 @@
 			}}>
 			<Input
 				type="search"
-				placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
+				placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
 				class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
 			<Button type="submit" variant="secondary">검색</Button>
 		</form>
@@ -55,7 +63,7 @@
 
 	<section id="recently-added" class="m-10">
 		<H2 class="break-keep">
-			{#if userMode === 'requester'}
+			{#if userMode === UserMode.requester}
 				새로 개장한 커미션 타입들입니다
 			{:else}
 				새로 지원을 기다리는 의뢰들입니다
@@ -69,10 +77,10 @@
 				<Card.Root>
 					<img
 						src={DocsImage}
-						alt="{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}"
+						alt="{userMode === UserMode.requester ? '커미션' : '의뢰'} {i + 1}"
 						class="aspect-video w-full object-cover" />
 					<Card.Header>
-						<Card.Title>{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}</Card.Title>
+						<Card.Title>{userMode === UserMode.requester ? '커미션' : '의뢰'} {i + 1}</Card.Title>
 						<Card.Description class="text-right">
 							by
 							<Avatar.Root class="inline-block h-6 w-6 align-middle">
@@ -92,7 +100,7 @@
 		</section>
 	</section>
 
-	{#if userMode === 'requester'}
+	{#if userMode === UserMode.requester}
 		<section
 			id="suggestion"
 			class="bg-accent text-accent-foreground my-10 flex flex-col items-center justify-center space-y-8 p-10 text-center">
@@ -127,6 +135,4 @@
 			<Carousel.Next />
 		</Carousel.Root>
 	</section>
-
-	<Footer />
-</article>
+</Layout>
