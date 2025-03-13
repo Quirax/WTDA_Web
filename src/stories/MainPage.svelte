@@ -21,8 +21,9 @@
 		user?: App.User;
 		onLogin?: () => void;
 		onLogout?: () => void;
-		commissionTypes?: App.CommisionType[];
-		requests?: App.Request[];
+		recentCommissionTypes?: App.CommisionType[];
+		recentRequests?: App.Request[];
+		introductions?: HTMLElement[];
 	}
 
 	const enum UserMode {
@@ -34,8 +35,9 @@
 		user,
 		onLogin = fn(),
 		onLogout = fn(),
-		commissionTypes = [],
-		requests = [],
+		recentCommissionTypes = [],
+		recentRequests = [],
+		introductions = [],
 	}: Props = $props();
 
 	let userMode = $state<UserMode>(UserMode.requester);
@@ -67,47 +69,49 @@
 		</form>
 	</section>
 
-	<section id="recently-added" class="m-10">
-		<H2 class="break-keep">
-			{#if userMode === UserMode.requester}
-				새로 개장한 커미션 타입들입니다
-			{:else}
-				새로 지원을 기다리는 의뢰들입니다
-			{/if}
-		</H2>
+	{#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
+		<section id="recently-added" class="m-10">
+			<H2 class="break-keep">
+				{#if userMode === UserMode.requester}
+					새로 개장한 커미션 타입들입니다
+				{:else}
+					새로 지원을 기다리는 의뢰들입니다
+				{/if}
+			</H2>
 
-		<section
-			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-			{#each userMode === UserMode.requester ? commissionTypes : requests as article}
-				<Card.Root>
-					<img
-						src={article?.thumbnail}
-						alt={article?.title}
-						class="aspect-video w-full object-cover" />
-					<Card.Header>
-						<Card.Title>{article?.title}</Card.Title>
-						<Card.Description class="text-right">
-							by
-							<Avatar.Root class="inline-block h-6 w-6 align-middle">
-								<Avatar.Image
-									src={article?.author.profileImage}
-									alt="{article?.author.username} (@{article?.author.id})" />
-								<Avatar.Fallback>{article?.author.fallbackInitial}</Avatar.Fallback>
-							</Avatar.Root>
-							{article?.author.username}
-						</Card.Description>
-					</Card.Header>
-					<Card.Content>
-						<Badge class="m-1">#{article?.category}</Badge>
-						{#each article?.tags?.slice(0, 3) || [] as tag}
-							<Badge class="m-1" variant="secondary">#{tag}</Badge>
-						{/each}
-					</Card.Content>
-				</Card.Root>
-			{/each}
+			<section
+				id="contents-list"
+				class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+				{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
+					<Card.Root>
+						<img
+							src={article?.thumbnail}
+							alt={article?.title}
+							class="aspect-video w-full object-cover" />
+						<Card.Header>
+							<Card.Title>{article?.title}</Card.Title>
+							<Card.Description class="text-right">
+								by
+								<Avatar.Root class="inline-block h-6 w-6 align-middle">
+									<Avatar.Image
+										src={article?.author.profileImage}
+										alt="{article?.author.username} (@{article?.author.id})" />
+									<Avatar.Fallback>{article?.author.fallbackInitial}</Avatar.Fallback>
+								</Avatar.Root>
+								{article?.author.username}
+							</Card.Description>
+						</Card.Header>
+						<Card.Content>
+							<Badge class="m-1">#{article?.category}</Badge>
+							{#each article?.tags?.slice(0, 3) || [] as tag}
+								<Badge class="m-1" variant="secondary">#{tag}</Badge>
+							{/each}
+						</Card.Content>
+					</Card.Root>
+				{/each}
+			</section>
 		</section>
-	</section>
+	{/if}
 
 	{#if userMode === UserMode.requester}
 		<section
@@ -122,26 +126,27 @@
 		</section>
 	{/if}
 
-	<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
-		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
-			<Carousel.Previous />
-			<Carousel.Content class="w-full">
-				{#each Array(5) as _, i (i)}
-					<Carousel.Item>
-						<div class="aspect-video p-1">
-							<Card.Root class="aspect-video">
-								<Card.Content class="flex aspect-video items-center justify-center p-6">
-									<span class="text-4xl font-semibold">
-										<span class="hidden sm:inline">소개 또는 광고</span>
-										{i + 1}
-									</span>
-								</Card.Content>
-							</Card.Root>
-						</div>
-					</Carousel.Item>
-				{/each}
-			</Carousel.Content>
-			<Carousel.Next />
-		</Carousel.Root>
-	</section>
+	{#if introductions.length > 0}
+		<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
+			<Carousel.Root
+				class="align-center aspect-video max-h-[50vh] max-w-full"
+				opts={{ loop: true }}>
+				<Carousel.Previous />
+				<Carousel.Content class="w-full">
+					{#each introductions as intro}
+						<Carousel.Item>
+							<div class="aspect-video p-1">
+								<Card.Root class="aspect-video">
+									<Card.Content class="flex aspect-video items-center justify-center p-6">
+										{intro}
+									</Card.Content>
+								</Card.Root>
+							</div>
+						</Carousel.Item>
+					{/each}
+				</Carousel.Content>
+				<Carousel.Next />
+			</Carousel.Root>
+		</section>
+	{/if}
 </Layout>
