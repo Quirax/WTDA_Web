@@ -11,7 +11,7 @@ declare global {
 			title: string;
 			author: NonNullable<User>;
 			category: string;
-			tags: string[]?;
+			tags: string[] | null;
 		}
 
 		type CommisionType = Articles & {};
@@ -25,3 +25,9 @@ declare global {
 }
 
 export {};
+
+export enum UserStatus {
+	REQUIRED_EMAIL_CONFIRM = 'REQUIRED_EMAIL_CONFIRM',
+	NOT_AUTHENTICATED = 'NOT_AUTHENTICATED',
+	AUTHENTICATED = 'AUTHENTICATED',
+}

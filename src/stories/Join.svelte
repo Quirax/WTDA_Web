@@ -1,6 +1,8 @@
 <svelte:options runes />
 
 <script lang="ts">
+	import { UserStatus } from '../app';
+
 	import { fn } from '@storybook/test';
 
 	import Layout from './Layout.svelte';
@@ -16,6 +18,8 @@
 		username: '',
 		profileImage: null,
 		fallbackInitial: '',
+		email: '',
+		status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 	};
 </script>
 
