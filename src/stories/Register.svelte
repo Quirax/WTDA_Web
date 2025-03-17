@@ -11,9 +11,10 @@
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod, zodClient } from 'sveltekit-superforms/adapters';
 
 	interface Props {
 		onSubmit?: (data: App.User) => boolean;
@@ -39,8 +40,13 @@
 		},
 	}: Props = $props();
 
-	const form = superForm(data, { validators: zodClient(formSchema) });
-	const { form: formData, enhance } = form;
+	const form = superForm(data, { validators: zod(formSchema) });
+	const { form: formData, enhance, validateForm } = form;
+
+	const onValidate = () =>
+		validateForm().then((result) => {
+			if (result.valid) console.log('ㅛㄷㄴ');
+		});
 </script>
 
 <Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>
@@ -102,7 +108,7 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button>가입하기</Form.Button>
+			<Button onclick={onValidate}>가입하기</Button>
 		</form>
 	</Section>
 </Layout>
