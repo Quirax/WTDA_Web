@@ -19,7 +19,7 @@
 </script>
 
 <footer class="bg-stone-400 p-10 text-sm text-stone-800 dark:bg-stone-800 dark:text-stone-400">
-	<P class="flex flex-wrap items-center space-x-4 text-base">
+	<div class="flex flex-wrap items-center space-x-4 text-base leading-7 [&:not(:first-child)]:mt-6">
 		<a href="." {...anchorProps}>공지사항</a>
 		<a href="." {...anchorProps}>고객센터</a>
 		<a href="." {...anchorProps}>이용약관</a>
@@ -35,8 +35,8 @@
 				<SIIcon icon={siBluesky} {...iconProps} title="블루스카이 공식 계정" />
 			</a>
 		</div>
-	</P>
-	<P class="flex flex-wrap items-center space-y-1 space-x-4">
+	</div>
+	<div class="flex flex-wrap items-center space-y-1 space-x-4 leading-7 [&:not(:first-child)]:mt-6">
 		<span>상호: 뭐하지공방</span>
 		<span>대표: 홍길동</span>
 		<span>개인정보관리책임자: 홍길동</span>
@@ -49,14 +49,14 @@
 			이메일: <a href="." {...anchorProps}>support@whattodo.at</a>
 		</span>
 		<span>전화: 031-1234-5678</span>
-	</P>
-	<P>
+	</div>
+	<div class=" leading-7 [&:not(:first-child)]:mt-6">
 		<!-- prettier-ignore -->
 		<span><a href="http://www.freepik.com/" target="_blank" {...anchorProps}>Freepik</a>에서</span>
 		디자인한 이미지 요소가 사용되었습니다.
-	</P>
-	<P>
+	</div>
+	<div class=" leading-7 [&:not(:first-child)]:mt-6">
 		뭐하지공방은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에 관한
 		의무와 책임은 계약 당사자 각자에게 있습니다.
-	</P>
+	</div>
 </footer>
