@@ -1,5 +1,5 @@
 import { enumToPgEnum } from '$lib/utils';
-import { pgTable, serial, text, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, integer, timestamp, pgEnum, json } from 'drizzle-orm/pg-core';
 import { UserStatus } from '../../../app';
 
 export const user = pgTable('user', {
@@ -13,6 +13,7 @@ export const user = pgTable('user', {
 	status: pgEnum('status', enumToPgEnum(UserStatus))('status')
 		.notNull()
 		.default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
+	preferences: json(),
 });
 
 export const session = pgTable('session', {
