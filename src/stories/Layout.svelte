@@ -4,8 +4,8 @@
 	import { fn } from '@storybook/test';
 
 	import './Layout.css';
-	import Header from './Header.svelte';
-	import Footer from './Footer.svelte';
+	import Header from './components/Header.svelte';
+	import Footer from './components/Footer.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLSlotAttributes {

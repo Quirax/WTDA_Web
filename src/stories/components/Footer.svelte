@@ -4,8 +4,6 @@
 	import { SIIcon } from '@willingtonortiz/svelte-simple-icons';
 	import { siX, siMastodon, siBluesky } from 'simple-icons';
 
-	import { P } from '$lib/components/typo';
-
 	import './Footer.css';
 
 	const anchorProps = {
