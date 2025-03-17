@@ -14,11 +14,11 @@ export const formSchema = z
 		message: '비밀번호가 일치하지 않습니다.',
 		path: ['passwordConfirm'],
 	})
-	.refine((data) => !data.agree_eula, {
+	.refine((data) => data.agree_eula, {
 		message: '이용약관에 동의해야 가입할 수 있습니다.',
 		path: ['agree_eula'],
 	})
-	.refine((data) => !data.agree_privacypolicy, {
+	.refine((data) => data.agree_privacypolicy, {
 		message: '개인정보처리방침에 동의해야 가입할 수 있습니다.',
 		path: ['agree_privacypolicy'],
 	});

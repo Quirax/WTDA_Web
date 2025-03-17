@@ -12,6 +12,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
@@ -41,7 +42,7 @@
 	}: Props = $props();
 
 	const form = superForm(data, { validators: zod(formSchema) });
-	const { form: formData, enhance, validateForm } = form;
+	const { form: formData, enhance, validateForm, constraints } = form;
 
 	const onValidate = () =>
 		validateForm({ update: true }).then((result) => {
@@ -53,61 +54,83 @@
 	<Section>
 		<H2>회원가입</H2>
 		<form method="POST" use:enhance class="w-2/3">
-			<Form.Field {form} name="email">
+			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
-					<Input {...attrs} bind:value={$formData.email} />
+					<Input {...attrs} bind:value={$formData.email} {...$constraints.email} />
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="password">
+			<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호</Form.Label>
-					<Input {...attrs} bind:value={$formData.password} />
+					<Input
+						{...attrs}
+						type="password"
+						bind:value={$formData.password}
+						{...$constraints.password} />
 				</Form.Control>
 				<Form.Description>최소 8자 이상</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="passwordConfirm">
+			<Form.Field {form} name="passwordConfirm" class="mb-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호 확인</Form.Label>
-					<Input {...attrs} bind:value={$formData.passwordConfirm} />
+					<Input
+						{...attrs}
+						type="password"
+						bind:value={$formData.passwordConfirm}
+						{...$constraints.passwordConfirm} />
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="username">
+			<Form.Field {form} name="username" class="mb-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 닉네임</Form.Label>
-					<Input {...attrs} bind:value={$formData.username} />
+					<Input {...attrs} bind:value={$formData.username} {...$constraints.username} />
 				</Form.Control>
 				<Form.Description>최대 20자</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="agree_eula">
-				<Form.Control let:attrs>
-					<Form.Label>
-						<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
-					</Form.Label>
-					<Input {...attrs} bind:value={$formData.agree_eula} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="agree_privacypolicy">
-				<Form.Control let:attrs>
-					<Form.Label>
-						<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
-					</Form.Label>
-					<Input {...attrs} bind:value={$formData.agree_privacypolicy} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="agree_marketing">
-				<Form.Control let:attrs>
-					<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
-					<Input {...attrs} bind:value={$formData.agree_marketing} />
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+			<div class="mb-4 border-2">
+				<Form.Field {form} name="agree_eula" class="p-4">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control let:attrs>
+							<Checkbox {...attrs} bind:checked={$formData.agree_eula} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>
+									<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
+								</Form.Label>
+							</div>
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="agree_privacypolicy" class="p-4">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control let:attrs>
+							<Checkbox {...attrs} bind:checked={$formData.agree_privacypolicy} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>
+									<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
+								</Form.Label>
+							</div>
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="agree_marketing" class="p-4">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control let:attrs>
+							<Checkbox {...attrs} bind:checked={$formData.agree_marketing} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
+							</div>
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
 			<Button onclick={onValidate}>가입하기</Button>
 		</form>
 	</Section>
