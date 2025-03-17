@@ -32,7 +32,7 @@
 				username: '',
 				email: '',
 				password: '',
-				confirm_password: '',
+				passwordConfirm: '',
 				agree_eula: false,
 				agree_privacypolicy: false,
 				agree_marketing: false,
@@ -44,7 +44,7 @@
 	const { form: formData, enhance, validateForm } = form;
 
 	const onValidate = () =>
-		validateForm().then((result) => {
+		validateForm({ update: true }).then((result) => {
 			if (result.valid) console.log('ㅛㄷㄴ');
 		});
 </script>
@@ -68,10 +68,10 @@
 				<Form.Description>최소 8자 이상</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="confirm_password">
+			<Form.Field {form} name="passwordConfirm">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호 확인</Form.Label>
-					<Input {...attrs} bind:value={$formData.confirm_password} />
+					<Input {...attrs} bind:value={$formData.passwordConfirm} />
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
