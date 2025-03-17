@@ -12,12 +12,23 @@
 		user?: App.User;
 		onLogin?: () => void;
 		onLogout?: () => void;
+		title?: string;
+		showSearchPanel?: boolean;
+		showUserPanel?: boolean;
 	}
 
-	const { user, onLogin = fn(), onLogout = fn(), children = fn() }: Props = $props();
+	const {
+		user,
+		onLogin = fn(),
+		onLogout = fn(),
+		children = fn(),
+		title,
+		showSearchPanel = true,
+		showUserPanel = true,
+	}: Props = $props();
 </script>
 
-<Header {user} {onLogin} {onLogout} />
+<Header {user} {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
 
 {@render children()}
 

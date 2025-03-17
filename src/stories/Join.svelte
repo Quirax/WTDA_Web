@@ -19,4 +19,4 @@
 	};
 </script>
 
-<Layout title="회원가입">내용없음</Layout>
+<Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>내용없음</Layout>

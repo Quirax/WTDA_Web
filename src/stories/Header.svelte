@@ -13,9 +13,18 @@
 		title?: string;
 		onLogin?: () => void;
 		onLogout?: () => void;
+		showSearchPanel?: boolean;
+		showUserPanel?: boolean;
 	}
 
-	const { user, onLogin = fn(), onLogout = fn(), title = '뭐하지공방' }: Props = $props();
+	const {
+		user,
+		onLogin = fn(),
+		onLogout = fn(),
+		title = '뭐하지공방',
+		showSearchPanel = true,
+		showUserPanel = true,
+	}: Props = $props();
 </script>
 
 <header class="bg-background border-b-2">
@@ -30,45 +39,49 @@
 			{title}
 		</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<div class="hidden space-x-2 sm:flex">
-				<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
-				<Button class="h-9" aria-label="Search">검색</Button>
-			</div>
-			{#if user}
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger asChild let:builder>
-						<Button
-							variant="ghost"
-							builders={[builder]}
-							class="relative size-9 rounded-full"
-							aria-label="User Menu">
-							<Avatar.Root class="size-9">
-								<Avatar.Image src={user.profileImage} alt="@{user.username}" />
-								<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
-							</Avatar.Root>
-						</Button>
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content class="w-56" align="end">
-						<DropdownMenu.Label class="font-normal">
-							<div class="flex flex-col space-y-1">
-								<p class="text-sm leading-none font-medium">{user.username}</p>
-								<p class="text-muted-foreground text-xs leading-none">@{user.username}</p>
-								<!-- TODO: email? -->
-							</div>
-						</DropdownMenu.Label>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Group>
-							<DropdownMenu.Item>알림</DropdownMenu.Item>
-							<DropdownMenu.Item>대화</DropdownMenu.Item>
-							<DropdownMenu.Item>설정</DropdownMenu.Item>
-						</DropdownMenu.Group>
-						<DropdownMenu.Separator />
-						<DropdownMenu.Item on:click={onLogout}>로그아웃</DropdownMenu.Item>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
-			{:else}
-				<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
-				<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
+			{#if showSearchPanel}
+				<div class="hidden space-x-2 sm:flex">
+					<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
+					<Button class="h-9" aria-label="Search">검색</Button>
+				</div>
+			{/if}
+			{#if showUserPanel}
+				{#if user}
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger asChild let:builder>
+							<Button
+								variant="ghost"
+								builders={[builder]}
+								class="relative size-9 rounded-full"
+								aria-label="User Menu">
+								<Avatar.Root class="size-9">
+									<Avatar.Image src={user.profileImage} alt="@{user.username}" />
+									<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
+								</Avatar.Root>
+							</Button>
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content class="w-56" align="end">
+							<DropdownMenu.Label class="font-normal">
+								<div class="flex flex-col space-y-1">
+									<p class="text-sm leading-none font-medium">{user.username}</p>
+									<p class="text-muted-foreground text-xs leading-none">@{user.username}</p>
+									<!-- TODO: email? -->
+								</div>
+							</DropdownMenu.Label>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Group>
+								<DropdownMenu.Item>알림</DropdownMenu.Item>
+								<DropdownMenu.Item>대화</DropdownMenu.Item>
+								<DropdownMenu.Item>설정</DropdownMenu.Item>
+							</DropdownMenu.Group>
+							<DropdownMenu.Separator />
+							<DropdownMenu.Item on:click={onLogout}>로그아웃</DropdownMenu.Item>
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
+				{:else}
+					<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
+					<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
+				{/if}
 			{/if}
 		</div>
 	</div>
