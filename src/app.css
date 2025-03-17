@@ -1,49 +1,68 @@
 @import 'tailwindcss';
 @config "../tailwind.config.js";
 
+@layer palette {
+	:root {
+		--hsl-white: 0 0% 100%;
+		--hsl-red-600: 0 72.22% 50.59%;
+		--hsl-stone-950: 20 14.3% 4.1%;
+		--hsl-stone-900: 24 9.8% 10%;
+		--hsl-stone-800: 12 6.5% 15.1%;
+		--hsl-stone-600: 33.35 6% 32%;
+		--hsl-stone-500: 25 5.3% 44.7%;
+		--hsl-stone-400: 24 5.4% 63.9%;
+		--hsl-stone-200: 20 5.9% 90%;
+		--hsl-stone-100: 60 4.8% 95.9%;
+		--hsl-stone-50: 60 9.1% 97.8%;
+
+		--hsl-light-primary: 29.52 83% 25%;
+		--hsl-dark-primary: 29.52 83% 25%;
+	}
+}
+
 @layer base {
 	:root {
-		--background: 0 0% 100%; /* white */
-		--foreground: 20 14.3% 4.1%; /* 950 */
-		--card: 0 0% 100%; /* white */
-		--card-foreground: 20 14.3% 4.1%; /* 950 */
-		--popover: 0 0% 100%; /* white */
-		--popover-foreground: 20 14.3% 4.1%; /* 950 */
-		--primary: 24 9.8% 10%; /* 900 */
-		--primary-foreground: 60 9.1% 97.8%; /* 50 */
-		--secondary: 60 4.8% 95.9%; /* 100 */
-		--secondary-foreground: 24 9.8% 10%; /* 900 */
-		--muted: 60 4.8% 95.9%; /* 100 */
-		--muted-foreground: 25 5.3% 44.7%; /* 500 */
-		--accent: 60 4.8% 95.9%; /* 100 */
-		--accent-foreground: 24 9.8% 10%; /* 900 */
-		--destructive: 0 72.22% 50.59%; /* red-600 */
-		--destructive-foreground: 60 9.1% 97.8%; /* 50 */
-		--border: 20 5.9% 90%; /* 200 */
-		--input: 20 5.9% 90%; /* 200 */
-		--ring: 20 14.3% 4.1%; /* 950 */
-		--radius: 0.5rem;
+		--background: var(--hsl-white);
+		--foreground: var(--hsl-stone-950);
+		--card: var(--hsl-stone-200);
+		--card-foreground: var(--hsl-stone-950);
+		--popover: var(--hsl-white);
+		--popover-foreground: var(--hsl-stone-950);
+		--primary: var(--hsl-light-primary);
+		--primary-foreground: var(--hsl-stone-50);
+		--secondary: var(--hsl-stone-100);
+		--secondary-foreground: var(--hsl-stone-900);
+		--muted: var(--hsl-stone-100);
+		--muted-foreground: var(--hsl-stone-500);
+		--accent: var(--hsl-stone-50);
+		--accent-foreground: var(--hsl-stone-800);
+		--destructive: var(--hsl-red-600);
+		--destructive-foreground: var(--hsl-stone-50);
+		--border: var(--hsl-stone-400);
+		--input: var(--hsl-stone-200);
+		--ring: var(--hsl-light-primary);
+		--radius: 0rem;
 	}
 	.dark {
-		--background: 20 14.3% 4.1%; /* 950 */
-		--foreground: 60 9.1% 97.8%; /* 50 */
-		--card: 20 14.3% 4.1%; /* 950 */
-		--card-foreground: 60 9.1% 97.8%; /* 50 */
-		--popover: 20 14.3% 4.1%; /* 950 */
-		--popover-foreground: 60 9.1% 97.8%; /* 50 */
-		--primary: 60 9.1% 97.8%; /* 50 */
-		--primary-foreground: 24 9.8% 10%; /* 900 */
-		--secondary: 12 6.5% 15.1%; /* 850 */
-		--secondary-foreground: 60 9.1% 97.8%; /* 50 */
-		--muted: 12 6.5% 15.1%; /* 850 */
-		--muted-foreground: 24 5.4% 63.9%; /* 400 */
-		--accent: 12 6.5% 15.1%; /* 850 */
-		--accent-foreground: 60 9.1% 97.8%; /* 50 */
-		--destructive: 0 62.8% 30.6%; /* red-900 */
-		--destructive-foreground: 60 9.1% 97.8%; /* 50 */
-		--border: 12 6.5% 15.1%; /* 850 */
-		--input: 12 6.5% 15.1%; /* 850 */
-		--ring: 24 5.7% 82.9%; /* 300 */
+		--background: var(--hsl-stone-950);
+		--foreground: var(--hsl-stone-50);
+		--card: var(--hsl-stone-950);
+		--card-foreground: var(--hsl-stone-50);
+		--popover: var(--hsl-stone-950);
+		--popover-foreground: var(--hsl-stone-50);
+		--primary: var(--hsl-dark-primary);
+		--primary-foreground: var(--hsl-stone-50);
+		--secondary: var(--hsl-stone-800);
+		--secondary-foreground: var(--hsl-stone-50);
+		--muted: var(--hsl-stone-800);
+		--muted-foreground: var(--hsl-stone-400);
+		--accent: var(--hsl-stone-800);
+		--accent-foreground: var(--hsl-stone-50);
+		--destructive: var(--hsl-red-600);
+		--destructive-foreground: var(--hsl-stone-50);
+		--border: var(--hsl-stone-600);
+		--input: var(--hsl-stone-800);
+		--ring: var(--hsl-dark-primary);
 	}
 }
 
@@ -53,5 +72,10 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+		background-image: url('/background-pattern-light.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
+	}
+
+	body.dark {
+		background-image: url('/background-pattern-dark.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
 	}
 }

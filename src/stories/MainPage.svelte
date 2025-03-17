@@ -11,26 +11,42 @@
 
 	import { H1, H2, P } from '$lib/components/typo';
 
+	import { fn } from '@storybook/test';
+
 	import './MainPage.css';
-	import Header from './Header.svelte';
-	import Footer from './Footer.svelte';
 
-	import DocsImage from './assets/docs.png';
-	import ProfileImage from './assets/profile_example.png';
+	import Layout from './Layout.svelte';
 
-	let user = $state<{ name: string }>();
-	let userMode = $state<string>('requester');
+	interface Props {
+		user?: App.User;
+		onLogin?: () => void;
+		onLogout?: () => void;
+		recentCommissionTypes?: App.CommisionType[];
+		recentRequests?: App.Request[];
+		introductions?: { src: string; alt: string }[];
+	}
+
+	const enum UserMode {
+		requester = 'requester',
+		commisioner = 'commisioner',
+	}
+
+	const {
+		user,
+		onLogin = fn(),
+		onLogout = fn(),
+		recentCommissionTypes = [],
+		recentRequests = [],
+		introductions = [],
+	}: Props = $props();
+
+	let userMode = $state<UserMode>(UserMode.requester);
 </script>
 
-<article>
-	<Header
-		{user}
-		onLogin={() => (user = { name: 'Jane Doe' })}
-		onLogout={() => (user = undefined)} />
-
+<Layout {user} {onLogin} {onLogout}>
 	<section
 		id="search"
-		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 p-20">
+		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 bg-[url(/background-pattern-banner.png)] p-20">
 		<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
 		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
@@ -47,52 +63,57 @@
 			}}>
 			<Input
 				type="search"
-				placeholder={userMode === 'requester' ? '커미션 타입 찾기' : '의뢰 찾기'}
-				class="h-xl border-stone-200 bg-stone-50 text-xl sm:w-full md:w-md" />
+				placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
+				class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
 			<Button type="submit" variant="secondary">검색</Button>
 		</form>
 	</section>
 
-	<section id="recently-added" class="m-10">
-		<H2 class="break-keep">
-			{#if userMode === 'requester'}
-				새로 개장한 커미션 타입들입니다
-			{:else}
-				새로 지원을 기다리는 의뢰들입니다
-			{/if}
-		</H2>
+	{#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
+		<section id="recently-added" class="m-10">
+			<H2 class="break-keep">
+				{#if userMode === UserMode.requester}
+					새로 개장한 커미션 타입들입니다
+				{:else}
+					새로 지원을 기다리는 의뢰들입니다
+				{/if}
+			</H2>
 
-		<section
-			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-			{#each Array(10) as _, i (i)}
-				<Card.Root>
-					<img
-						src={DocsImage}
-						alt="{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}"
-						class="aspect-video w-full object-cover" />
-					<Card.Header>
-						<Card.Title>{userMode === 'requester' ? '커미션' : '의뢰'} {i + 1}</Card.Title>
-						<Card.Description class="text-right">
-							by
-							<Avatar.Root class="inline-block h-6 w-6 align-middle">
-								<Avatar.Image src={ProfileImage} alt="@quiraxical" />
-								<Avatar.Fallback>QR</Avatar.Fallback>
-							</Avatar.Root> Quirax Lee
-						</Card.Description>
-					</Card.Header>
-					<Card.Content>
-						<Badge class="m-1">#그림</Badge>
-						<Badge class="m-1" variant="secondary">#이런 태그</Badge>
-						<Badge class="m-1" variant="secondary">#저런 태그</Badge>
-						<Badge class="m-1" variant="secondary">#요런 태그</Badge>
-					</Card.Content>
-				</Card.Root>
-			{/each}
+			<section
+				id="contents-list"
+				class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+				{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
+					<Card.Root>
+						<img
+							src={article?.thumbnail}
+							alt={article?.title}
+							class="aspect-video w-full object-cover" />
+						<Card.Header>
+							<Card.Title>{article?.title}</Card.Title>
+							<Card.Description class="text-right">
+								by
+								<Avatar.Root class="inline-block h-6 w-6 align-middle">
+									<Avatar.Image
+										src={article?.author.profileImage}
+										alt="{article?.author.username} (@{article?.author.id})" />
+									<Avatar.Fallback>{article?.author.fallbackInitial}</Avatar.Fallback>
+								</Avatar.Root>
+								{article?.author.username}
+							</Card.Description>
+						</Card.Header>
+						<Card.Content>
+							<Badge class="m-1">#{article?.category}</Badge>
+							{#each article?.tags?.slice(0, 3) || [] as tag}
+								<Badge class="m-1" variant="secondary">#{tag}</Badge>
+							{/each}
+						</Card.Content>
+					</Card.Root>
+				{/each}
+			</section>
 		</section>
-	</section>
+	{/if}
 
-	{#if userMode === 'requester'}
+	{#if userMode === UserMode.requester}
 		<section
 			id="suggestion"
 			class="bg-accent text-accent-foreground my-10 flex flex-col items-center justify-center space-y-8 p-10 text-center">
@@ -105,28 +126,25 @@
 		</section>
 	{/if}
 
-	<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
-		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
-			<Carousel.Previous />
-			<Carousel.Content class="w-full">
-				{#each Array(5) as _, i (i)}
-					<Carousel.Item>
-						<div class="aspect-video p-1">
-							<Card.Root class="aspect-video">
-								<Card.Content class="flex aspect-video items-center justify-center p-6">
-									<span class="text-4xl font-semibold">
-										<span class="hidden sm:inline">소개 또는 광고</span>
-										{i + 1}
-									</span>
-								</Card.Content>
-							</Card.Root>
-						</div>
-					</Carousel.Item>
-				{/each}
-			</Carousel.Content>
-			<Carousel.Next />
-		</Carousel.Root>
-	</section>
-
-	<Footer />
-</article>
+	{#if introductions.length > 0}
+		<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
+			<Carousel.Root
+				class="align-center aspect-video max-h-[50vh] max-w-full"
+				opts={{ loop: true }}>
+				<Carousel.Previous />
+				<Carousel.Content class="w-full">
+					{#each introductions as intro}
+						<Carousel.Item>
+							<div class="aspect-video p-1">
+								<Card.Root class="aspect-video">
+									<img class="size-full" src={intro.src} alt={intro.alt} />
+								</Card.Root>
+							</div>
+						</Carousel.Item>
+					{/each}
+				</Carousel.Content>
+				<Carousel.Next />
+			</Carousel.Root>
+		</section>
+	{/if}
+</Layout>

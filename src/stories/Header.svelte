@@ -9,7 +9,7 @@
 	import { fn } from '@storybook/test';
 
 	interface Props {
-		user?: { name: string };
+		user?: App.User;
 		title?: string;
 		onLogin?: () => void;
 		onLogout?: () => void;
@@ -18,39 +18,41 @@
 	const { user, onLogin = fn(), onLogout = fn(), title = '뭐하지공방' }: Props = $props();
 </script>
 
-<header class="border-b">
+<header class="bg-background border-b-2">
 	<div class="flex h-16 items-center px-4">
-		<Avatar.Root class="bg-white p-1">
-			<Avatar.Image src={logo} alt="뭐하지공방 로고" />
-			<Avatar.Fallback>WA</Avatar.Fallback>
-		</Avatar.Root>
-		<div class="mx-6 flex hidden items-center space-x-4 font-bold sm:block lg:space-x-6">
+		<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
+			<Avatar.Root class="bg-white p-1">
+				<Avatar.Image src={logo} alt="뭐하지공방 로고" />
+				<Avatar.Fallback>WA</Avatar.Fallback>
+			</Avatar.Root>
+		</a>
+		<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 			{title}
 		</div>
 		<div class="ml-auto flex items-center space-x-4">
-			<Input
-				type="search"
-				placeholder="검색..."
-				class="hidden h-9 sm:flex md:w-[100px] lg:w-[300px]" />
+			<div class="hidden space-x-2 sm:flex">
+				<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
+				<Button class="h-9" aria-label="Search">검색</Button>
+			</div>
 			{#if user}
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger asChild let:builder>
 						<Button
 							variant="ghost"
 							builders={[builder]}
-							class="relative h-8 w-8 rounded-full"
+							class="relative size-9 rounded-full"
 							aria-label="User Menu">
-							<Avatar.Root class="h-8 w-8">
-								<Avatar.Image src="/avatars/01.png" alt="@{user.name}" />
-								<Avatar.Fallback>JD</Avatar.Fallback><!-- TODO: auto-generate fallback -->
+							<Avatar.Root class="size-9">
+								<Avatar.Image src={user.profileImage} alt="@{user.username}" />
+								<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
 							</Avatar.Root>
 						</Button>
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
 						<DropdownMenu.Label class="font-normal">
 							<div class="flex flex-col space-y-1">
-								<p class="text-sm leading-none font-medium">{user.name}</p>
-								<p class="text-muted-foreground text-xs leading-none">m@example.com</p>
+								<p class="text-sm leading-none font-medium">{user.username}</p>
+								<p class="text-muted-foreground text-xs leading-none">@{user.username}</p>
 								<!-- TODO: email? -->
 							</div>
 						</DropdownMenu.Label>
@@ -65,8 +67,8 @@
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			{:else}
-				<Button class="h-8 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
-				<Button class="h-8 w-[6em]" aria-label="Sign up">회원가입</Button>
+				<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
+				<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
 			{/if}
 		</div>
 	</div>

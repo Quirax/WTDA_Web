@@ -6,7 +6,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { cn } from '$lib/utils';
 
-	type $$Props = HTMLAttributes<HTMLDivElement>;
+	type $$Props = HTMLAttributes<HTMLParagraphElement>;
 
 	let className: $$Props['class'] = undefined;
 	export { className as class };
