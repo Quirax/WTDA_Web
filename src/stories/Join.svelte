@@ -6,6 +6,7 @@
 	import { fn } from '@storybook/test';
 
 	import Layout from './Layout.svelte';
+	import Section from './components/Section.svelte';
 
 	interface Props {
 		onSubmit?: (data: App.User) => boolean;
@@ -23,4 +24,6 @@
 	};
 </script>
 
-<Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>내용없음</Layout>
+<Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>
+	<Section>내용없음</Section>
+</Layout>

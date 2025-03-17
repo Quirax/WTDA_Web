@@ -16,6 +16,7 @@
 	import './MainPage.css';
 
 	import Layout from './Layout.svelte';
+	import Section from './components/Section.svelte';
 
 	interface Props {
 		user?: App.User;
@@ -70,7 +71,7 @@
 	</section>
 
 	{#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
-		<section id="recently-added" class="m-10">
+		<Section id="recently-added">
 			<H2 class="break-keep">
 				{#if userMode === UserMode.requester}
 					새로 개장한 커미션 타입들입니다
@@ -110,7 +111,7 @@
 					</Card.Root>
 				{/each}
 			</section>
-		</section>
+		</Section>
 	{/if}
 
 	{#if userMode === UserMode.requester}
