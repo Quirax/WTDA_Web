@@ -6,6 +6,9 @@ import { fail } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { hash } from '@node-rs/argon2';
 import { UserStatus } from '../../app';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -14,7 +17,25 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	emailIsUnique: async ({ request }) => {
+		const formData = await request.formData();
+
+		const email = formData.get('email') as string;
+
+		const user = (await db.select().from(table.user).where(eq(table.user.email, email))).at(0);
+
+		if (!user) {
+			return {
+				message: 'The email is unique',
+			};
+		} else {
+			return fail(400, {
+				message: 'There is an user that uses the email',
+			});
+		}
+	},
+
+	do: async ({ request }) => {
 		const form = await superValidate(request, zod(formSchema));
 
 		if (!form.valid) {
@@ -43,14 +64,6 @@ export const actions: Actions = {
 				agree_marketing,
 			},
 		});
-		// const userId = generateUserId();
-		// const passwordHash = await hash(password, {
-		// 	// recommended minimum parameters
-		// 	memoryCost: 19456,
-		// 	timeCost: 2,
-		// 	outputLen: 32,
-		// 	parallelism: 1,
-		// });
 		// try {
 		// 	await db.insert(table.user).values({ id: userId, username, passwordHash });
 		// 	const sessionToken = auth.generateSessionToken();

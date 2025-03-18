@@ -45,7 +45,7 @@
 <Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>
 	<Section>
 		<H2>회원가입</H2>
-		<form method="POST" use:enhance class="w-2/3">
+		<form method="POST" use:enhance class="w-2/3" action="?/do">
 			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
