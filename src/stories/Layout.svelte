@@ -1,12 +1,21 @@
 <svelte:options runes />
 
 <script lang="ts">
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+
 	import { fn } from '@storybook/test';
 
 	import './Layout.css';
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
+
+	export interface Alert {
+		title: string;
+		description: string;
+		cancel?: boolean | string;
+		action?: boolean | string;
+	}
 
 	interface Props extends HTMLSlotAttributes {
 		user?: App.User;
@@ -15,9 +24,11 @@
 		title?: string;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
+		alert?: Alert;
+		openAlert?: boolean;
 	}
 
-	const {
+	let {
 		user,
 		onLogin = fn(),
 		onLogout = fn(),
@@ -25,6 +36,8 @@
 		title,
 		showSearchPanel = true,
 		showUserPanel = true,
+		alert = undefined,
+		openAlert = $bindable(false),
 	}: Props = $props();
 </script>
 
@@ -33,3 +46,24 @@
 {@render children()}
 
 <Footer />
+
+<AlertDialog.Root bind:open={openAlert}>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title>{alert?.title}</AlertDialog.Title>
+			<AlertDialog.Description>{alert?.description}</AlertDialog.Description>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			{#if alert?.cancel}
+				<AlertDialog.Cancel>
+					{typeof alert.cancel === 'string' ? alert.cancel : '취소'}
+				</AlertDialog.Cancel>
+			{/if}
+			{#if alert?.action || !alert?.cancel}
+				<AlertDialog.Action>
+					{typeof alert?.action === 'string' ? alert?.action : '확인'}
+				</AlertDialog.Action>
+			{/if}
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>

@@ -85,6 +85,8 @@ export const actions: Actions = {
 			},
 		});
 
+		return fail(500, { message: 'An error has occurred', form });
+
 		// try {
 		// 	await db.insert(table.user).values({ id: userId, username, passwordHash });
 		// 	const sessionToken = auth.generateSessionToken();
