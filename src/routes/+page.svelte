@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { UserStatus } from '../app';
+
 	import MainPage from '../stories/MainPage.svelte';
 
 	import DocsImage from '../stories/assets/docs.png';
@@ -15,6 +17,8 @@
 			username: 'Quirax Lee',
 			fallbackInitial: 'QR',
 			profileImage: null,
+			email: '',
+			status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 		})}
 	onLogout={() => (user = undefined)}
 	recentCommissionTypes={Array(10)
@@ -27,6 +31,8 @@
 				username: 'Quirax Lee',
 				fallbackInitial: 'QR',
 				profileImage: ProfileImage,
+				email: '',
+				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 			},
 			category: '그림',
 			tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
@@ -41,6 +47,8 @@
 				username: 'Quirax Lee',
 				fallbackInitial: 'QR',
 				profileImage: ProfileImage,
+				email: '',
+				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 			},
 			category: '그림',
 			tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],

@@ -4,6 +4,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import Header from './Header.svelte';
 	import { fn } from '@storybook/test';
+	import { UserStatus } from '../../app';
 
 	// More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 	const { Story } = defineMeta({
@@ -13,16 +14,27 @@
 		tags: ['autodocs'],
 		parameters: {
 			// More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
-			layout: 'fullscreen'
+			layout: 'fullscreen',
 		},
 		args: {
 			onLogin: fn(),
-			onLogout: fn()
-		}
+			onLogout: fn(),
+		},
 	});
 </script>
 
-<Story name="Logged In" args={{ user: { name: 'Jane Doe' } }} />
+<Story
+	name="Logged In"
+	args={{
+		user: {
+			id: 'quiraxical',
+			username: 'Quirax Lee',
+			fallbackInitial: 'QR',
+			profileImage: null,
+			email: '',
+			status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+		},
+	}} />
 
 <Story name="Logged Out" args={{}} />
 
