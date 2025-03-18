@@ -35,6 +35,26 @@ export const actions: Actions = {
 		}
 	},
 
+	usernameIsUnique: async ({ request }) => {
+		const formData = await request.formData();
+
+		const username = formData.get('username') as string;
+
+		const user = (await db.select().from(table.user).where(eq(table.user.username, username))).at(
+			0,
+		);
+
+		if (!user) {
+			return {
+				message: 'The username is unique',
+			};
+		} else {
+			return fail(400, {
+				message: 'There is an user that uses the username',
+			});
+		}
+	},
+
 	do: async ({ request }) => {
 		const form = await superValidate(request, zod(formSchema));
 

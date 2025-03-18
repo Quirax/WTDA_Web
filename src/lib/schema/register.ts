@@ -32,6 +32,23 @@ export const formSchema = z
 		message: '비밀번호가 일치하지 않습니다.',
 		path: ['passwordConfirm'],
 	})
+	.refine(
+		async ({ username }) => {
+			if (!browser) return true;
+
+			const formData = new FormData();
+			formData.append('username', username);
+
+			const result = await fetch('?/usernameIsUnique', { method: 'post', body: formData });
+
+			const { status } = await result.json();
+			return status === 200; // OK
+		},
+		{
+			message: '해당 닉네임은 이미 사용중입니다. 다른 닉네임을 입력하십시오.',
+			path: ['username'],
+		},
+	)
 	.refine((data) => data.agree_eula, {
 		message: '이용약관에 동의해야 가입할 수 있습니다.',
 		path: ['agree_eula'],
