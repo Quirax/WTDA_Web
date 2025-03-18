@@ -3,6 +3,9 @@ import { superForm, superValidate } from 'sveltekit-superforms';
 import { formSchema } from '$lib/schema/register';
 import { zod, zodClient } from 'sveltekit-superforms/adapters';
 import { fail } from '@sveltejs/kit';
+import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { hash } from '@node-rs/argon2';
+import { UserStatus } from '../../app';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -18,16 +21,28 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', formData: form.data });
 		}
 
-		console.log(form.data);
-		// const formData = await event.request.formData();
-		// const username = formData.get('username');
-		// const password = formData.get('password');
-		// if (!validateUsername(username)) {
-		// 	return fail(400, { message: 'Invalid username' });
-		// }
-		// if (!validatePassword(password)) {
-		// 	return fail(400, { message: 'Invalid password' });
-		// }
+		const { email, username, password, agree_marketing } = form.data;
+
+		const userID = generateUserId();
+		const passwordHash = await hash(password, {
+			// recommended minimum parameters
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1,
+		});
+
+		console.log({
+			id: userID,
+			username,
+			passwordHash,
+			fallbackInitial: 'TODO',
+			email,
+			status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+			preferences: {
+				agree_marketing,
+			},
+		});
 		// const userId = generateUserId();
 		// const passwordHash = await hash(password, {
 		// 	// recommended minimum parameters
@@ -48,12 +63,7 @@ export const actions: Actions = {
 	},
 };
 
-// function generateUserId() {
-// 	// ID with 120 bits of entropy, or about the same as UUID v4.
-// 	const bytes = crypto.getRandomValues(new Uint8Array(15));
-// 	const id = encodeBase32LowerCase(bytes);
-// 	return id;
-// }
+const generateUserId = () => encodeBase32LowerCase(crypto.getRandomValues(new Uint8Array(15))); // ID with 120 bits of entropy, or about the same as UUID v4.
 
 // function validateUsername(username: unknown): username is string {
 // 	return (
