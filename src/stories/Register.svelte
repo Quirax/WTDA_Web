@@ -94,6 +94,9 @@
 									<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
 								</Form.Label>
 							</div>
+							<!-- Checkbox 사용 시 별도의 hidden field 필요 -->
+							<!-- ref: https://stackoverflow.com/a/78404901 -->
+							<input name={attrs.name} value={$formData.agree_eula} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
@@ -107,6 +110,7 @@
 									<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
 								</Form.Label>
 							</div>
+							<input name={attrs.name} value={$formData.agree_privacypolicy} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
@@ -118,6 +122,7 @@
 							<div class="space-y-1 leading-none">
 								<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
 							</div>
+							<input name={attrs.name} value={$formData.agree_marketing} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
