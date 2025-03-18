@@ -38,6 +38,17 @@
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
+		onResult({ result }) {
+			console.log(result);
+			if (result.status !== 200) {
+				return alert('회원가입 처리 도중 오류가 발생했습니다. 고객센터에 문의해주시기 바랍니다.');
+			}
+
+			alert(
+				'회원가입을 완료하기 위해서는 이메일 인증이 필요합니다. 가입시 사용한 이메일로 보내드린 인증 메일을 확인해주시기 바랍니다.',
+			);
+			location.href = '/';
+		},
 	});
 	const { form: formData, enhance, constraints } = form;
 </script>

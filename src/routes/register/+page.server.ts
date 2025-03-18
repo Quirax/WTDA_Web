@@ -84,6 +84,7 @@ export const actions: Actions = {
 				agree_marketing,
 			},
 		});
+
 		// try {
 		// 	await db.insert(table.user).values({ id: userId, username, passwordHash });
 		// 	const sessionToken = auth.generateSessionToken();
@@ -92,21 +93,9 @@ export const actions: Actions = {
 		// } catch (e) {
 		// 	return fail(500, { message: 'An error has occurred' });
 		// }
-		// return redirect(302, '/demo/lucia');
+
+		return { message: 'Registration completed, but requires email confirmation.', form };
 	},
 };
 
 const generateUserId = () => encodeBase32LowerCase(crypto.getRandomValues(new Uint8Array(15))); // ID with 120 bits of entropy, or about the same as UUID v4.
-
-// function validateUsername(username: unknown): username is string {
-// 	return (
-// 		typeof username === 'string' &&
-// 		username.length >= 3 &&
-// 		username.length <= 31 &&
-// 		/^[a-z0-9_-]+$/.test(username)
-// 	);
-// }
-
-// function validatePassword(password: unknown): password is string {
-// 	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
-// }
