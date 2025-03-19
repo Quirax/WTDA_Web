@@ -88,7 +88,7 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred', form });
 		}
 
-		return redirect(302, '/');
+		return redirect(302, '/register/email-confirm');
 	},
 };
 
