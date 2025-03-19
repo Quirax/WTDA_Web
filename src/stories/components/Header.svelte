@@ -1,8 +1,10 @@
 <script lang="ts">
-	import * as Avatar from '$lib/components/ui/avatar';
+	import * as LogoAvatar from '$lib/components/ui/avatar';
 	import { Input } from '$lib/components/ui/input';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
+
+	import UserAvatar from './Avatar.svelte';
 
 	import './header.css';
 	import logo from '../assets/logo.png';
@@ -30,10 +32,10 @@
 <header class="bg-background border-b-2">
 	<div class="flex h-16 items-center px-4">
 		<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
-			<Avatar.Root class="bg-white p-1">
-				<Avatar.Image src={logo} alt="뭐하지공방 로고" />
-				<Avatar.Fallback>WA</Avatar.Fallback>
-			</Avatar.Root>
+			<LogoAvatar.Root class="bg-white p-1">
+				<LogoAvatar.Image src={logo} alt="뭐하지공방 로고" />
+				<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
+			</LogoAvatar.Root>
 		</a>
 		<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 			{title}
@@ -54,10 +56,7 @@
 								builders={[builder]}
 								class="relative size-9 rounded-full"
 								aria-label="User Menu">
-								<Avatar.Root class="size-9">
-									<Avatar.Image src={user.profileImage} alt="@{user.username}" />
-									<Avatar.Fallback>{user.fallbackInitial}</Avatar.Fallback>
-								</Avatar.Root>
+								<UserAvatar class="size-9" {user} />
 							</Button>
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content class="w-56" align="end">

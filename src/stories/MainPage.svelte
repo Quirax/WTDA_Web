@@ -5,18 +5,18 @@
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Input } from '$lib/components/ui/input';
-	import * as Avatar from '$lib/components/ui/avatar';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 
 	import { H1, H2, P } from '$lib/components/typo';
 
+	import Layout from './Layout.svelte';
+	import Section from './components/Section.svelte';
+	import Avatar from './components/Avatar.svelte';
+
 	import { fn } from '@storybook/test';
 
 	import './MainPage.css';
-
-	import Layout from './Layout.svelte';
-	import Section from './components/Section.svelte';
 
 	interface Props {
 		user?: App.User;
@@ -93,12 +93,7 @@
 							<Card.Title>{article?.title}</Card.Title>
 							<Card.Description class="text-right">
 								by
-								<Avatar.Root class="inline-block h-6 w-6 align-middle">
-									<Avatar.Image
-										src={article?.author.profileImage}
-										alt="{article?.author.username} (@{article?.author.id})" />
-									<Avatar.Fallback>{article?.author.fallbackInitial}</Avatar.Fallback>
-								</Avatar.Root>
+								<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
 								{article?.author.username}
 							</Card.Description>
 						</Card.Header>
