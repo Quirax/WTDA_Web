@@ -35,7 +35,6 @@ export async function validateSessionToken(token: string) {
 				id: table.user.id,
 				username: table.user.username,
 				profileImage: table.user.profileImage,
-				fallbackInitial: table.user.fallbackInitial,
 				email: table.user.email,
 				status: table.user.status,
 			},

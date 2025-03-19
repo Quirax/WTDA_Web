@@ -10,7 +10,7 @@ export const user = pgTable('user', {
 	username: text('username').notNull().unique(), // 닉네임
 	passwordHash: text('password_hash').notNull(), // 비밀번호
 	profileImage: text('profile_image'), // 프로필 이미지
-	fallbackInitial: text('fallback_initial').notNull(), // 이니셜
+	// fallbackInitial: text('fallback_initial').notNull(), // 이니셜
 	email: text('email').notNull().unique(), // 이메일
 	status: statusEnum().notNull().default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
 	preferences: json(),
