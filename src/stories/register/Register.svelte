@@ -3,8 +3,8 @@
 <script lang="ts">
 	import { formSchema, type FormSchema } from '$lib/schema/register';
 
-	import Layout from './Layout.svelte';
-	import Section from './components/Section.svelte';
+	import Layout from '../Layout.svelte';
+	import Section from '../components/Section.svelte';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';

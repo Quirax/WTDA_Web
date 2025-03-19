@@ -2,7 +2,7 @@
 
 <script lang="ts">
 	import type { PageData } from './$types';
-	import Register from '../../stories/Register.svelte';
+	import Register from '../../stories/register/Register.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLSlotAttributes {
