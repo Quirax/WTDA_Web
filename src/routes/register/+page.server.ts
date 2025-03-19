@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { superForm, superValidate } from 'sveltekit-superforms';
 import { formSchema } from '$lib/schema/register';
 import { zod, zodClient } from 'sveltekit-superforms/adapters';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { hash } from '@node-rs/argon2';
 import { UserStatus } from '../../app';
@@ -73,30 +73,22 @@ export const actions: Actions = {
 			parallelism: 1,
 		});
 
-		console.log({
-			id: userID,
-			username,
-			passwordHash,
-			fallbackInitial: 'TODO',
-			email,
-			status: UserStatus.REQUIRED_EMAIL_CONFIRM,
-			preferences: {
-				agree_marketing,
-			},
-		});
+		try {
+			await db.insert(table.user).values({
+				id: userID,
+				username,
+				passwordHash,
+				email,
+				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+				preferences: {
+					agree_marketing,
+				},
+			});
+		} catch (e) {
+			return fail(500, { message: 'An error has occurred', form });
+		}
 
-		return fail(500, { message: 'An error has occurred', form });
-
-		// try {
-		// 	await db.insert(table.user).values({ id: userId, username, passwordHash });
-		// 	const sessionToken = auth.generateSessionToken();
-		// 	const session = await auth.createSession(sessionToken, userId);
-		// 	auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-		// } catch (e) {
-		// 	return fail(500, { message: 'An error has occurred' });
-		// }
-
-		return { message: 'Registration completed, but requires email confirmation.', form };
+		return redirect(302, '/');
 	},
 };
 

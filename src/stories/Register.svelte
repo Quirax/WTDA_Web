@@ -41,7 +41,7 @@
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result }) {
-			if (result.status !== 200) openAlert = true;
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) openAlert = true;
 		},
 	});
 	const { form: formData, enhance, constraints } = form;
