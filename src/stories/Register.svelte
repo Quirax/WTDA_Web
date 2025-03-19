@@ -36,16 +36,32 @@
 		},
 	}: Props = $props();
 
+	let openAlert = $state(false);
+
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
+		onResult({ result, cancel }) {
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				openAlert = true;
+				cancel();
+			}
+		},
 	});
 	const { form: formData, enhance, constraints } = form;
 </script>
 
-<Layout title="회원가입" showSearchPanel={false} showUserPanel={false}>
+<Layout
+	title="회원가입"
+	showSearchPanel={false}
+	showUserPanel={false}
+	bind:openAlert
+	alert={{
+		title: '회원가입 처리 도중 오류가 발생했습니다.',
+		description: '고객센터에 문의해주시기 바랍니다.',
+	}}>
 	<Section>
 		<H2>회원가입</H2>
-		<form method="POST" use:enhance class="w-2/3">
+		<form method="POST" use:enhance class="w-2/3" action="?/do">
 			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control let:attrs>
 					<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
@@ -94,6 +110,9 @@
 									<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
 								</Form.Label>
 							</div>
+							<!-- Checkbox 사용 시 별도의 hidden field 필요 -->
+							<!-- ref: https://stackoverflow.com/a/78404901 -->
+							<input name={attrs.name} value={$formData.agree_eula} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
@@ -107,6 +126,7 @@
 									<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
 								</Form.Label>
 							</div>
+							<input name={attrs.name} value={$formData.agree_privacypolicy} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
@@ -118,6 +138,7 @@
 							<div class="space-y-1 leading-none">
 								<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
 							</div>
+							<input name={attrs.name} value={$formData.agree_marketing} hidden />
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />

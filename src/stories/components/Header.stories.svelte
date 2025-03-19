@@ -29,7 +29,6 @@
 		user: {
 			id: 'quiraxical',
 			username: 'Quirax Lee',
-			fallbackInitial: 'QR',
 			profileImage: null,
 			email: '',
 			status: UserStatus.REQUIRED_EMAIL_CONFIRM,

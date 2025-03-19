@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { z } from 'zod';
 
 export const formSchema = z
@@ -10,10 +11,44 @@ export const formSchema = z
 		agree_privacypolicy: z.boolean().default(false),
 		agree_marketing: z.boolean().default(false),
 	})
+	.refine(
+		async ({ email }) => {
+			if (!browser) return true;
+
+			const formData = new FormData();
+			formData.append('email', email);
+
+			const result = await fetch('?/emailIsUnique', { method: 'post', body: formData });
+
+			const { status } = await result.json();
+			return status === 200; // OK
+		},
+		{
+			message: '해당 이메일은 이미 사용중입니다. 다른 이메일을 입력하십시오.',
+			path: ['email'],
+		},
+	)
 	.refine((data) => data.password === data.passwordConfirm, {
 		message: '비밀번호가 일치하지 않습니다.',
 		path: ['passwordConfirm'],
 	})
+	.refine(
+		async ({ username }) => {
+			if (!browser) return true;
+
+			const formData = new FormData();
+			formData.append('username', username);
+
+			const result = await fetch('?/usernameIsUnique', { method: 'post', body: formData });
+
+			const { status } = await result.json();
+			return status === 200; // OK
+		},
+		{
+			message: '해당 닉네임은 이미 사용중입니다. 다른 닉네임을 입력하십시오.',
+			path: ['username'],
+		},
+	)
 	.refine((data) => data.agree_eula, {
 		message: '이용약관에 동의해야 가입할 수 있습니다.',
 		path: ['agree_eula'],
