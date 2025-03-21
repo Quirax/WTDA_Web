@@ -2,54 +2,108 @@
 
 <!-- ref: https://github.com/carstenlebek/svelte-email?tab=readme-ov-file -->
 <script lang="ts">
-	import fs from 'node:fs';
-
 	import * as paraglide from '$lib/paraglide/runtime';
+	import { footerInfo, isLink } from '$lib/config';
 
-	import Footer from '../../../stories/components/Footer.svelte';
+	import st, * as s from './style';
+
+	const anchorProps = {
+		class: 'anchor',
+		style: st(s.fontWeight('medium'), s.color(s.c.stone_800), s.text_decoration_no_underline),
+	};
+
+	const sectionDivProps = {
+		style: st(s.leading(7), s.mt(6)),
+	};
+
+	const infoSpanProps = {
+		style: st(s.mr(4), s.mb(1), s.whitespace_nowrap),
+	};
 
 	const { children = () => {} } = $props();
-
-	// ref: https://stackoverflow.com/a/7734250
-	const logoDataURL = `data:image/png;base64,${fs.readFileSync('./static/logo.png', 'base64')}`;
-
-	const css = `<style type="text/css">${fs.readFileSync('./static/mail.css')}</style>`;
 </script>
 
 <html lang={paraglide.languageTag()}>
 	<head>
-		<meta charset="utf-8" />
+		<meta content="text/html; charset=utf-8" http-equiv="content-type" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
-		{@html css}
+		<style>
+			.im {
+				all: initial;
+			}
+
+			.anchor + .anchor {
+				margin-left: calc(0.25rem * 4);
+				margin-top: 0.25rem;
+			}
+
+			.anchor:hover {
+				color: #753f0b !important;
+			}
+
+			.contents {
+				margin: 0 auto;
+			}
+		</style>
 	</head>
-	<body>
-		<div style="display: contents">
-			<header class="bg-background border-b-2">
-				<div class="flex h-16 items-center px-4">
-					<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
-						<div
-							class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full bg-white p-1"
-							id="bits-312"
-							data-avatar-root=""
-							data-status="loading">
-							<img
-								alt="뭐하지공방 로고"
-								class="aspect-square h-full w-full"
-								id="bits-313"
-								data-status="loading"
-								data-avatar-image=""
-								src={logoDataURL} />
-						</div>
-					</a>
-					<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
-						뭐하지공방
-					</div>
+	<body style={st(s.bg(s.t.secondary), s.color(s.c.black), s.textSize('base'))}>
+		<div class="contents" style={st(s.w('full'), s.max_w(150), s.bg(s.t.background))}>
+			<header style={st(s.bg(s.t.background), s.border_b(2), s.text_center)}>
+				<div
+					style={st(
+						s.relative,
+						s.rounded_full,
+						s.size(10),
+						s.overflow_hidden,
+						s.bg(s.c.white),
+						s.p(1),
+						s.inline_block,
+					)}>
+					<img
+						style={st(s.aspect_square, s.size('full'))}
+						alt="뭐하지공방 로고"
+						src="
+https://drive.google.com/u/0/drive-viewer/AKGpihaE7cMbJ5dg1UQxSJGd7YIpA8q46pva_5HUe7uEiYGjhU4SJNmm6jZ1f1KrwQGV_z4IItqjMahgQF7ph2gNcuyalYgN6tAdGJ4=s1600-rw-v1" />
 				</div>
+				<div style={st(s.mx(6), s.fontWeight('bold'))}>뭐하지공방</div>
 			</header>
-			{@render children()}
-			<Footer />
+			<main style={st()}>
+				{@render children()}
+			</main>
+			<footer style={st(s.p(10), s.textSize('sm'), s.bg(s.c.stone_400), s.color(s.c.stone_800))}>
+				<div style={st(s.textSize('base'), s.leading(7))}>
+					{#each footerInfo.links as link}
+						<a href={link.href} target={link.target} {...anchorProps}>{link.text}</a>
+					{/each}
+				</div>
+				<div {...sectionDivProps}>
+					{#each footerInfo.info as info}
+						{#if isLink(info.info)}
+							<span {...infoSpanProps}>
+								{info.subject}:
+								<a href={info.info.href} target={info.info.target} {...anchorProps}>
+									{info.info.text}
+								</a>
+							</span>
+						{:else}
+							<span {...infoSpanProps}>{info.subject}: {info.info}</span>
+						{/if}
+					{/each}
+				</div>
+				<div {...sectionDivProps}>
+					<span>
+						{#each footerInfo.usedDesignBy as by, idx}
+							<a href={by.href} target={by.target} {...anchorProps}>{by.text}</a>
+							{idx < footerInfo.usedDesignBy.length - 1 ? ',' : ''}
+						{/each}
+						등에서
+					</span>
+					디자인한 이미지 요소가 사용되었습니다.
+				</div>
+				<div {...sectionDivProps}>
+					{footerInfo.disclaimar}
+				</div>
+			</footer>
 		</div>
 	</body>
 </html>

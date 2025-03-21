@@ -74,4 +74,6 @@ const createSendMail =
 
 import EmailConfirm from './emailConfirm.svelte';
 
-export const sendEmailConfirm = createSendMail(EmailConfirm, ({}) => ({}));
+export const sendEmailConfirm = createSendMail(EmailConfirm, ({}) => ({
+	subject: '[뭐하지공방] 이메일 인증 안내',
+}));
