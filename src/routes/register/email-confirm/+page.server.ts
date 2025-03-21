@@ -1,13 +1,11 @@
 import type { Actions, PageServerLoad } from './$types';
-import { renderMail } from '$lib/server/mail';
-
-import EmailConfirm from '$lib/server/mail/emailConfirm.svelte';
+import { sendEmailConfirm } from '$lib/server/mail';
 
 export const actions: Actions = {
 	send: async ({ request, fetch }) => {
 		return {
 			message: 'testing',
-			html: await renderMail(EmailConfirm, { confirmCode: 'XXXXX-XXXXX' }),
+			result: await sendEmailConfirm({ to: 'quiraxical@gmail.com', confirmCode: 'XXXXX-XXXXX' }),
 		};
 	},
 };

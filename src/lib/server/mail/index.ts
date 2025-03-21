@@ -6,7 +6,6 @@ import type { Component, ComponentProps } from 'svelte';
 import type { HTMLSlotAttributes } from 'svelte/elements';
 import { render } from 'svelte/server';
 
-if (!env.MAIL_SENDER) throw new Error('MAIL_SENDER is not set');
 if (!env.MAIL_HOST) throw new Error('MAIL_HOST is not set');
 if (!env.MAIL_AUTH_USER) throw new Error('MAIL_AUTH_USER is not set');
 
