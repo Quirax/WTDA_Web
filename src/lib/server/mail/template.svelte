@@ -44,6 +44,14 @@
 			.contents {
 				margin: 0 auto;
 			}
+
+			.p {
+				line-height: calc(0.25rem * 7);
+			}
+
+			.p + .p {
+				margin-top: calc(0.25rem * 6);
+			}
 		</style>
 	</head>
 	<body style={st(s.bg(s.t.secondary), s.color(s.c.black), s.textSize('base'))}>

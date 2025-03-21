@@ -14,6 +14,7 @@ export const t = {
 	secondary: c.stone_100,
 	border: c.stone_400,
 	primary: c.primary,
+	muted: c.stone_100,
 };
 
 export type Size =
@@ -67,20 +68,18 @@ const _lineHeight = {
 	'9xl': 1,
 };
 
-export type Weight = 'medium' | 'bold' | 500 | 700;
+export type Weight = 'medium' | 'bold' | 500 | 700 | 'semibold' | 600;
 
 const _fontWeight = {
 	medium: 500,
+	semibold: 600,
 	bold: 700,
 };
 
 const _spacing = '0.25rem';
-const _text_sm = '0.875rem';
-const _text_sm_line_height = 'calc(1.25 / 0.875)';
+const _tracking_tight = '-0.025em';
 
 const tw_border_style = 'solid';
-
-export const border_b = (px = 1) => `border-bottom: ${px}px ${tw_border_style} ${t.border};`;
 
 export const rounded_full = 'border-radius: calc(infinity * 1px);';
 
@@ -89,6 +88,10 @@ export const overflow_hidden = 'overflow: hidden;';
 export const aspect_square = 'aspect-ratio: 1 / 1;';
 
 export const whitespace_nowrap = `white-space: nowrap;`;
+
+/* border */
+export const border = (px = 1) => `border: ${px}px ${tw_border_style} ${t.border};`;
+export const border_b = (px = 1) => `border-bottom: ${px}px ${tw_border_style} ${t.border};`;
 
 /* background */
 export const bg = (color: string) => `background-color: ${color};`;
@@ -124,15 +127,29 @@ export const ml = (sp: number) => `margin-left: calc(${_spacing} * ${sp});`;
 export const mr = (sp: number) => `margin-right: calc(${_spacing} * ${sp});`;
 export const mb = (sp: number) => `margin-bottom: calc(${_spacing} * ${sp});`;
 export const mx = (sp: number) => st(ml(sp), mr(sp));
+export const m = (sp: number) => `margin: calc(${_spacing} * ${sp});`;
 
 /* padding */
-export const pl = (sp: number) => `padding-left: calc(${_spacing} * ${sp});`;
-export const pr = (sp: number) => `padding-right: calc(${_spacing} * ${sp});`;
-export const px = (sp: number) => st(pl(sp), pr(sp));
-export const p = (sp: number) => `padding: calc(${_spacing} * ${sp});`;
+export const pl = (sp: number | string) =>
+	typeof sp === 'number' ? `padding-left: calc(${_spacing} * ${sp});` : `padding-left: ${sp};`;
+export const pr = (sp: number | string) =>
+	typeof sp === 'number' ? `padding-right: calc(${_spacing} * ${sp});` : `padding-right: ${sp};`;
+export const px = (sp: number | string) => st(pl(sp), pr(sp));
+export const pb = (sp: number | string) =>
+	typeof sp === 'number' ? `padding-bottom: calc(${_spacing} * ${sp});` : `padding-bottom: ${sp};`;
+export const pt = (sp: number | string) =>
+	typeof sp === 'number' ? `padding-top: calc(${_spacing} * ${sp});` : `padding-top: ${sp};`;
+export const py = (sp: number | string) => st(pt(sp), pb(sp));
+export const p = (sp: number | string) =>
+	typeof sp === 'number' ? `padding: calc(${_spacing} * ${sp});` : `padding: ${sp};`;
 
 /* position */
 export const relative = 'position: relative;';
+
+/* font */
+export const fontWeight = (weight: Weight) =>
+	typeof weight === 'number' ? `font-weight: ${weight}` : `font-weight: ${_fontWeight[weight]};`;
+export const font_mono = `font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;`;
 
 /* text */
 export const color = (value: string) => `color: ${value};`;
@@ -143,8 +160,7 @@ export const textSize = (size: Size | number) =>
 export const text_center = 'text-align: center;';
 export const leading = (sp: number | None) =>
 	typeof sp === 'number' ? `line-height: calc(${_spacing} * ${sp});` : `line-height: 1;`;
-export const fontWeight = (weight: Weight) =>
-	typeof weight === 'number' ? `font-weight: ${weight}` : `font-weight: ${_fontWeight[weight]};`;
 export const text_decoration_no_underline = `text-decoration-line: none;`;
+export const tracking_tight = `letter-spacing: ${_tracking_tight};`;
 
 export default st;
