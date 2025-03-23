@@ -3,7 +3,7 @@
 	"style": "default",
 	"tailwind": {
 		"config": "tailwind.config.js",
-		"css": "src\\app2.css",
+		"css": "src\\app.css",
 		"baseColor": "stone"
 	},
 	"aliases": {
