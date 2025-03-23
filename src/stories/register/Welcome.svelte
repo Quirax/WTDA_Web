@@ -23,6 +23,6 @@
 	</section>
 	<div class="m-6 space-y-4 text-lg text-center">
 		<P>이제 로그인하여 뭐하지공방의 모든 서비스를 이용해보세요!</P>
-		<Button class="text-lg">로그인</Button>
+		<Button href="/login" class="text-lg">로그인</Button>
 	</div>
 </Layout>
