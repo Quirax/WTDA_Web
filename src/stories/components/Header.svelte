@@ -50,12 +50,8 @@
 			{#if showUserPanel}
 				{#if user}
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder>
-							<Button
-								variant="ghost"
-								builders={[builder]}
-								class="relative size-9 rounded-full"
-								aria-label="User Menu">
+						<DropdownMenu.Trigger>
+							<Button variant="ghost" class="relative size-9 rounded-full" aria-label="User Menu">
 								<UserAvatar class="size-9" {user} />
 							</Button>
 						</DropdownMenu.Trigger>
@@ -74,11 +70,11 @@
 								<DropdownMenu.Item>설정</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item on:click={onLogout}>로그아웃</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
+					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>로그인</Button>
 					<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
 				{/if}
 			{/if}
