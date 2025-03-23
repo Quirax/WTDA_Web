@@ -1,10 +1,13 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
+import type EmailConfirm from '$lib/server/mail/emailConfirm.svelte';
+
 declare global {
 	namespace App {
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
 		type Session = import('$lib/server/auth').SessionValidationResult['session'];
+		type EmailConfirm = import('$lib/server/mail/auth').SessionValidationResult['emailConfirm'];
 
 		interface Articles {
 			thumbnail: string;
@@ -20,6 +23,7 @@ declare global {
 		interface Locals {
 			user: User;
 			session: Session;
+			emailConfirm: EmailConfirm & ({ email: string } | null);
 		}
 	}
 }

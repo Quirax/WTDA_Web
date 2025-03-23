@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const formSchema = z.object({
-	email: z.string().email('잘못된 이메일 주소입니다.'),
 	confirmCode: z
 		.string()
 		.regex(

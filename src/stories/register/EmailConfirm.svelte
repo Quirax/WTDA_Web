@@ -27,7 +27,6 @@
 			posted: false,
 			errors: { _errors: undefined },
 			data: {
-				email: '',
 				confirmCode: '',
 			},
 		},
@@ -85,7 +84,6 @@
 
 	const onSend = async () => {
 		const formData = new FormData();
-		formData.append('email', $formData.email);
 
 		const result = await fetch('?/send', {
 			method: 'post',
@@ -145,7 +143,6 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<input type="hidden" name="email" value={$formData.email} />
 			<Form.Button type="submit" disabled={expiresIn === 0}>인증완료</Form.Button>
 		</form>
 	</Section>

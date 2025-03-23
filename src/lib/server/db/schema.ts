@@ -32,6 +32,7 @@ export const emailConfirm = pgTable('emailConfirm', {
 		.references(() => user.id),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
 	for: emailConfirmFor().notNull(),
+	confirmCode: text('confirm_code').notNull(),
 });
 
 export type Session = typeof session.$inferSelect;

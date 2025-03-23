@@ -5,10 +5,11 @@ import { zod, zodClient } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { hash } from '@node-rs/argon2';
-import { UserStatus } from '../../app';
+import { EmailConfirmFor, UserStatus } from '../../app';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
+import * as auth from '$lib/server/auth';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -55,8 +56,8 @@ export const actions: Actions = {
 		}
 	},
 
-	do: async ({ request }) => {
-		const form = await superValidate(request, zod(formSchema));
+	do: async (event) => {
+		const form = await superValidate(event.request, zod(formSchema));
 
 		if (!form.valid) {
 			return fail(400, { message: 'The form is not valid.', formData: form.data });
@@ -84,6 +85,10 @@ export const actions: Actions = {
 					agree_marketing,
 				},
 			});
+
+			const sessionToken = auth.generateSessionToken();
+			const session = await auth.createSession(sessionToken, userID);
+			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
 			return fail(500, { message: 'An error has occurred', form });
 		}
