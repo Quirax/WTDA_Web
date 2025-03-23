@@ -7,7 +7,6 @@ declare global {
 	namespace App {
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
 		type Session = import('$lib/server/auth').SessionValidationResult['session'];
-		type EmailConfirm = import('$lib/server/mail/auth').SessionValidationResult['emailConfirm'];
 
 		interface Articles {
 			thumbnail: string;
@@ -23,7 +22,6 @@ declare global {
 		interface Locals {
 			user: User;
 			session: Session;
-			emailConfirm: EmailConfirm & ({ email: string } | null);
 		}
 	}
 }
