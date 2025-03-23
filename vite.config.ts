@@ -15,9 +15,9 @@ export default defineConfig({
 		sveltekit(),
 		paraglide({
 			project: './project.inlang',
-			outdir: './src/lib/paraglide'
+			outdir: './src/lib/paraglide',
 		}),
-		tailwindcss()
+		tailwindcss(),
 	],
 	test: {
 		workspace: [
@@ -30,8 +30,8 @@ export default defineConfig({
 					clearMocks: true,
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
 					exclude: ['src/lib/server/**'],
-					setupFiles: ['./vitest-setup-client.ts']
-				}
+					setupFiles: ['./vitest-setup-client.ts'],
+				},
 			},
 			{
 				extends: './vite.config.ts',
@@ -39,8 +39,8 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
-				}
+					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}'],
+				},
 			},
 			{
 				extends: true,
@@ -48,8 +48,8 @@ export default defineConfig({
 					// The plugin will run tests for the stories defined in your Storybook config
 					// See options at: https://storybook.js.org/docs/writing-tests/test-addon#storybooktest
 					storybookTest({
-						configDir: path.join(dirname, '.storybook')
-					})
+						configDir: path.join(dirname, '.storybook'),
+					}),
 				],
 				test: {
 					name: 'storybook',
@@ -59,13 +59,13 @@ export default defineConfig({
 						provider: 'playwright',
 						instances: [
 							{
-								browser: 'chromium'
-							}
-						]
+								browser: 'chromium',
+							},
+						],
 					},
-					setupFiles: ['.storybook/vitest.setup.ts']
-				}
-			}
-		]
-	}
+					setupFiles: ['.storybook/vitest.setup.ts'],
+				},
+			},
+		],
+	},
 });
