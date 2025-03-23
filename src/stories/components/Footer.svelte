@@ -17,7 +17,9 @@
 	};
 </script>
 
-<footer class="p-10 text-sm bg-stone-400 text-stone-800 dark:bg-stone-800 dark:text-stone-400">
+<!-- ref: https://stackoverflow.com/a/72232241 -->
+<footer
+	class="sticky top-[100vh] bg-stone-400 p-10 text-sm text-stone-800 dark:bg-stone-800 dark:text-stone-400">
 	<div class="flex flex-wrap items-center space-x-4 text-base leading-7 [&:not(:first-child)]:mt-6">
 		{#each footerInfo.links as link}
 			<a href={link.href} target={link.target} {...anchorProps}>{link.text}</a>
