@@ -3,11 +3,17 @@ import { sendEmailConfirm } from '$lib/server/mail';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '$lib/schema/emailConfirm';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import * as mailauth from '$lib/server/mail/auth';
-import { EmailConfirmFor } from '../../../app';
+import { EmailConfirmFor, UserStatus } from '../../../app';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+	if (!locals.user) throw redirect(302, '/register');
+	if (locals.user.status !== UserStatus.REQUIRED_EMAIL_CONFIRM) throw redirect(302, '/');
+
 	return {
 		form: await superValidate(zod(formSchema)),
 	};
@@ -59,13 +65,15 @@ export const actions: Actions = {
 
 			if (!emailConfirm)
 				return fail(404, { message: 'Not found email confirmation with the code', form });
+
+			await db
+				.update(table.user)
+				.set({ status: UserStatus.NOT_AUTHENTICATED })
+				.where(eq(table.user.id, emailConfirm.userId));
 		} catch (e: any) {
 			return fail(500, { message: 'An error has occurred', error: e, form });
 		}
 
-		return {
-			message: 'completed',
-			form,
-		};
+		return redirect(302, '/register/welcome');
 	},
 };
