@@ -13,6 +13,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Button } from '$lib/components/ui/button';
 	import { EmailConfirmFor } from '../../app';
+	import { emailExpiresIn } from '$lib/config';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -31,22 +32,7 @@
 				confirmCode: '',
 			},
 		},
-		result = {
-			message: '',
-			result: {
-				envelope: {
-					from: '',
-					to: [],
-				},
-				messageId: '',
-				accepted: [],
-				rejected: [],
-				response: '',
-				envelopeTime: 0,
-				messageTime: 0,
-				messageSize: 0,
-			},
-		},
+		result,
 		confirmFor,
 	}: Props = $props();
 
@@ -87,7 +73,40 @@
 			}
 		},
 	});
-	const { form: formData, enhance, constraints } = form;
+
+	const { form: formData, enhance, constraints, reset: resetForm } = form;
+
+	let expiresIn = $state(0); // seconds
+	let expireTimer: ReturnType<typeof setInterval> = null!;
+
+	const resetTimer = () => {
+		resetForm();
+		clearInterval(expireTimer);
+	};
+
+	const onSend = async () => {
+		const result = await fetch('?/send', {
+			method: 'post',
+			body: '',
+		}).then((r) => r.json());
+
+		if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+			alertData = {
+				title: '인증메일을 보내는 도중 오류가 발생했습니다.',
+				description: '고객센터에 문의해주시기 바랍니다.',
+			};
+			openAlert = true;
+			return;
+		}
+
+		expiresIn = emailExpiresIn;
+
+		resetTimer();
+
+		expireTimer = setInterval(() => {
+			if (--expiresIn === 0) resetTimer();
+		}, 1000);
+	};
 </script>
 
 <Layout
@@ -99,21 +118,28 @@
 	<Section>
 		<H2>{descriptions.heading}</H2>
 		<P>{descriptions.desc}</P>
-		<form method="POST" class="w-2/3" action="?/do">
-			<div class="my-4 flex flex-col space-y-1">
-				<div class="text-sm leading-none font-medium">
+		<form method="POST" class="w-2/3" action="?/do" use:enhance>
+			<div class="flex flex-col my-4 space-y-1">
+				<div class="text-sm font-medium leading-none">
 					아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 				</div>
 			</div>
-			<Button formaction="?/send">인증메일 보내기</Button>
-			<Form.Field {form} name="confirmCode" class="my-4 flex flex-col space-y-1">
-				<Form.Control let:attrs>
-					<Form.Label>인증 코드</Form.Label>
-					<Input
-						{...attrs}
-						placeholder="XXXXX-XXXXX"
-						bind:value={$formData.confirmCode}
-						{...$constraints.confirmCode} />
+			<Button onclick={onSend}>인증메일 보내기</Button>
+			<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>
+							인증 코드{expiresIn > 0
+								? ` (${Math.floor(expiresIn / 60)}:${String(expiresIn % 60).padStart(2, '0')} 후 만료)`
+								: ''}
+						</Form.Label>
+						<Input
+							{...props}
+							placeholder="XXXXX-XXXXX"
+							bind:value={$formData.confirmCode}
+							disabled={expiresIn === 0}
+							{...$constraints.confirmCode} />
+					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>

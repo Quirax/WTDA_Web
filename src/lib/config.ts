@@ -48,3 +48,5 @@ export const footerInfo: {
 	disclaimar:
 		'뭐하지공방은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에 관한 의무와 책임은 계약 당사자 각자에게 있습니다.',
 };
+
+export const emailExpiresIn = 180; // 3 minutes = 180 seconds
