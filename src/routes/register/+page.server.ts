@@ -11,7 +11,9 @@ import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+	if (locals.user) throw redirect(302, '/');
+
 	return {
 		form: await superValidate(zod(formSchema)),
 	};
