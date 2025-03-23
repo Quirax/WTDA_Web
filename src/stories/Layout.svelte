@@ -60,7 +60,10 @@
 				</AlertDialog.Cancel>
 			{/if}
 			{#if alert?.action || !alert?.cancel}
-				<AlertDialog.Action>
+				<AlertDialog.Action
+					onclick={() => {
+						openAlert = false;
+					}}>
 					{typeof alert?.action === 'string' ? alert?.action : '확인'}
 				</AlertDialog.Action>
 			{/if}

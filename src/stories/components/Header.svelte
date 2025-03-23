@@ -29,18 +29,18 @@
 	}: Props = $props();
 </script>
 
-<header class="bg-background border-b-2">
-	<div class="flex h-16 items-center px-4">
-		<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
-			<LogoAvatar.Root class="bg-white p-1">
+<header class="border-b-2 bg-background">
+	<div class="flex items-center h-16 px-4">
+		<a href="/" class="relative rounded-full size-9" aria-label="Logo">
+			<LogoAvatar.Root class="p-1 bg-white">
 				<LogoAvatar.Image src={logo} alt="뭐하지공방 로고" />
 				<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
 			</LogoAvatar.Root>
 		</a>
-		<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
+		<div class="items-center hidden mx-6 space-x-4 font-bold sm:flex lg:space-x-6">
 			{title}
 		</div>
-		<div class="ml-auto flex items-center space-x-4">
+		<div class="flex items-center ml-auto space-x-4">
 			{#if showSearchPanel}
 				<div class="hidden space-x-2 sm:flex">
 					<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
@@ -50,20 +50,16 @@
 			{#if showUserPanel}
 				{#if user}
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger asChild let:builder>
-							<Button
-								variant="ghost"
-								builders={[builder]}
-								class="relative size-9 rounded-full"
-								aria-label="User Menu">
+						<DropdownMenu.Trigger>
+							<Button variant="ghost" class="relative rounded-full size-9" aria-label="User Menu">
 								<UserAvatar class="size-9" {user} />
 							</Button>
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content class="w-56" align="end">
 							<DropdownMenu.Label class="font-normal">
 								<div class="flex flex-col space-y-1">
-									<p class="text-sm leading-none font-medium">{user.username}</p>
-									<p class="text-muted-foreground text-xs leading-none">@{user.username}</p>
+									<p class="text-sm font-medium leading-none">{user.username}</p>
+									<p class="text-xs leading-none text-muted-foreground">@{user.username}</p>
 									<!-- TODO: email? -->
 								</div>
 							</DropdownMenu.Label>
@@ -74,12 +70,12 @@
 								<DropdownMenu.Item>설정</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item on:click={onLogout}>로그아웃</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button class="h-9 w-[6em]" aria-label="Log in" on:click={onLogin}>로그인</Button>
-					<Button class="h-9 w-[6em]" aria-label="Sign up">회원가입</Button>
+					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>로그인</Button>
+					<Button class="h-9 w-[6em]" aria-label="Sign up" href="/register">회원가입</Button>
 				{/if}
 			{/if}
 		</div>

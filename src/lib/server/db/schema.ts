@@ -1,8 +1,9 @@
 import { enumToPgEnum } from '../../utils';
-import { pgTable, serial, text, integer, timestamp, pgEnum, json } from 'drizzle-orm/pg-core';
-import { UserStatus } from '../../../app';
+import { pgTable, text, timestamp, pgEnum, json } from 'drizzle-orm/pg-core';
+import { EmailConfirmFor, UserStatus } from '../../../app';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
+export const emailConfirmFor = pgEnum('emailConfirmFor', enumToPgEnum(EmailConfirmFor));
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -24,6 +25,16 @@ export const session = pgTable('session', {
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
 });
 
-export type Session = typeof session.$inferSelect;
+export const emailConfirm = pgTable('emailConfirm', {
+	id: text('id').primaryKey(),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id),
+	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
+	for: emailConfirmFor().notNull(),
+	confirmCode: text('confirm_code').notNull(),
+});
 
+export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
+export type EmailConfirm = typeof emailConfirm.$inferSelect;
