@@ -4,18 +4,14 @@
 	import type { PageData, ActionData } from './$types';
 	import EmailConfirm from '../../../stories/register/EmailConfirm.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
+	import { EmailConfirmFor } from '../../../app';
 
 	interface Props extends HTMLSlotAttributes {
 		data: PageData;
-		form: ActionData;
+		result: ActionData;
 	}
 
-	const { data, form }: Props = $props();
-
-	$effect(() => {
-		console.log(form);
-	});
+	const { data, result }: Props = $props();
 </script>
 
-<!-- <EmailConfirm data={data.form} /> -->
-<EmailConfirm />
+<EmailConfirm data={data.form} {result} confirmFor={EmailConfirmFor.REGISTRATION} />
