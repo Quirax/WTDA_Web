@@ -8,10 +8,9 @@
 
 	interface Props extends HTMLSlotAttributes {
 		data: PageData;
-		result: ActionData;
 	}
 
-	const { data, result }: Props = $props();
+	const { data }: Props = $props();
 </script>
 
-<EmailConfirm data={data.form} {result} confirmFor={EmailConfirmFor.REGISTRATION} />
+<EmailConfirm data={data.form} confirmFor={EmailConfirmFor.REGISTRATION} />

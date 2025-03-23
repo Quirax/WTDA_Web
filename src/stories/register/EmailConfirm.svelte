@@ -17,7 +17,6 @@
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
-		result?: ActionData;
 		confirmFor: EmailConfirmFor;
 	}
 
@@ -32,7 +31,6 @@
 				confirmCode: '',
 			},
 		},
-		result,
 		confirmFor,
 	}: Props = $props();
 
@@ -64,6 +62,7 @@
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.log(result.status);
 				alertData = {
 					title: '이메일 인증 처리 도중 오류가 발생했습니다.',
 					description: '고객센터에 문의해주시기 바랍니다.',
@@ -85,9 +84,12 @@
 	};
 
 	const onSend = async () => {
+		const formData = new FormData();
+		formData.append('email', $formData.email);
+
 		const result = await fetch('?/send', {
 			method: 'post',
-			body: '',
+			body: formData,
 		}).then((r) => r.json());
 
 		if ([200, 204, 302].indexOf(result.status || 0) === -1) {
@@ -143,7 +145,8 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button>인증완료</Form.Button>
+			<input type="hidden" name="email" value={$formData.email} />
+			<Form.Button type="submit" disabled={expiresIn === 0}>인증완료</Form.Button>
 		</form>
 	</Section>
 </Layout>
