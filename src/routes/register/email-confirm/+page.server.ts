@@ -3,6 +3,7 @@ import { sendEmailConfirm } from '$lib/server/mail';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '$lib/schema/emailConfirm';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -12,9 +13,11 @@ export const load: PageServerLoad = async () => {
 
 export const actions: Actions = {
 	send: async ({ request, fetch }) => {
+		return fail(400, { message: 'testing' });
+
 		return {
 			message: 'testing',
-			result: await sendEmailConfirm({ to: 'quiraxical@gmail.com', confirmCode: 'XXXXX-XXXXX' }),
+			// result: await sendEmailConfirm({ to: 'quiraxical@gmail.com', confirmCode: 'XXXXX-XXXXX' }),
 		};
 	},
 };
