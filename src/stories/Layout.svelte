@@ -16,6 +16,8 @@
 		description: string | Snippet;
 		cancel?: boolean | string;
 		action?: boolean | string;
+		onCancel?: () => void;
+		onAction?: () => void;
 	}
 
 	interface Props extends HTMLSlotAttributes {
@@ -63,7 +65,7 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			{#if alert?.cancel}
-				<AlertDialog.Cancel>
+				<AlertDialog.Cancel onclick={alert?.onCancel || fn}>
 					{typeof alert.cancel === 'string' ? alert.cancel : '취소'}
 				</AlertDialog.Cancel>
 			{/if}
@@ -71,6 +73,7 @@
 				<AlertDialog.Action
 					onclick={() => {
 						openAlert = false;
+						(alert?.onAction || fn)();
 					}}>
 					{typeof alert?.action === 'string' ? alert?.action : '확인'}
 				</AlertDialog.Action>

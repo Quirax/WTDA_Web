@@ -75,7 +75,7 @@ https://drive.google.com/u/0/drive-viewer/AKGpihaE7cMbJ5dg1UQxSJGd7YIpA8q46pva_5
 				</div>
 				<div style={st(s.mx(6), s.fontWeight('bold'))}>뭐하지공방</div>
 			</header>
-			<main style={st()}>
+			<main style={st(s.p(10))}>
 				{@render children()}
 			</main>
 			<footer style={st(s.p(10), s.textSize('sm'), s.bg(s.c.stone_400), s.color(s.c.stone_800))}>

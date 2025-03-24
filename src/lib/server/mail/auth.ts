@@ -69,7 +69,7 @@ export async function validateSessionToken(token: string, confirmCode: string) {
 	}
 	const { emailConfirm, user } = result;
 
-	await invalidateSession(emailConfirm.id);
+	if (emailConfirm.for !== EmailConfirmFor.RESET_PASSWORD) await invalidateSession(emailConfirm.id);
 
 	const sessionExpired = Date.now() >= emailConfirm.expiresAt.getTime();
 	if (sessionExpired) return { emailConfirm: null, user: null };

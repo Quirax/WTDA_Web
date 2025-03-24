@@ -65,7 +65,7 @@ const createSendMail =
 		template: Component<AdditionalProps, {}, string>,
 		options: SendMailOptions<AdditionalProps>,
 	) =>
-	async (props: ComponentProps<Component> & AdditionalProps & Mail.Options) =>
+	async (props: SendMailProps<AdditionalProps>) =>
 		await transporter.sendMail({
 			...props,
 			...options(props),
@@ -73,7 +73,12 @@ const createSendMail =
 		});
 
 import EmailConfirm from './emailConfirm.svelte';
+import PasswordChanged from './passwordChanged.svelte';
 
 export const sendEmailConfirm = createSendMail(EmailConfirm, ({}) => ({
 	subject: '[뭐하지공방] 이메일 인증 안내',
+}));
+
+export const sendPasswordChangedNotification = createSendMail(PasswordChanged, ({}) => ({
+	subject: '[뭐하지공방] 비밀번호 변경됨',
 }));
