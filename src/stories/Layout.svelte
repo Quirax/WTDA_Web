@@ -38,7 +38,9 @@
 	const onLogin = () => {
 		window.location.href = '/login';
 	};
-	const onLogout = () => {};
+	const onLogout = () => {
+		window.location.href = '/logout';
+	};
 </script>
 
 <Header {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
