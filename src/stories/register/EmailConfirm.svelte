@@ -61,7 +61,6 @@
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				console.log(result.status);
 				alertData = {
 					title: '이메일 인증 처리 도중 오류가 발생했습니다.',
 					description: '고객센터에 문의해주시기 바랍니다.',
