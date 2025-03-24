@@ -2,6 +2,8 @@
 
 <script lang="ts">
 	import H2 from '$lib/components/typo/h2.svelte';
+	import Ul from '$lib/components/typo/ul.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { formSchema, type FormSchema } from '$lib/schema/login';
@@ -37,8 +39,7 @@
 				if (result.status === 404)
 					alertData = {
 						title: '입력하신 이메일 또는 비밀번호가 틀렸습니다.',
-						description:
-							'회원가입 시 사용한 이메일 또는 비밀번호가 맞는지 다시 확인하시기 바랍니다. 회원가입을 하지 않으셨다면 회원가입을 하시기 바랍니다. 비밀번호를 잊어버렸다면 비밀번호를 재설정하시기 바랍니다.',
+						description: userNotFoundDesc,
 					};
 				else
 					alertData = {
@@ -52,6 +53,21 @@
 	});
 	const { form: formData, enhance, constraints } = form;
 </script>
+
+{#snippet userNotFoundDesc()}
+	<Ul>
+		<li>회원가입 시 사용한 이메일 또는 비밀번호가 맞는지 다시 확인하시기 바랍니다.</li>
+		<li>
+			회원가입을 하지 않으셨다면 <Button variant="link" href="/register">회원가입</Button>을 하시기
+			바랍니다.
+		</li>
+		<li>
+			비밀번호를 잊어버렸다면 <Button variant="link" href="/login/reset-password">
+				비밀번호를 재설정
+			</Button>하시기 바랍니다.
+		</li>
+	</Ul>
+{/snippet}
 
 <Layout title="로그인" bind:openAlert alert={alertData}>
 	<Section>

@@ -9,10 +9,11 @@
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
+	import type { Snippet } from 'svelte';
 
 	export interface Alert {
 		title: string;
-		description: string;
+		description: string | Snippet;
 		cancel?: boolean | string;
 		action?: boolean | string;
 	}
@@ -51,7 +52,13 @@
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>{alert?.title}</AlertDialog.Title>
-			<AlertDialog.Description>{alert?.description}</AlertDialog.Description>
+			<AlertDialog.Description>
+				{#if typeof alert?.description === 'string'}
+					{alert?.description}
+				{:else}
+					{@render alert?.description()}
+				{/if}
+			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			{#if alert?.cancel}
