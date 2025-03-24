@@ -53,9 +53,15 @@
 				{#if user}
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger class="p-0 m-0">
-							<Button variant="ghost" class="p-0 rounded-full size-9" aria-label="User Menu">
-								<UserAvatar class="size-9" {user} />
-							</Button>
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									variant="ghost"
+									class="p-0 rounded-full size-9"
+									aria-label="User Menu">
+									<UserAvatar class="size-9" {user} />
+								</Button>
+							{/snippet}
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content class="w-56" align="end">
 							<DropdownMenu.Label class="font-normal">
