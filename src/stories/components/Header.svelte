@@ -74,7 +74,7 @@
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>로그인</Button>
+					<Button class="h-9 w-[6em]" aria-label="Log in" href="/login">로그인</Button>
 					<Button class="h-9 w-[6em]" aria-label="Sign up" href="/register">회원가입</Button>
 				{/if}
 			{/if}
