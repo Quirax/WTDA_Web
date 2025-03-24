@@ -96,6 +96,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 			<Form.Button>로그인</Form.Button>
+			<Button href="/login/reset-password">비밀번호 재설정</Button>
 		</form>
 	</Section>
 </Layout>
