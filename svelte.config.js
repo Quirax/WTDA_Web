@@ -9,7 +9,7 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
-		alias: { $stories: 'src/stories' },
+		alias: { $stories: 'src/stories', '@app': 'src/app.ts' },
 	},
 };
 
