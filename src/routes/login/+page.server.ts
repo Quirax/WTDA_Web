@@ -8,6 +8,7 @@ import * as table from '$lib/server/db/schema';
 import { verify } from '@node-rs/argon2';
 import * as auth from '$lib/server/auth';
 import { eq } from 'drizzle-orm';
+import { UserStatus } from '../../app';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) throw redirect(302, '/');
@@ -48,6 +49,8 @@ export const actions: Actions = {
 		const session = await auth.createSession(sessionToken, existingUser.id);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/');
+		if (existingUser.status === UserStatus.REQUIRED_EMAIL_CONFIRM)
+			return redirect(302, '/register/email-confirm');
+		else return redirect(302, '/');
 	},
 };
