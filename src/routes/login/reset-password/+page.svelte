@@ -1,9 +1,15 @@
 <svelte:options runes />
 
 <script lang="ts">
-	import Layout from '$stories/Layout.svelte';
+	import EmailConfirm from '$stories/register/EmailConfirm.svelte';
+	import { EmailConfirmFor } from '../../../app';
+	import type { PageData } from './$types';
+
+	interface Props extends ReturnType<typeof $props> {
+		data: PageData;
+	}
+
+	const { data }: Props = $props();
 </script>
 
-<Layout title="비밀번호 재설정">
-	<!---->
-</Layout>
+<EmailConfirm data={data.form} confirmFor={EmailConfirmFor.RESET_PASSWORD} />

@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { z } from 'zod';
 
 export const formSchema = z.object({
@@ -6,3 +7,9 @@ export const formSchema = z.object({
 });
 
 export type FormSchema = typeof formSchema;
+
+export const passwordSchema = z.object({
+	password: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.'),
+});
+
+export type PasswordSchema = typeof passwordSchema;
