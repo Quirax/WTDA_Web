@@ -86,6 +86,8 @@
 	const onSend = async () => {
 		const formData = new FormData();
 
+		expiresIn = -1;
+
 		if (confirmFor === EmailConfirmFor.RESET_PASSWORD) {
 			formData.append('email', email);
 		}
@@ -161,7 +163,7 @@
 					아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 				</div>
 			</div>
-			<Button onclick={onSend}>인증메일 보내기</Button>
+			<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
 			<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -174,13 +176,13 @@
 							{...props}
 							placeholder="XXXXX-XXXXX"
 							bind:value={$formData.confirmCode}
-							disabled={expiresIn === 0}
+							disabled={expiresIn <= 0}
 							{...$constraints.confirmCode} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button type="submit" disabled={expiresIn === 0}>인증완료</Form.Button>
+			<Form.Button type="submit" disabled={expiresIn <= 0}>인증완료</Form.Button>
 		</form>
 	</Section>
 </Layout>

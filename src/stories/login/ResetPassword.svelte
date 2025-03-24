@@ -20,8 +20,13 @@
 	let openAlert = $state(false);
 	let alertData = $state<Alert | undefined>(undefined);
 
+	let disableButton = $state(false);
+
 	const form = superForm(data, {
 		validators: zodClient(passwordSchema),
+		onSubmit() {
+			disableButton = true;
+		},
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				alertData = {
@@ -29,6 +34,7 @@
 					description: '고객센터에 문의해주시기 바랍니다.',
 				};
 				openAlert = true;
+				disableButton = false;
 				cancel();
 			} else {
 				alertData = {
@@ -82,7 +88,7 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button>비밀번호 재설정</Form.Button>
+			<Form.Button disabled={disableButton}>비밀번호 재설정</Form.Button>
 		</form>
 	</Section>
 </Layout>
