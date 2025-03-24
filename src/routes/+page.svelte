@@ -1,25 +1,24 @@
 <script lang="ts">
+	import { sessionContext, userContext } from '$lib/context';
 	import { UserStatus } from '../app';
 
 	import MainPage from '../stories/MainPage.svelte';
 
 	import DocsImage from '../stories/assets/docs.png';
 	import ProfileImage from '../stories/assets/profile_example.png';
+	import type { PageServerData } from './$types';
 
-	let user = $state<App.User>();
+	interface Props extends ReturnType<typeof $props> {
+		data: PageServerData;
+	}
+
+	let { data }: Props = $props();
+
+	userContext.v = data.user;
+	sessionContext.v = data.session;
 </script>
 
 <MainPage
-	{user}
-	onLogin={() =>
-		(user = {
-			id: 'quiraxical',
-			username: 'Quirax Lee',
-			profileImage: null,
-			email: '',
-			status: UserStatus.REQUIRED_EMAIL_CONFIRM,
-		})}
-	onLogout={() => (user = undefined)}
 	recentCommissionTypes={Array(10)
 		.fill(undefined)
 		.map((_, i) => ({

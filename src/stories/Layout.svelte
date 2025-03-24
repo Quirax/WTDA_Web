@@ -19,9 +19,6 @@
 	}
 
 	interface Props extends HTMLSlotAttributes {
-		user?: App.User;
-		onLogin?: () => void;
-		onLogout?: () => void;
 		title?: string;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
@@ -30,9 +27,6 @@
 	}
 
 	let {
-		user,
-		onLogin = fn(),
-		onLogout = fn(),
 		children = fn(),
 		title,
 		showSearchPanel = true,
@@ -40,9 +34,14 @@
 		alert = undefined,
 		openAlert = $bindable(false),
 	}: Props = $props();
+
+	const onLogin = () => {
+		window.location.href = '/login';
+	};
+	const onLogout = () => {};
 </script>
 
-<Header {user} {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
+<Header {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
 
 {@render children()}
 
