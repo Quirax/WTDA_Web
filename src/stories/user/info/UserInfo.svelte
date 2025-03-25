@@ -61,8 +61,8 @@
 
 <Layout
 	{title}
-	showSearchPanel={false}
-	showUserPanel={false}
+	showSearchPanel={userInfoFor !== UserInfoFor.REGISTRATION}
+	showUserPanel={userInfoFor !== UserInfoFor.REGISTRATION}
 	bind:openAlert
 	alert={{
 		title: `${title} 처리 도중 오류가 발생했습니다.`,
@@ -72,7 +72,7 @@
 		<H2>{title}</H2>
 		<form method="POST" use:enhance class="w-2/3" action="?/do">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
+				<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
@@ -86,43 +86,67 @@
 					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
-			<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
+			{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+				<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호</Form.Label>
+							<Input
+								{...props}
+								type="password"
+								bind:value={$formData.password}
+								{...$constraints.password} />
+						{/snippet}
+					</Form.Control>
+					<Form.Description>최소 8자 이상</Form.Description>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="passwordConfirm" class="mt-4 flex flex-col space-y-1">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호 확인</Form.Label>
+							<Input
+								{...props}
+								type="password"
+								bind:value={$formData.passwordConfirm}
+								{...$constraints.passwordConfirm} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
+			<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호</Form.Label>
-						<Input
-							{...props}
-							type="password"
-							bind:value={$formData.password}
-							{...$constraints.password} />
-					{/snippet}
-				</Form.Control>
-				<Form.Description>최소 8자 이상</Form.Description>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="passwordConfirm" class="mb-4 flex flex-col space-y-1">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호 확인</Form.Label>
-						<Input
-							{...props}
-							type="password"
-							bind:value={$formData.passwordConfirm}
-							{...$constraints.passwordConfirm} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="username" class="mb-4 flex flex-col space-y-1">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label><Badge variant="destructive">필수</Badge> 닉네임</Form.Label>
+						<Form.Label>
+							{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+								<Badge variant="destructive">필수</Badge>
+							{/if}
+							닉네임
+						</Form.Label>
 						<Input {...props} bind:value={$formData.username} {...$constraints.username} />
 					{/snippet}
 				</Form.Control>
 				<Form.Description>최대 20자</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
+			{#if userInfoFor !== UserInfoFor.REGISTRATION}
+				<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>
+								{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+									<Badge variant="destructive">필수</Badge>
+								{/if}
+								닉네임
+							</Form.Label>
+							<Input {...props} bind:value={$formData.username} {...$constraints.username} />
+						{/snippet}
+					</Form.Control>
+					<Form.Description>최대 20자</Form.Description>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<div class="mb-4 border-2">
 					<Form.Field {form} name="agree_eula" class="p-4">
@@ -191,7 +215,9 @@
 					</Form.Field>
 				</div>
 			{/if}
-			<Form.Button>가입하기</Form.Button>
+			{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+				<Form.Button>가입하기</Form.Button>
+			{/if}
 		</form>
 	</Section>
 </Layout>
