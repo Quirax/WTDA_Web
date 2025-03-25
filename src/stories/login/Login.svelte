@@ -56,7 +56,7 @@
 
 {#snippet userNotFoundDesc()}
 	<Ul>
-		<li>회원가입 시 사용한 이메일 또는 비밀번호가 맞는지 다시 확인하시기 바랍니다.</li>
+		<li>이메일 또는 비밀번호가 맞는지 다시 확인하시기 바랍니다.</li>
 		<li>
 			회원가입을 하지 않으셨다면 <Button variant="link" href="/register">회원가입</Button>을 하시기
 			바랍니다.
@@ -73,7 +73,7 @@
 	<Section>
 		<H2>로그인</H2>
 		<form method="POST" use:enhance class="w-2/3" action="?">
-			<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
+			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>이메일</Form.Label>
@@ -82,7 +82,7 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="password" class="flex flex-col mb-4 space-y-1">
+			<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>비밀번호</Form.Label>
