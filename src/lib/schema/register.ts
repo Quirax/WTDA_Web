@@ -12,9 +12,10 @@ const formObject = z.object({
 });
 
 const userObject = z.object({
-	username: z.string().min(1, '닉네임이 필요합니다').max(20, '닉네임은 20자를 넘을 수 없습니다.'),
 	password: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.').optional(),
 	passwordConfirm: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.').optional(),
+	username: z.string().min(1, '닉네임이 필요합니다').max(20, '닉네임은 20자를 넘을 수 없습니다.'),
+	profileImage: z.string().url().nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
 });
 
 const passwordConfirm = {

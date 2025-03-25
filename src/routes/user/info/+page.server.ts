@@ -15,6 +15,7 @@ export const load = (async ({ locals }) => {
 			.select({
 				user: {
 					username: table.user.username,
+					profileImage: table.user.profileImage,
 				},
 			})
 			.from(table.user)

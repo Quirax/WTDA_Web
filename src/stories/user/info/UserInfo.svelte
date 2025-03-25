@@ -21,6 +21,7 @@
 
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import User from 'lucide-svelte/icons/user';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -128,6 +129,7 @@
 							{...props}
 							bind:value={$formData.username}
 							{...$constraints.username}
+							class="text-foreground opacity-100!"
 							disabled={userInfoFor !== UserInfoFor.INFO_EDIT} />
 					{/snippet}
 				</Form.Control>
@@ -137,20 +139,24 @@
 				{/if}
 			</Form.Field>
 			{#if userInfoFor !== UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
+				<Form.Field {form} name="profileImage" class="my-4 flex flex-col space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label>
-								{#if userInfoFor !== UserInfoFor.INFO_VIEW}
-									<Badge variant="destructive">필수</Badge>
-								{/if}
-								닉네임
-							</Form.Label>
-							<Input {...props} bind:value={$formData.username} {...$constraints.username} />
+							<Form.Label>프로필 이미지</Form.Label>
+							{#if ($formData as Infer<UserSchema>).profileImage}
+								<img
+									src={($formData as Infer<UserSchema>).profileImage}
+									alt="프로필 이미지"
+									class="size-50 border" />
+							{:else}
+								<User class="size-50 border" />
+							{/if}
+							<!-- <Input {...props} bind:value={$formData.username} {...$constraints.username} /> -->
 						{/snippet}
 					</Form.Control>
-					<Form.Description>최대 20자</Form.Description>
-					<Form.FieldErrors />
+					{#if userInfoFor === UserInfoFor.INFO_EDIT}
+						<Form.FieldErrors />
+					{/if}
 				</Form.Field>
 			{/if}
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
