@@ -14,14 +14,9 @@
 	import Section from './components/Section.svelte';
 	import Avatar from './components/Avatar.svelte';
 
-	import { fn } from '@storybook/test';
-
 	import './MainPage.css';
 
 	interface Props {
-		user?: App.User;
-		onLogin?: () => void;
-		onLogout?: () => void;
 		recentCommissionTypes?: App.CommisionType[];
 		recentRequests?: App.Request[];
 		introductions?: { src: string; alt: string }[];
@@ -32,19 +27,12 @@
 		commisioner = 'commisioner',
 	}
 
-	const {
-		user,
-		onLogin = fn(),
-		onLogout = fn(),
-		recentCommissionTypes = [],
-		recentRequests = [],
-		introductions = [],
-	}: Props = $props();
+	const { recentCommissionTypes = [], recentRequests = [], introductions = [] }: Props = $props();
 
 	let userMode = $state<UserMode>(UserMode.requester);
 </script>
 
-<Layout {user} {onLogin} {onLogout}>
+<Layout>
 	<section
 		id="search"
 		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 bg-[url(/background-pattern-banner.png)] p-20">
@@ -58,14 +46,14 @@
 		</Tabs.Root>
 
 		<form
-			class="flex w-full max-w-sm flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
+			class="flex flex-col items-center w-full max-w-sm space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
 			onsubmit={(e) => {
 				e.preventDefault();
 			}}>
 			<Input
 				type="search"
 				placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
-				class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
+				class="text-xl h-xl border-stone-200 bg-stone-50 text-stone-950 sm:w-full md:w-md" />
 			<Button type="submit" variant="secondary">검색</Button>
 		</form>
 	</section>
@@ -82,18 +70,18 @@
 
 			<section
 				id="contents-list"
-				class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+				class="grid gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 				{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
 					<Card.Root>
 						<img
 							src={article?.thumbnail}
 							alt={article?.title}
-							class="aspect-video w-full object-cover" />
+							class="object-cover w-full aspect-video" />
 						<Card.Header>
 							<Card.Title>{article?.title}</Card.Title>
 							<Card.Description class="text-right">
 								by
-								<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
+								<Avatar class="inline-block w-6 h-6 align-middle" user={article?.author} />
 								{article?.author.username}
 							</Card.Description>
 						</Card.Header>
@@ -112,7 +100,7 @@
 	{#if userMode === UserMode.requester}
 		<section
 			id="suggestion"
-			class="bg-accent text-accent-foreground my-10 flex flex-col items-center justify-center space-y-8 p-10 text-center">
+			class="flex flex-col items-center justify-center p-10 my-10 space-y-8 text-center bg-accent text-accent-foreground">
 			<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
 			<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
 			<div class="space-y-0">
@@ -123,7 +111,7 @@
 	{/if}
 
 	{#if introductions.length > 0}
-		<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
+		<section id="introducing" class="relative flex justify-center mt-20 mb-10 px-17">
 			<Carousel.Root
 				class="align-center aspect-video max-h-[50vh] max-w-full"
 				opts={{ loop: true }}>
@@ -131,7 +119,7 @@
 				<Carousel.Content class="w-full">
 					{#each introductions as intro}
 						<Carousel.Item>
-							<div class="aspect-video p-1">
+							<div class="p-1 aspect-video">
 								<Card.Root class="aspect-video">
 									<img class="size-full" src={intro.src} alt={intro.alt} />
 								</Card.Root>

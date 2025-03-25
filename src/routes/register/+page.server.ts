@@ -68,19 +68,12 @@ export const actions: Actions = {
 		const { email, username, password, agree_marketing } = form.data;
 
 		const userID = generateUserId();
-		const passwordHash = await hash(password, {
-			// recommended minimum parameters
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1,
-		});
 
 		try {
 			await db.insert(table.user).values({
 				id: userID,
 				username,
-				passwordHash,
+				passwordHash: await auth.getPasswordHash(password),
 				email,
 				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 				preferences: {

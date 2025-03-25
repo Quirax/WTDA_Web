@@ -9,18 +9,18 @@
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
+	import type { Snippet } from 'svelte';
 
 	export interface Alert {
 		title: string;
-		description: string;
+		description: string | Snippet;
 		cancel?: boolean | string;
 		action?: boolean | string;
+		onCancel?: () => void;
+		onAction?: () => void;
 	}
 
 	interface Props extends HTMLSlotAttributes {
-		user?: App.User;
-		onLogin?: () => void;
-		onLogout?: () => void;
 		title?: string;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
@@ -29,9 +29,6 @@
 	}
 
 	let {
-		user,
-		onLogin = fn(),
-		onLogout = fn(),
 		children = fn(),
 		title,
 		showSearchPanel = true,
@@ -39,9 +36,16 @@
 		alert = undefined,
 		openAlert = $bindable(false),
 	}: Props = $props();
+
+	const onLogin = () => {
+		window.location.href = '/login';
+	};
+	const onLogout = () => {
+		window.location.href = '/logout';
+	};
 </script>
 
-<Header {user} {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
+<Header {onLogin} {onLogout} {title} {showSearchPanel} {showUserPanel} />
 
 {@render children()}
 
@@ -51,11 +55,17 @@
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>{alert?.title}</AlertDialog.Title>
-			<AlertDialog.Description>{alert?.description}</AlertDialog.Description>
+			<AlertDialog.Description>
+				{#if typeof alert?.description === 'string'}
+					{alert?.description}
+				{:else}
+					{@render alert?.description()}
+				{/if}
+			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			{#if alert?.cancel}
-				<AlertDialog.Cancel>
+				<AlertDialog.Cancel onclick={alert?.onCancel || fn}>
 					{typeof alert.cancel === 'string' ? alert.cancel : '취소'}
 				</AlertDialog.Cancel>
 			{/if}
@@ -63,6 +73,7 @@
 				<AlertDialog.Action
 					onclick={() => {
 						openAlert = false;
+						(alert?.onAction || fn)();
 					}}>
 					{typeof alert?.action === 'string' ? alert?.action : '확인'}
 				</AlertDialog.Action>

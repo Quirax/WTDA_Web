@@ -9,11 +9,11 @@
 	import P from '$lib/components/typo/p.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { formSchema, type FormSchema } from '$lib/schema/emailConfirm';
-	import type { ActionData } from '../../routes/register/email-confirm/$types';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Button } from '$lib/components/ui/button';
-	import { EmailConfirmFor } from '../../app';
+	import { EmailConfirmFor } from '@app';
 	import { emailExpiresIn } from '$lib/config';
+	import Ul from '$lib/components/typo/ul.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -44,9 +44,9 @@
 			}
 			case EmailConfirmFor.RESET_PASSWORD: {
 				return {
-					title: '비밀번호 초기화',
-					heading: '이메일 인증',
-					desc: '다른 악의적 사용자에 의해 비밀번호 초기화가 진행되는 경우를 대비하여 이메일 인증을 진행합니다.',
+					title: '비밀번호 재설정',
+					heading: '비밀번호 재설정',
+					desc: '다른 악의적 사용자에 의해 비밀번호가 재설정되지 않도록 이메일 인증을 진행합니다.',
 				};
 			}
 		}
@@ -61,7 +61,6 @@
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				console.log(result.status);
 				alertData = {
 					title: '이메일 인증 처리 도중 오류가 발생했습니다.',
 					description: '고객센터에 문의해주시기 바랍니다.',
@@ -82,8 +81,16 @@
 		clearInterval(expireTimer);
 	};
 
+	let email = $state('');
+
 	const onSend = async () => {
 		const formData = new FormData();
+
+		expiresIn = -1;
+
+		if (confirmFor === EmailConfirmFor.RESET_PASSWORD) {
+			formData.append('email', email);
+		}
 
 		const result = await fetch('?/send', {
 			method: 'post',
@@ -91,10 +98,16 @@
 		}).then((r) => r.json());
 
 		if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-			alertData = {
-				title: '인증메일을 보내는 도중 오류가 발생했습니다.',
-				description: '고객센터에 문의해주시기 바랍니다.',
-			};
+			if (result.status === 404)
+				alertData = {
+					title: '해당 이메일을 사용하는 사용자가 없습니다.',
+					description: userNotFoundDesc,
+				};
+			else
+				alertData = {
+					title: '인증메일을 보내는 도중 오류가 발생했습니다.',
+					description: '고객센터에 문의해주시기 바랍니다.',
+				};
 			openAlert = true;
 			return;
 		}
@@ -109,6 +122,16 @@
 	};
 </script>
 
+{#snippet userNotFoundDesc()}
+	<Ul>
+		<li>회원가입 시 사용한 이메일이 맞는지 다시 확인하시기 바랍니다.</li>
+		<li>
+			회원가입을 하지 않으셨다면 <Button variant="link" href="/register">회원가입</Button>을 하시기
+			바랍니다.
+		</li>
+	</Ul>
+{/snippet}
+
 <Layout
 	title={descriptions.title}
 	showSearchPanel={false}
@@ -119,12 +142,28 @@
 		<H2>{descriptions.heading}</H2>
 		<P>{descriptions.desc}</P>
 		<form method="POST" class="w-2/3" action="?/do" use:enhance>
+			{#if confirmFor === EmailConfirmFor.RESET_PASSWORD}
+				<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>비밀번호를 재설정할 이메일 주소</Form.Label>
+							<Input
+								{...props}
+								placeholder="이메일 주소"
+								bind:value={email}
+								{...$constraints.email}
+								required />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
 			<div class="flex flex-col my-4 space-y-1">
 				<div class="text-sm font-medium leading-none">
 					아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 				</div>
 			</div>
-			<Button onclick={onSend}>인증메일 보내기</Button>
+			<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
 			<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -137,13 +176,13 @@
 							{...props}
 							placeholder="XXXXX-XXXXX"
 							bind:value={$formData.confirmCode}
-							disabled={expiresIn === 0}
+							disabled={expiresIn <= 0}
 							{...$constraints.confirmCode} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Button type="submit" disabled={expiresIn === 0}>인증완료</Form.Button>
+			<Form.Button type="submit" disabled={expiresIn <= 0}>인증완료</Form.Button>
 		</form>
 	</Section>
 </Layout>
