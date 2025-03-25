@@ -174,8 +174,8 @@
 					{/if}
 				</Form.Field>
 			{/if}
-			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<div class="mb-4 border-2">
+			<div class="mb-4 border-2">
+				{#if userInfoFor === UserInfoFor.REGISTRATION}
 					<Form.Field {form} name="agree_eula" class="p-4">
 						<div class="flex flex-row items-center space-y-0 space-x-3">
 							<Form.Control>
@@ -220,28 +220,28 @@
 						</div>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Form.Field {form} name="agree_marketing" class="p-4">
-						<div class="flex flex-row items-center space-y-0 space-x-3">
-							<Form.Control>
-								{#snippet children({ props })}
-									<!-- prettier-ignore -->
-									<Checkbox
+				{/if}
+				<Form.Field {form} name="agree_marketing" class="p-4">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox
 										{...props}
-										bind:checked={($formData as Infer<FormSchema>).agree_marketing} />
-									<div class="space-y-1 leading-none">
-										<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
-									</div>
-									<input
-										name={props.name}
-										value={($formData as Infer<FormSchema>).agree_marketing}
-										hidden />
-								{/snippet}
-							</Form.Control>
-						</div>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-			{/if}
+										bind:checked={($formData as Infer<FormSchema>).agree_marketing} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+								<div class="space-y-1 leading-none">
+									<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<FormSchema>).agree_marketing}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Button>가입하기</Form.Button>
 			{:else if userInfoFor === UserInfoFor.INFO_VIEW}

@@ -16,6 +16,7 @@ const userObject = z.object({
 	passwordConfirm: z.string().optional(),
 	username: z.string().min(1, '닉네임이 필요합니다').max(20, '닉네임은 20자를 넘을 수 없습니다.'),
 	profileImage: z.string().url().nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
+	agree_marketing: z.boolean().default(false),
 });
 
 const passwordConfirm = {

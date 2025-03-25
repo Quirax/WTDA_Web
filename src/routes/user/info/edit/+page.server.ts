@@ -26,6 +26,7 @@ export const load = (async (event) => {
 				user: {
 					username: table.user.username,
 					profileImage: table.user.profileImage,
+					preferences: table.user.preferences,
 				},
 			})
 			.from(table.user)
@@ -36,7 +37,13 @@ export const load = (async (event) => {
 
 	return {
 		form: await superValidate(zod(userSchema), {
-			defaults: results.user,
+			defaults: {
+				username: results.user.username,
+				profileImage: results.user.profileImage,
+				agree_marketing:
+					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
+					false,
+			},
 		}),
 	};
 }) satisfies PageServerLoad;
@@ -51,12 +58,21 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
 
-		const { password, username, profileImage } = form.data;
+		const { password, username, profileImage, agree_marketing } = form.data;
 
-		let set: Partial<{ username: typeof username; profileImage: typeof profileImage }> &
+		let set: Partial<{
+			username: typeof username;
+			profileImage: typeof profileImage;
+			preferences: {
+				agree_marketing: typeof agree_marketing;
+			};
+		}> &
 			Partial<{ passwordHash: string }> = {
 			username,
 			profileImage,
+			preferences: {
+				agree_marketing,
+			},
 		};
 
 		if (password) set = { ...set, passwordHash: await getPasswordHash(password) };

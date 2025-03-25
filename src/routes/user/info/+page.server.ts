@@ -16,6 +16,7 @@ export const load = (async ({ locals }) => {
 				user: {
 					username: table.user.username,
 					profileImage: table.user.profileImage,
+					preferences: table.user.preferences,
 				},
 			})
 			.from(table.user)
@@ -28,7 +29,13 @@ export const load = (async ({ locals }) => {
 		user: locals.user,
 		session: locals.session,
 		form: await superValidate(zod(userSchema), {
-			defaults: results.user,
+			defaults: {
+				username: results.user.username,
+				profileImage: results.user.profileImage,
+				agree_marketing:
+					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
+					false,
+			},
 		}),
 	};
 }) satisfies PageServerLoad;
