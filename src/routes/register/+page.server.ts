@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superForm, superValidate } from 'sveltekit-superforms';
-import { formSchema } from '$lib/schema/register';
+import { formSchema } from '$lib/schema/userInfo';
 import { zod, zodClient } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';

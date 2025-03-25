@@ -1,7 +1,7 @@
 import { superValidate } from 'sveltekit-superforms';
 import type { PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
-import { userSchema } from '$lib/schema/register';
+import { userSchema } from '$lib/schema/userInfo';
 import { redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -30,3 +30,5 @@ export const load = (async ({ locals }) => {
 		}),
 	};
 }) satisfies PageServerLoad;
+
+export const _userInfoEditCookie = 'user-info-edit';
