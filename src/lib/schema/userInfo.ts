@@ -12,8 +12,8 @@ const formObject = z.object({
 });
 
 const userObject = z.object({
-	password: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.').optional(),
-	passwordConfirm: z.string().min(8, '비밀번호는 최소 8자 이상이어야 합니다.').optional(),
+	password: z.string().optional(),
+	passwordConfirm: z.string().optional(),
 	username: z.string().min(1, '닉네임이 필요합니다').max(20, '닉네임은 20자를 넘을 수 없습니다.'),
 	profileImage: z.string().url().nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
 });
@@ -34,7 +34,7 @@ const uniqueUsername = {
 		const formData = new FormData();
 		formData.append('username', username);
 
-		const result = await fetch('?/usernameIsUnique', { method: 'post', body: formData });
+		const result = await fetch('/register?/usernameIsUnique', { method: 'post', body: formData });
 
 		const { status } = await result.json();
 		return status === 200; // OK
@@ -77,6 +77,14 @@ export const formSchema = formObject
 export type FormSchema = typeof formSchema;
 
 export const userSchema = userObject
+	.refine((data) => !data.password || data.password.length >= 8, {
+		message: '비밀번호는 최소 8자 이상이어야 합니다.',
+		path: ['password'],
+	})
+	.refine((data) => !data.passwordConfirm || data.passwordConfirm.length >= 8, {
+		message: '비밀번호는 최소 8자 이상이어야 합니다.',
+		path: ['passwordConfirm'],
+	})
 	.refine(passwordConfirm.pred, passwordConfirm.error)
 	.refine(uniqueUsername.pred, uniqueUsername.error);
 

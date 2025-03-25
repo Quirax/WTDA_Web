@@ -53,6 +53,7 @@
 		validators: zodClient(userInfoFor === UserInfoFor.REGISTRATION ? formSchema : userSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
 				openAlert = true;
 				cancel();
 			}

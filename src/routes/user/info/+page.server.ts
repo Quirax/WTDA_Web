@@ -25,6 +25,8 @@ export const load = (async ({ locals }) => {
 	if (!results) throw redirect(302, '/');
 
 	return {
+		user: locals.user,
+		session: locals.session,
 		form: await superValidate(zod(userSchema), {
 			defaults: results.user,
 		}),
