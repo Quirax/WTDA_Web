@@ -25,8 +25,6 @@
 	const form = superForm(data, {
 		validators: zodClient(passwordSchema),
 		onResult({ result, cancel }) {
-			console.log(result);
-
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				if (result.status === 404)
 					alertData = {
