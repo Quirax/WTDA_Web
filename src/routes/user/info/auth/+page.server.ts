@@ -1,5 +1,52 @@
-import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+import { fail, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { passwordSchema } from '$lib/schema/userInfo';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
+import { eq } from 'drizzle-orm';
+import * as auth from '$lib/server/auth';
+import { _userInfoEditCookie } from '../+page.server';
 
-export const load = (async () => {
-	return {};
+export const load = (async ({ locals }) => {
+	if (!locals.user) throw redirect(302, '/');
+
+	return {
+		form: await superValidate(zod(passwordSchema)),
+	};
 }) satisfies PageServerLoad;
+
+export const actions: Actions = {
+	default: async (event) => {
+		const form = await superValidate(event.request, zod(passwordSchema));
+
+		if (!form.valid) {
+			return fail(400, { message: 'The form is not valid.', formData: form.data });
+		}
+
+		const { password } = form.data;
+
+		const results = await db
+			.select()
+			.from(table.user)
+			.where(eq(table.user.id, event.locals.user!.id));
+
+		const existingUser = results.at(0);
+		if (!existingUser) {
+			return fail(404, { message: 'Not found matched user' });
+		}
+
+		const validPassword = await auth.validatePassword(existingUser.passwordHash, password);
+		if (!validPassword) {
+			return fail(404, { message: 'Not found matched user' });
+		}
+
+		event.cookies.set(_userInfoEditCookie, auth.generateSessionToken(), {
+			expires: new Date(Date.now() + 3 * 60 * 1000),
+			path: '/',
+		});
+
+		return redirect(302, '/user/info/edit');
+	},
+};

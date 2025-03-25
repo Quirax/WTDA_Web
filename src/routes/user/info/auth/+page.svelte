@@ -1,5 +1,8 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import UserInfoAuth from '$stories/user/info/UserInfoAuth.svelte';
+	import type { PageServerData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data }: { data: PageServerData } = $props();
 </script>
+
+<UserInfoAuth data={data.form} />

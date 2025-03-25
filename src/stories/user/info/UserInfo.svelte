@@ -9,7 +9,7 @@
 </script>
 
 <script lang="ts">
-	import { formSchema, userSchema, type FormSchema, type UserSchema } from '$lib/schema/register';
+	import { formSchema, userSchema, type FormSchema, type UserSchema } from '$lib/schema/userInfo';
 
 	import Layout from '../../Layout.svelte';
 	import Section from '../../components/Section.svelte';
@@ -22,6 +22,7 @@
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import User from 'lucide-svelte/icons/user';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -43,7 +44,7 @@
 			break;
 		}
 		case UserInfoFor.INFO_EDIT: {
-			title = '회원정보 수정';
+			title = '회원정보 변경';
 			break;
 		}
 	}
@@ -227,9 +228,11 @@
 					</Form.Field>
 				</div>
 			{/if}
-			{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Button>가입하기</Form.Button>
-			{/if}
+			{:else if userInfoFor === UserInfoFor.INFO_VIEW}
+				<Button href="/user/info/auth">변경하기</Button>
+			{:else}{/if}
 		</form>
 	</Section>
 </Layout>
