@@ -92,26 +92,38 @@
 				<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호</Form.Label>
+							<Form.Label>
+								{#if userInfoFor !== UserInfoFor.INFO_EDIT}
+									<Badge variant="destructive">필수</Badge>
+								{/if}
+								비밀번호
+							</Form.Label>
 							<Input
 								{...props}
 								type="password"
 								bind:value={$formData.password}
-								{...$constraints.password} />
+								{...$constraints.password}
+								placeholder="(기존 비밀번호 유지)" />
 						{/snippet}
 					</Form.Control>
-					<Form.Description>최소 8자 이상</Form.Description>
+					<Form.Description>변경하려는 경우에만 입력, 최소 8자 이상</Form.Description>
 					<Form.FieldErrors />
 				</Form.Field>
 				<Form.Field {form} name="passwordConfirm" class="mt-4 flex flex-col space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label><Badge variant="destructive">필수</Badge> 비밀번호 확인</Form.Label>
+							<Form.Label>
+								{#if userInfoFor !== UserInfoFor.INFO_EDIT}
+									<Badge variant="destructive">필수</Badge>
+								{/if}
+								비밀번호 확인
+							</Form.Label>
 							<Input
 								{...props}
 								type="password"
 								bind:value={$formData.passwordConfirm}
-								{...$constraints.passwordConfirm} />
+								{...$constraints.passwordConfirm}
+								placeholder="(기존 비밀번호 유지)" />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />
@@ -156,6 +168,7 @@
 						{/snippet}
 					</Form.Control>
 					{#if userInfoFor === UserInfoFor.INFO_EDIT}
+						<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
 						<Form.FieldErrors />
 					{/if}
 				</Form.Field>
@@ -232,7 +245,9 @@
 				<Form.Button>가입하기</Form.Button>
 			{:else if userInfoFor === UserInfoFor.INFO_VIEW}
 				<Button href="/user/info/auth">변경하기</Button>
-			{:else}{/if}
+			{:else}
+				<Form.Button>저장하기</Form.Button>
+			{/if}
 		</form>
 	</Section>
 </Layout>
