@@ -124,11 +124,17 @@
 							{/if}
 							닉네임
 						</Form.Label>
-						<Input {...props} bind:value={$formData.username} {...$constraints.username} />
+						<Input
+							{...props}
+							bind:value={$formData.username}
+							{...$constraints.username}
+							disabled={userInfoFor !== UserInfoFor.INFO_EDIT} />
 					{/snippet}
 				</Form.Control>
-				<Form.Description>최대 20자</Form.Description>
-				<Form.FieldErrors />
+				{#if userInfoFor === UserInfoFor.INFO_EDIT}
+					<Form.Description>최대 20자</Form.Description>
+					<Form.FieldErrors />
+				{/if}
 			</Form.Field>
 			{#if userInfoFor !== UserInfoFor.REGISTRATION}
 				<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
