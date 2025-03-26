@@ -10,6 +10,7 @@
 	import logo from '../assets/logo.png';
 	import { fn } from '@storybook/test';
 	import { userStore } from '$lib/context';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		title?: string;
@@ -74,9 +75,7 @@
 							</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item onclick={() => (window.location.href = '/user/info')}>
-									내 정보
-								</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/user/info')}>내 정보</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
