@@ -23,6 +23,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import User from 'lucide-svelte/icons/user';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { imageFormat } from '$lib/config';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -60,6 +61,35 @@
 		},
 	});
 	const { form: formData, enhance, constraints } = form;
+
+	// ref: https://svelte.dev/playground/file-inputs?version=5.25.3
+	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
+	// ref: https://stackoverflow.com/a/11058858
+	// ref: https://superforms.rocks/concepts/tainted
+	let imageFiles = $state<FileList | undefined>();
+
+	$effect(() => {
+		if (!imageFiles) return;
+
+		let imageFile = imageFiles[0];
+
+		if (!imageFile) return;
+
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			let result: string;
+
+			if (!e.target?.result) result = '';
+			else if (typeof e.target.result === 'string') result = e.target.result;
+			else result = String.fromCharCode(...new Uint16Array(e.target.result));
+
+			formData.update(($formData: Infer<UserSchema>) => {
+				$formData.profileImage = result;
+				return $formData;
+			});
+		};
+		reader.readAsDataURL(imageFile);
+	});
 </script>
 
 <Layout
@@ -165,7 +195,13 @@
 							{:else}
 								<User class="size-50 border" />
 							{/if}
-							<!-- <Input {...props} bind:value={$formData.username} {...$constraints.username} /> -->
+							{#if userInfoFor === UserInfoFor.INFO_EDIT}
+								<Input type="file" accept={imageFormat} bind:files={imageFiles} />
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).profileImage}
+									hidden />
+							{/if}
 						{/snippet}
 					</Form.Control>
 					{#if userInfoFor === UserInfoFor.INFO_EDIT}
