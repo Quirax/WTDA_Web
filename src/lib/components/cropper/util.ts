@@ -4,9 +4,9 @@
  */
 // ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
 
-import type { CropArea } from 'svelte-easy-crop';
+import type { CropArea } from './cropper.svelte';
 
-const createImage = (url: string) =>
+export const createImage = (url: string) =>
 	new Promise<HTMLImageElement>((resolve, reject) => {
 		const image = new Image();
 		image.addEventListener('load', () => resolve(image));

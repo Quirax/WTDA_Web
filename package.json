@@ -86,6 +86,6 @@
 		"nodemailer": "^6.10.0",
 		"postgres": "^3.4.5",
 		"simple-icons": "^14.9.0",
-		"svelte-easy-crop": "^4.0.1"
+		"svelte-crop-window": "^0.1.1"
 	}
 }

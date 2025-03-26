@@ -25,8 +25,7 @@
 	import User from 'lucide-svelte/icons/user';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { imageFormat } from '$lib/config';
-	import Cropper, { getCroppedImg, getRotatedImage } from '$lib/components/cropper';
-	import type { CropArea } from 'svelte-easy-crop';
+	import Cropper, { getCroppedImg, getRotatedImage, type CropArea } from '$lib/components/cropper';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -324,8 +323,12 @@
 		</Dialog.Header>
 		<Cropper
 			image={sourceImage || ''}
-			oncropcomplete={(details) => (cropDetails = details.pixels)}
-			maxZoom={10} />
+			oncropcomplete={(details) => (cropDetails = details)}
+			maxZoom={10}
+			aspect={1}
+			shape="round"
+			crop_window_margin={30}
+			overlay_options={{ show_third_lines: true }} />
 		<Dialog.Footer>
 			<Button onclick={onSetProfileImage}>확인</Button>
 		</Dialog.Footer>
