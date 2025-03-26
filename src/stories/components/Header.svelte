@@ -38,7 +38,7 @@
 		<div class="flex items-center">
 			<a href="/" class="relative rounded-full size-9" aria-label="Logo">
 				<LogoAvatar.Root class="p-1 bg-white">
-					<LogoAvatar.Image src={logo} alt="뭐하지공방 로고" />
+					<LogoAvatar.Image src="/logo.png" alt="뭐하지공방 로고" />
 					<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
 				</LogoAvatar.Root>
 			</a>
