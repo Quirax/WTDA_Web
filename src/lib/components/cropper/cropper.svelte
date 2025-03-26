@@ -18,9 +18,17 @@
 		defaultOptions,
 	} from 'svelte-crop-window';
 	import Slider from '../ui/slider/slider.svelte';
-	import { createImage, getCroppedImg } from './util';
-	import { number } from 'zod';
+	import { createImage } from './util';
 	import { onDestroy, onMount } from 'svelte';
+	import {
+		ZoomIn,
+		ZoomOut,
+		FlipHorizontal2,
+		FlipVertical2,
+		RotateCw,
+		RotateCcw,
+	} from 'lucide-svelte';
+	import Button from '../ui/button/button.svelte';
 
 	interface Props extends Partial<CropOptions<Partial<typeof defaultOverlayOptions>>> {
 		image: string;
@@ -41,13 +49,21 @@
 
 	const options = { ...defaultOptions, ..._options };
 
+	let value = $state({
+		...defaultValue,
+		aspect,
+	});
+
+	// Get image size to calculate output dimension
 	let imageSize = $state<{ height: number; width: number }>();
 	createImage(image).then((imgObj) => (imageSize = { height: imgObj.height, width: imgObj.width }));
 
+	// Several routines to get container's offset size and set view's size
 	let container = $state<HTMLDivElement>();
 	let viewHeight = $state(0);
 	let viewWidth = $state(0);
 
+	// Reset view's size to recalculate container's size
 	const onResize = () => {
 		if (!container) return;
 
@@ -55,6 +71,7 @@
 		viewHeight = 0;
 	};
 
+	// Set view's size according to aspect ratio using container's size
 	$effect(() => {
 		if (!container) return;
 		if (viewHeight > 0) return;
@@ -67,17 +84,14 @@
 		else viewWidth = viewHeight * aspect;
 	});
 
+	// Set and reset event listener
+	// ref: https://beomy.github.io/tech/svelte/lifecycle/
 	onMount(() => {
 		window.addEventListener('resize', onResize);
 	});
 
 	onDestroy(() => {
 		window.removeEventListener('resize', onResize);
-	});
-
-	let value = $state({
-		...defaultValue,
-		aspect,
 	});
 
 	$effect(() => {
@@ -93,6 +107,10 @@
 
 		oncropcomplete({ x: targetX, y: targetY, width: targetWidth, height: targetHeight });
 	});
+
+	const onClickZoomButton = (delta: number) => () => {
+		value.scale = Math.max(Math.min(value.scale + delta, maxZoom), minZoom);
+	};
 </script>
 
 <div class="relative w-full" bind:this={container}>
@@ -100,5 +118,18 @@
 		<CropWindow media={{ content_type: 'image', url: image }} bind:value {options} />
 	</div>
 </div>
-
-<Slider type="single" bind:value={value.scale} max={maxZoom} min={minZoom} step={0.01} />
+<div class="flex w-full space-x-4">
+	<Button variant="outline" size="icon" class="flex-none" onclick={onClickZoomButton(-0.5)}>
+		<ZoomOut />
+	</Button>
+	<Slider type="single" bind:value={value.scale} max={maxZoom} min={minZoom} step={0.01} />
+	<Button variant="outline" size="icon" class="flex-none" onclick={onClickZoomButton(0.5)}>
+		<ZoomIn />
+	</Button>
+</div>
+<div class="flex justify-center w-full">
+	<Button variant="outline" size="icon"><FlipHorizontal2 /></Button>
+	<Button variant="outline" size="icon"><FlipVertical2 /></Button>
+	<Button variant="outline" size="icon"><RotateCcw /></Button>
+	<Button variant="outline" size="icon"><RotateCw /></Button>
+</div>
