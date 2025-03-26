@@ -9,7 +9,7 @@
 	import './header.css';
 	import logo from '../assets/logo.png';
 	import { fn } from '@storybook/test';
-	import { userContext, userStore } from '$lib/context';
+	import { userStore } from '$lib/context';
 
 	interface Props {
 		title?: string;

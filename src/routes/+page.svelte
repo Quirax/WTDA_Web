@@ -1,21 +1,10 @@
 <script lang="ts">
-	import { sessionContext, userContext } from '$lib/context';
 	import { UserStatus } from '../app';
 
 	import MainPage from '../stories/MainPage.svelte';
 
 	import DocsImage from '../stories/assets/docs.png';
 	import ProfileImage from '../stories/assets/profile_example.png';
-	import type { PageServerData } from './$types';
-
-	interface Props extends ReturnType<typeof $props> {
-		data: PageServerData;
-	}
-
-	let { data }: Props = $props();
-
-	userContext.v = data.user;
-	sessionContext.v = data.session;
 </script>
 
 <MainPage

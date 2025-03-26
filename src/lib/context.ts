@@ -16,8 +16,5 @@ class Context<T> {
 	}
 }
 
-export const userContext = new Context<App.User>('user');
-export const sessionContext = new Context<App.Session>('session');
-
 export const userStore = writable<App.User>();
 export const sessionStore = writable<App.Session>();
