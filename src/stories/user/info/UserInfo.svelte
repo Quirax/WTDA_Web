@@ -26,6 +26,8 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { imageFormat } from '$lib/config';
 	import Cropper from '$lib/components/cropper';
+	import Dropzone from 'svelte-file-dropzone';
+	import { X } from 'lucide-svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -64,19 +66,15 @@
 	});
 	const { form: formData, enhance, constraints } = form;
 
-	// ref: https://svelte.dev/playground/file-inputs?version=5.25.3
 	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
 	// ref: https://stackoverflow.com/a/11058858
-	// ref: https://superforms.rocks/concepts/tainted
-	let imageFiles = $state<FileList | undefined>();
 	let sourceImage = $state<string>();
 	let openCropper = $state(false);
-	let fileValue = $state<string>();
 
-	$effect(() => {
-		if (!imageFiles) return;
+	const onDropFile = ({ detail }: any) => {
+		const { acceptedFiles } = detail;
 
-		let imageFile = imageFiles[0];
+		let imageFile = acceptedFiles[0];
 
 		if (!imageFile) return;
 
@@ -86,14 +84,14 @@
 			else if (typeof e.target.result === 'string') sourceImage = e.target.result;
 			else sourceImage = String.fromCharCode(...new Uint16Array(e.target.result));
 
-			fileValue = '';
 			openCropper = true;
 		};
 		reader.readAsDataURL(imageFile);
-	});
+	};
 
 	let cropper = $state<ReturnType<typeof Cropper>>();
 
+	// ref: https://superforms.rocks/concepts/tainted
 	const onSetProfileImage = () => {
 		if (!cropper) return;
 
@@ -106,6 +104,13 @@
 			});
 
 			openCropper = false;
+		});
+	};
+
+	const removeProfileImage = () => {
+		formData.update(($formData: Infer<UserSchema>) => {
+			$formData.profileImage = '';
+			return $formData;
 		});
 	};
 </script>
@@ -121,7 +126,7 @@
 	}}>
 	<Section>
 		<H2>{title}</H2>
-		<form method="POST" use:enhance class="w-2/3" action="?/do">
+		<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Field {form} name="email" class="flex flex-col mt-4 space-y-1">
 					<Form.Control>
@@ -206,23 +211,32 @@
 						{#snippet children({ props })}
 							<Form.Label>프로필 이미지</Form.Label>
 							{#if ($formData as Infer<UserSchema>).profileImage}
-								<img
-									src={($formData as Infer<UserSchema>).profileImage}
-									alt="프로필 이미지"
-									class="border size-50" />
+								<div class="relative border rounded-full size-50">
+									<img
+										src={($formData as Infer<UserSchema>).profileImage}
+										alt="프로필 이미지"
+										class="rounded-full size-full" />
+									{#if userInfoFor === UserInfoFor.INFO_EDIT}
+										<Button
+											variant="outline"
+											size="icon"
+											onclick={removeProfileImage}
+											class="absolute top-0 right-0 size-7">
+											<X />
+										</Button>
+										<input
+											name={props.name}
+											value={($formData as Infer<UserSchema>).profileImage}
+											hidden />
+									{/if}
+								</div>
+							{:else if userInfoFor === UserInfoFor.INFO_EDIT}
+								<Dropzone id={props.id} accept={imageFormat} on:drop={onDropFile} multiple={false}>
+									<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
+								</Dropzone>
+								<input name={props.name} value="" hidden />
 							{:else}
 								<User class="border size-50" />
-							{/if}
-							{#if userInfoFor === UserInfoFor.INFO_EDIT}
-								<Input
-									type="file"
-									accept={imageFormat}
-									bind:files={imageFiles}
-									bind:value={fileValue} />
-								<input
-									name={props.name}
-									value={($formData as Infer<UserSchema>).profileImage}
-									hidden />
 							{/if}
 						{/snippet}
 					</Form.Control>
