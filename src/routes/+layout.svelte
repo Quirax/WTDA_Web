@@ -3,7 +3,9 @@
 	import { i18n } from '$lib/i18n';
 	import { ParaglideJS } from '@inlang/paraglide-sveltekit';
 	import type { LayoutServerData } from './$types';
-	import { sessionContext, userContext } from '$lib/context';
+	import { sessionStore, userStore } from '$lib/context';
+	import Layout from '$stories/Layout.svelte';
+	import { afterNavigate, invalidate } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {
 		data: LayoutServerData;
@@ -11,10 +13,19 @@
 
 	let { children, data }: Props = $props();
 
-	userContext.v = data.user;
-	sessionContext.v = data.session;
+	userStore.set(data.user);
+	sessionStore.set(data.session);
+
+	afterNavigate(() => {
+		invalidate('/').then(() => {
+			userStore.set(data.user);
+			sessionStore.set(data.session);
+		});
+	});
 </script>
 
 <ParaglideJS {i18n}>
-	{@render children()}
+	<Layout>
+		{@render children()}
+	</Layout>
 </ParaglideJS>

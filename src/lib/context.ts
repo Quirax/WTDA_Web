@@ -1,4 +1,5 @@
 import { getContext, setContext } from 'svelte';
+import { writable } from 'svelte/store';
 
 class Context<T> {
 	private key: string;
@@ -17,3 +18,6 @@ class Context<T> {
 
 export const userContext = new Context<App.User>('user');
 export const sessionContext = new Context<App.Session>('session');
+
+export const userStore = writable<App.User>();
+export const sessionStore = writable<App.Session>();
