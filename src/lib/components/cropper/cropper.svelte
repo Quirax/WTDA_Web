@@ -20,6 +20,7 @@
 	import Slider from '../ui/slider/slider.svelte';
 	import { createImage, getCroppedImg } from './util';
 	import { number } from 'zod';
+	import { onDestroy, onMount } from 'svelte';
 
 	interface Props extends Partial<CropOptions<Partial<typeof defaultOverlayOptions>>> {
 		image: string;
@@ -41,8 +42,38 @@
 	const options = { ...defaultOptions, ..._options };
 
 	let imageSize = $state<{ height: number; width: number }>();
-
 	createImage(image).then((imgObj) => (imageSize = { height: imgObj.height, width: imgObj.width }));
+
+	let container = $state<HTMLDivElement>();
+	let viewHeight = $state(0);
+	let viewWidth = $state(0);
+
+	const onResize = () => {
+		if (!container) return;
+
+		viewWidth = 0;
+		viewHeight = 0;
+	};
+
+	$effect(() => {
+		if (!container) return;
+		if (viewHeight > 0) return;
+		if (viewWidth > 0) return;
+
+		viewWidth = container.offsetWidth;
+		viewHeight = screen.height - (container.offsetParent as HTMLDivElement)!.offsetHeight;
+
+		if (viewWidth < viewHeight * aspect) viewHeight = viewWidth / aspect;
+		else viewWidth = viewHeight * aspect;
+	});
+
+	onMount(() => {
+		window.addEventListener('resize', onResize);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('resize', onResize);
+	});
 
 	let value = $state({
 		...defaultValue,
@@ -64,8 +95,10 @@
 	});
 </script>
 
-<div class="relative aspect-square w-[300px]">
-	<CropWindow media={{ content_type: 'image', url: image }} bind:value {options} />
+<div class="relative w-full" bind:this={container}>
+	<div style={`height: ${viewHeight}px; width: ${viewWidth}px;`} class="mx-auto">
+		<CropWindow media={{ content_type: 'image', url: image }} bind:value {options} />
+	</div>
 </div>
 
 <Slider type="single" bind:value={value.scale} max={maxZoom} min={minZoom} step={0.01} />
