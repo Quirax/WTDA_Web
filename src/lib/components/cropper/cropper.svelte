@@ -18,7 +18,7 @@
 		defaultOptions,
 	} from 'svelte-crop-window';
 	import Slider from '../ui/slider/slider.svelte';
-	import { createImage } from './util';
+	import { createImage, getFlippedImage, getRotatedImage } from './util';
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		ZoomIn,
@@ -55,8 +55,25 @@
 	});
 
 	// Get image size to calculate output dimension
+	let _image = $state<string>(image);
 	let imageSize = $state<{ height: number; width: number }>();
-	createImage(image).then((imgObj) => (imageSize = { height: imgObj.height, width: imgObj.width }));
+
+	const afterConversion = (converted: string) => {
+		_image = converted;
+		value = {
+			...defaultValue,
+			aspect,
+		};
+		createImage(_image).then(
+			(imgObj) => (imageSize = { height: imgObj.height, width: imgObj.width }),
+		);
+	};
+
+	const rotateImage = (rotation: 0 | 90 | 270 = 0) => {
+		getRotatedImage(_image, rotation).then(afterConversion);
+	};
+
+	rotateImage(0);
 
 	// Several routines to get container's offset size and set view's size
 	let container = $state<HTMLDivElement>();
@@ -111,11 +128,15 @@
 	const onClickZoomButton = (delta: number) => () => {
 		value.scale = Math.max(Math.min(value.scale + delta, maxZoom), minZoom);
 	};
+
+	const onClickFlipButton = (direction: 'horizontal' | 'vertical') => () => {
+		getFlippedImage(_image, direction).then(afterConversion);
+	};
 </script>
 
 <div class="relative w-full" bind:this={container}>
 	<div style={`height: ${viewHeight}px; width: ${viewWidth}px;`} class="mx-auto">
-		<CropWindow media={{ content_type: 'image', url: image }} bind:value {options} />
+		<CropWindow media={{ content_type: 'image', url: _image }} bind:value {options} />
 	</div>
 </div>
 <div class="flex w-full space-x-4">
@@ -128,8 +149,12 @@
 	</Button>
 </div>
 <div class="flex justify-center w-full">
-	<Button variant="outline" size="icon"><FlipHorizontal2 /></Button>
-	<Button variant="outline" size="icon"><FlipVertical2 /></Button>
-	<Button variant="outline" size="icon"><RotateCcw /></Button>
-	<Button variant="outline" size="icon"><RotateCw /></Button>
+	<Button variant="outline" size="icon" onclick={onClickFlipButton('horizontal')}>
+		<FlipHorizontal2 />
+	</Button>
+	<Button variant="outline" size="icon" onclick={onClickFlipButton('vertical')}>
+		<FlipVertical2 />
+	</Button>
+	<Button variant="outline" size="icon" onclick={() => rotateImage(270)}><RotateCcw /></Button>
+	<Button variant="outline" size="icon" onclick={() => rotateImage(90)}><RotateCw /></Button>
 </div>

@@ -82,3 +82,27 @@ export async function getRotatedImage(imageSrc: string, rotation = 0) {
 
 	return canvas.toDataURL('image/jpeg');
 }
+
+export async function getFlippedImage(imageSrc: string, direction: 'horizontal' | 'vertical') {
+	const image = await createImage(imageSrc);
+	const canvas = document.createElement('canvas');
+	const ctx = canvas.getContext('2d')!;
+
+	canvas.width = image.width;
+	canvas.height = image.height;
+
+	switch (direction) {
+		case 'horizontal': {
+			ctx.translate(image.width, 0);
+			ctx.scale(-1, 1);
+			break;
+		}
+		case 'vertical': {
+			ctx.translate(0, image.height);
+			ctx.scale(1, -1);
+		}
+	}
+	ctx.drawImage(image, 0, 0);
+
+	return canvas.toDataURL('image/jpeg');
+}

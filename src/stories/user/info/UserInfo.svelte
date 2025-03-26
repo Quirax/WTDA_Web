@@ -83,17 +83,12 @@
 
 		let reader = new FileReader();
 		reader.onload = (e) => {
-			let result: string;
+			if (!e.target?.result) sourceImage = '';
+			else if (typeof e.target.result === 'string') sourceImage = e.target.result;
+			else sourceImage = String.fromCharCode(...new Uint16Array(e.target.result));
 
-			if (!e.target?.result) result = '';
-			else if (typeof e.target.result === 'string') result = e.target.result;
-			else result = String.fromCharCode(...new Uint16Array(e.target.result));
-
-			getRotatedImage(result).then((converted) => {
-				sourceImage = converted;
-				fileValue = '';
-				openCropper = true;
-			});
+			fileValue = '';
+			openCropper = true;
 		};
 		reader.readAsDataURL(imageFile);
 	});
