@@ -25,7 +25,7 @@
 	import User from 'lucide-svelte/icons/user';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { imageFormat } from '$lib/config';
-	import Cropper, { getCroppedImg, getRotatedImage, type CropArea } from '$lib/components/cropper';
+	import Cropper from '$lib/components/cropper';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -71,7 +71,6 @@
 	let imageFiles = $state<FileList | undefined>();
 	let sourceImage = $state<string>();
 	let openCropper = $state(false);
-	let cropDetails = $state<CropArea>();
 	let fileValue = $state<string>();
 
 	$effect(() => {
@@ -93,17 +92,22 @@
 		reader.readAsDataURL(imageFile);
 	});
 
-	const onSetProfileImage = () =>
-		getCroppedImg(sourceImage || '', cropDetails || { x: 0, y: 0, width: 0, height: 0 }).then(
-			(destImage) => {
-				formData.update(($formData: Infer<UserSchema>) => {
-					$formData.profileImage = destImage;
-					return $formData;
-				});
+	let cropper = $state<ReturnType<typeof Cropper>>();
 
-				openCropper = false;
-			},
-		);
+	const onSetProfileImage = () => {
+		if (!cropper) return;
+
+		cropper.getImage().then((destImage) => {
+			if (!destImage) return;
+
+			formData.update(($formData: Infer<UserSchema>) => {
+				$formData.profileImage = destImage;
+				return $formData;
+			});
+
+			openCropper = false;
+		});
+	};
 </script>
 
 <Layout
@@ -318,12 +322,12 @@
 		</Dialog.Header>
 		<Cropper
 			image={sourceImage || ''}
-			oncropcomplete={(details) => (cropDetails = details)}
 			maxZoom={10}
 			aspect={1}
 			shape="round"
 			crop_window_margin={30}
-			overlay_options={{ show_third_lines: true }} />
+			overlay_options={{ show_third_lines: true }}
+			bind:this={cropper} />
 		<Dialog.Footer>
 			<Button onclick={onSetProfileImage}>확인</Button>
 		</Dialog.Footer>

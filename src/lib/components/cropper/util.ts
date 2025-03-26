@@ -83,6 +83,7 @@ export async function getRotatedImage(imageSrc: string, rotation = 0) {
 	return canvas.toDataURL('image/jpeg');
 }
 
+// ref: https://stackoverflow.com/questions/3129099/how-to-flip-images-horizontally-with-html5
 export async function getFlippedImage(imageSrc: string, direction: 'horizontal' | 'vertical') {
 	const image = await createImage(imageSrc);
 	const canvas = document.createElement('canvas');

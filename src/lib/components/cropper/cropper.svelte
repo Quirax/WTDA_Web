@@ -18,7 +18,7 @@
 		defaultOptions,
 	} from 'svelte-crop-window';
 	import Slider from '../ui/slider/slider.svelte';
-	import { createImage, getFlippedImage, getRotatedImage } from './util';
+	import { createImage, getCroppedImg, getFlippedImage, getRotatedImage } from './util';
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		ZoomIn,
@@ -32,20 +32,12 @@
 
 	interface Props extends Partial<CropOptions<Partial<typeof defaultOverlayOptions>>> {
 		image: string;
-		oncropcomplete: (arg0: CropArea) => void;
 		minZoom?: number;
 		maxZoom?: number;
 		aspect?: number;
 	}
 
-	const {
-		image = '',
-		oncropcomplete = () => {},
-		minZoom = 1,
-		maxZoom = 3,
-		aspect = 4 / 3,
-		..._options
-	}: Props = $props();
+	const { image = '', minZoom = 1, maxZoom = 3, aspect = 4 / 3, ..._options }: Props = $props();
 
 	const options = { ...defaultOptions, ..._options };
 
@@ -111,19 +103,23 @@
 		window.removeEventListener('resize', onResize);
 	});
 
-	$effect(() => {
-		if (!value) return;
+	export const getImage = () =>
+		new Promise<string | null>((resolve) => {
+			if (!imageSize) return resolve(null);
 
-		if (!imageSize) return;
+			const targetHeight = imageSize.height / value.scale;
+			const targetWidth = value.aspect * targetHeight;
 
-		const targetHeight = imageSize.height / value.scale;
-		const targetWidth = value.aspect * targetHeight;
+			const targetX = (imageSize.width - targetWidth) / 2 - value.position.x * targetHeight;
+			const targetY = (imageSize.height - targetHeight) / 2 - value.position.y * targetHeight;
 
-		const targetX = (imageSize.width - targetWidth) / 2 - value.position.x * targetHeight;
-		const targetY = (imageSize.height - targetHeight) / 2 - value.position.y * targetHeight;
-
-		oncropcomplete({ x: targetX, y: targetY, width: targetWidth, height: targetHeight });
-	});
+			getCroppedImg(_image, {
+				x: targetX,
+				y: targetY,
+				width: targetWidth,
+				height: targetHeight,
+			}).then((destImage) => resolve(destImage));
+		});
 
 	const onClickZoomButton = (delta: number) => () => {
 		value.scale = Math.max(Math.min(value.scale + delta, maxZoom), minZoom);
