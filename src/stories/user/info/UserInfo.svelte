@@ -18,12 +18,15 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import * as Dialog from '$lib/components/ui/dialog';
 
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import User from 'lucide-svelte/icons/user';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { imageFormat } from '$lib/config';
+	import Cropper, { getCroppedImg, getRotatedImage } from '$lib/components/cropper';
+	import type { CropArea } from 'svelte-easy-crop';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -67,6 +70,10 @@
 	// ref: https://stackoverflow.com/a/11058858
 	// ref: https://superforms.rocks/concepts/tainted
 	let imageFiles = $state<FileList | undefined>();
+	let sourceImage = $state<string>();
+	let openCropper = $state(false);
+	let cropDetails = $state<CropArea>();
+	let fileValue = $state<string>();
 
 	$effect(() => {
 		if (!imageFiles) return;
@@ -83,13 +90,26 @@
 			else if (typeof e.target.result === 'string') result = e.target.result;
 			else result = String.fromCharCode(...new Uint16Array(e.target.result));
 
-			formData.update(($formData: Infer<UserSchema>) => {
-				$formData.profileImage = result;
-				return $formData;
+			getRotatedImage(result).then((converted) => {
+				sourceImage = converted;
+				fileValue = '';
+				openCropper = true;
 			});
 		};
 		reader.readAsDataURL(imageFile);
 	});
+
+	const onSetProfileImage = () =>
+		getCroppedImg(sourceImage || '', cropDetails || { x: 0, y: 0, width: 0, height: 0 }).then(
+			(destImage) => {
+				formData.update(($formData: Infer<UserSchema>) => {
+					$formData.profileImage = destImage;
+					return $formData;
+				});
+
+				openCropper = false;
+			},
+		);
 </script>
 
 <Layout
@@ -105,7 +125,7 @@
 		<H2>{title}</H2>
 		<form method="POST" use:enhance class="w-2/3" action="?/do">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
+				<Form.Field {form} name="email" class="flex flex-col mt-4 space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
@@ -120,7 +140,7 @@
 				</Form.Field>
 			{/if}
 			{#if userInfoFor !== UserInfoFor.INFO_VIEW}
-				<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
+				<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>
@@ -140,7 +160,7 @@
 					<Form.Description>변경하려는 경우에만 입력, 최소 8자 이상</Form.Description>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="passwordConfirm" class="mt-4 flex flex-col space-y-1">
+				<Form.Field {form} name="passwordConfirm" class="flex flex-col mt-4 space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>
@@ -160,7 +180,7 @@
 					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
-			<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
+			<Form.Field {form} name="username" class="flex flex-col my-4 space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>
@@ -183,7 +203,7 @@
 				{/if}
 			</Form.Field>
 			{#if userInfoFor !== UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="profileImage" class="my-4 flex flex-col space-y-1">
+				<Form.Field {form} name="profileImage" class="flex flex-col my-4 space-y-1">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>프로필 이미지</Form.Label>
@@ -191,12 +211,16 @@
 								<img
 									src={($formData as Infer<UserSchema>).profileImage}
 									alt="프로필 이미지"
-									class="size-50 border" />
+									class="border size-50" />
 							{:else}
-								<User class="size-50 border" />
+								<User class="border size-50" />
 							{/if}
 							{#if userInfoFor === UserInfoFor.INFO_EDIT}
-								<Input type="file" accept={imageFormat} bind:files={imageFiles} />
+								<Input
+									type="file"
+									accept={imageFormat}
+									bind:files={imageFiles}
+									bind:value={fileValue} />
 								<input
 									name={props.name}
 									value={($formData as Infer<UserSchema>).profileImage}
@@ -213,7 +237,7 @@
 			<div class="mb-4 border-2">
 				{#if userInfoFor === UserInfoFor.REGISTRATION}
 					<Form.Field {form} name="agree_eula" class="p-4">
-						<div class="flex flex-row items-center space-y-0 space-x-3">
+						<div class="flex flex-row items-center space-x-3 space-y-0">
 							<Form.Control>
 								{#snippet children({ props })}
 									<!-- prettier-ignore -->
@@ -235,7 +259,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 					<Form.Field {form} name="agree_privacypolicy" class="p-4">
-						<div class="flex flex-row items-center space-y-0 space-x-3">
+						<div class="flex flex-row items-center space-x-3 space-y-0">
 							<Form.Control>
 								{#snippet children({ props })}
 									<!-- prettier-ignore -->
@@ -258,7 +282,7 @@
 					</Form.Field>
 				{/if}
 				<Form.Field {form} name="agree_marketing" class="p-4">
-					<div class="flex flex-row items-center space-y-0 space-x-3">
+					<div class="flex flex-row items-center space-x-3 space-y-0">
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
@@ -288,3 +312,21 @@
 		</form>
 	</Section>
 </Layout>
+
+<Dialog.Root bind:open={openCropper}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Description>
+				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
+				저장 후에 반영됩니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Cropper
+			image={sourceImage || ''}
+			oncropcomplete={(details) => (cropDetails = details.pixels)} />
+		<Dialog.Footer>
+			<Button onclick={onSetProfileImage}>확인</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>

@@ -16,9 +16,9 @@ export const load = (async (event) => {
 
 	if (!userInfoEditToken) throw redirect(302, '/user/info');
 
-	event.cookies.delete(_userInfoEditCookie, {
-		path: '/',
-	});
+	// event.cookies.delete(_userInfoEditCookie, {
+	// 	path: '/',
+	// });
 
 	const results = (
 		await db
