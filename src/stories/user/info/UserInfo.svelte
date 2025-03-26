@@ -324,7 +324,8 @@
 		</Dialog.Header>
 		<Cropper
 			image={sourceImage || ''}
-			oncropcomplete={(details) => (cropDetails = details.pixels)} />
+			oncropcomplete={(details) => (cropDetails = details.pixels)}
+			maxZoom={10} />
 		<Dialog.Footer>
 			<Button onclick={onSetProfileImage}>확인</Button>
 		</Dialog.Footer>
