@@ -5,7 +5,6 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '$lib/schema/login';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { verify } from '@node-rs/argon2';
 import * as auth from '$lib/server/auth';
 import { eq } from 'drizzle-orm';
 import { UserStatus } from '../../app';
@@ -35,12 +34,7 @@ export const actions: Actions = {
 			return fail(404, { message: 'Not found matched user' });
 		}
 
-		const validPassword = await verify(existingUser.passwordHash, password, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1,
-		});
+		const validPassword = await auth.validatePassword(existingUser.passwordHash, password);
 		if (!validPassword) {
 			return fail(404, { message: 'Not found matched user' });
 		}

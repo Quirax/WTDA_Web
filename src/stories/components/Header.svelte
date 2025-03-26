@@ -30,16 +30,16 @@
 	const user = userContext.v;
 </script>
 
-<header class="border-b-2 bg-background">
-	<div class="flex items-center justify-between h-16 px-4">
+<header class="bg-background border-b-2">
+	<div class="flex h-16 items-center justify-between px-4">
 		<div class="flex items-center">
-			<a href="/" class="relative rounded-full size-9" aria-label="Logo">
-				<LogoAvatar.Root class="p-1 bg-white">
+			<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
+				<LogoAvatar.Root class="bg-white p-1">
 					<LogoAvatar.Image src={logo} alt="뭐하지공방 로고" />
 					<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
 				</LogoAvatar.Root>
 			</a>
-			<div class="items-center hidden mx-6 space-x-4 font-bold sm:flex lg:space-x-6">
+			<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 				{title}
 			</div>
 		</div>
@@ -52,12 +52,12 @@
 			{/if}{#if showUserPanel}
 				{#if user}
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger class="p-0 m-0">
+						<DropdownMenu.Trigger class="m-0 p-0">
 							{#snippet child({ props })}
 								<Button
 									{...props}
 									variant="ghost"
-									class="p-0 rounded-full size-9"
+									class="size-9 rounded-full p-0"
 									aria-label="User Menu">
 									<UserAvatar class="size-9" {user} />
 								</Button>
@@ -66,15 +66,15 @@
 						<DropdownMenu.Content class="w-56" align="end">
 							<DropdownMenu.Label class="font-normal">
 								<div class="flex flex-col space-y-1">
-									<p class="text-sm font-medium leading-none">{user.username}</p>
-									<p class="text-xs leading-none text-muted-foreground">{user.email}</p>
+									<p class="text-sm leading-none font-medium">{user.username}</p>
+									<p class="text-muted-foreground text-xs leading-none">{user.email}</p>
 								</div>
 							</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item>알림</DropdownMenu.Item>
-								<DropdownMenu.Item>대화</DropdownMenu.Item>
-								<DropdownMenu.Item>설정</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => (window.location.href = '/user/info')}>
+									내 정보
+								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>

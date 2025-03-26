@@ -1,6 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superForm, superValidate } from 'sveltekit-superforms';
-import { formSchema } from '$lib/schema/register';
+import { formSchema } from '$lib/schema/userInfo';
 import { zod, zodClient } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
@@ -38,7 +38,7 @@ export const actions: Actions = {
 		}
 	},
 
-	usernameIsUnique: async ({ request }) => {
+	usernameIsUnique: async ({ request, locals }) => {
 		const formData = await request.formData();
 
 		const username = formData.get('username') as string;
@@ -50,6 +50,10 @@ export const actions: Actions = {
 		if (!user) {
 			return {
 				message: 'The username is unique',
+			};
+		} else if (locals.user && user.id === locals.user.id) {
+			return {
+				message: 'The username is not changed',
 			};
 		} else {
 			return fail(400, {
