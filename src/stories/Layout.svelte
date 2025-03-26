@@ -8,8 +8,8 @@
 	import './Layout.css';
 	import Header from './components/Header.svelte';
 	import Footer from './components/Footer.svelte';
-	import type { HTMLSlotAttributes } from 'svelte/elements';
 	import type { Snippet } from 'svelte';
+	import { layoutStore } from '$lib/context';
 
 	export interface Alert {
 		title: string;
@@ -20,7 +20,7 @@
 		onAction?: () => void;
 	}
 
-	interface Props extends HTMLSlotAttributes {
+	interface Props extends ReturnType<typeof $props> {
 		title?: string;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
@@ -33,9 +33,31 @@
 		title,
 		showSearchPanel = true,
 		showUserPanel = true,
-		alert = undefined,
-		openAlert = $bindable(false),
+		alert,
+		openAlert = false,
 	}: Props = $props();
+
+	layoutStore.subscribe((v) => {
+		if (!v) return;
+
+		title = v.title;
+		showSearchPanel = v.showSearchPanel ?? true;
+		showUserPanel = v.showUserPanel ?? true;
+		alert = v.alert;
+		openAlert = v.openAlert ?? false;
+
+		console.log(v);
+	});
+
+	$effect(() => {
+		layoutStore.update((value) => {
+			const newValue = { ...value };
+
+			newValue.openAlert = openAlert;
+
+			return newValue;
+		});
+	});
 
 	const onLogin = () => {
 		window.location.href = '/login';

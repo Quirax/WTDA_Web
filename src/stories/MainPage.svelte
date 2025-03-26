@@ -10,11 +10,11 @@
 
 	import { H1, H2, P } from '$lib/components/typo';
 
-	import Layout from './Layout.svelte';
 	import Section from './components/Section.svelte';
 	import Avatar from './components/Avatar.svelte';
 
 	import './MainPage.css';
+	import { layoutStore } from '$lib/context';
 
 	interface Props {
 		recentCommissionTypes?: App.CommisionType[];
@@ -29,106 +29,111 @@
 
 	const { recentCommissionTypes = [], recentRequests = [], introductions = [] }: Props = $props();
 
+	$effect.pre(() => {
+		layoutStore.set({
+			title: '뭐하지공방',
+			showSearchPanel: true,
+			showUserPanel: true,
+			openAlert: false,
+		});
+	});
+
 	let userMode = $state<UserMode>(UserMode.requester);
 </script>
 
-<Layout>
-	<section
-		id="search"
-		class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 bg-[url(/background-pattern-banner.png)] p-20">
-		<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
+<section
+	id="search"
+	class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 bg-[url(/background-pattern-banner.png)] p-20">
+	<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
-		<Tabs.Root bind:value={userMode} class="md:w-[400px]">
-			<Tabs.List class="grid h-full! w-full md:grid-cols-2">
-				<Tabs.Trigger value="requester">저는 의뢰주입니다</Tabs.Trigger>
-				<Tabs.Trigger value="comissioner">저는 커미션주입니다</Tabs.Trigger>
-			</Tabs.List>
-		</Tabs.Root>
+	<Tabs.Root bind:value={userMode} class="md:w-[400px]">
+		<Tabs.List class="grid h-full! w-full md:grid-cols-2">
+			<Tabs.Trigger value="requester">저는 의뢰주입니다</Tabs.Trigger>
+			<Tabs.Trigger value="comissioner">저는 커미션주입니다</Tabs.Trigger>
+		</Tabs.List>
+	</Tabs.Root>
 
-		<form
-			class="flex flex-col items-center w-full max-w-sm space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
-			onsubmit={(e) => {
-				e.preventDefault();
-			}}>
-			<Input
-				type="search"
-				placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
-				class="text-xl h-xl border-stone-200 bg-stone-50 text-stone-950 sm:w-full md:w-md" />
-			<Button type="submit" variant="secondary">검색</Button>
-		</form>
-	</section>
+	<form
+		class="flex flex-col items-center w-full max-w-sm space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
+		onsubmit={(e) => {
+			e.preventDefault();
+		}}>
+		<Input
+			type="search"
+			placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
+			class="text-xl h-xl border-stone-200 bg-stone-50 text-stone-950 sm:w-full md:w-md" />
+		<Button type="submit" variant="secondary">검색</Button>
+	</form>
+</section>
 
-	{#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
-		<Section id="recently-added">
-			<H2 class="break-keep">
-				{#if userMode === UserMode.requester}
-					새로 개장한 커미션 타입들입니다
-				{:else}
-					새로 지원을 기다리는 의뢰들입니다
-				{/if}
-			</H2>
+{#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
+	<Section id="recently-added">
+		<H2 class="break-keep">
+			{#if userMode === UserMode.requester}
+				새로 개장한 커미션 타입들입니다
+			{:else}
+				새로 지원을 기다리는 의뢰들입니다
+			{/if}
+		</H2>
 
-			<section
-				id="contents-list"
-				class="grid gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-				{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
-					<Card.Root>
-						<img
-							src={article?.thumbnail}
-							alt={article?.title}
-							class="object-cover w-full aspect-video" />
-						<Card.Header>
-							<Card.Title>{article?.title}</Card.Title>
-							<Card.Description class="text-right">
-								by
-								<Avatar class="inline-block w-6 h-6 align-middle" user={article?.author} />
-								{article?.author.username}
-							</Card.Description>
-						</Card.Header>
-						<Card.Content>
-							<Badge class="m-1">#{article?.category}</Badge>
-							{#each article?.tags?.slice(0, 3) || [] as tag}
-								<Badge class="m-1" variant="secondary">#{tag}</Badge>
-							{/each}
-						</Card.Content>
-					</Card.Root>
-				{/each}
-			</section>
-		</Section>
-	{/if}
-
-	{#if userMode === UserMode.requester}
 		<section
-			id="suggestion"
-			class="flex flex-col items-center justify-center p-10 my-10 space-y-8 text-center bg-accent text-accent-foreground">
-			<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
-			<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
-			<div class="space-y-0">
-				<P>의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.</P>
-				<P>물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다.</P>
-			</div>
+			id="contents-list"
+			class="grid gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
+				<Card.Root>
+					<img
+						src={article?.thumbnail}
+						alt={article?.title}
+						class="object-cover w-full aspect-video" />
+					<Card.Header>
+						<Card.Title>{article?.title}</Card.Title>
+						<Card.Description class="text-right">
+							by
+							<Avatar class="inline-block w-6 h-6 align-middle" user={article?.author} />
+							{article?.author.username}
+						</Card.Description>
+					</Card.Header>
+					<Card.Content>
+						<Badge class="m-1">#{article?.category}</Badge>
+						{#each article?.tags?.slice(0, 3) || [] as tag}
+							<Badge class="m-1" variant="secondary">#{tag}</Badge>
+						{/each}
+					</Card.Content>
+				</Card.Root>
+			{/each}
 		</section>
-	{/if}
+	</Section>
+{/if}
 
-	{#if introductions.length > 0}
-		<section id="introducing" class="relative flex justify-center mt-20 mb-10 px-17">
-			<Carousel.Root
-				class="align-center aspect-video max-h-[50vh] max-w-full"
-				opts={{ loop: true }}>
-				<Carousel.Previous />
-				<Carousel.Content class="w-full">
-					{#each introductions as intro}
-						<Carousel.Item>
-							<div class="p-1 aspect-video">
-								<Card.Root class="aspect-video">
-									<img class="size-full" src={intro.src} alt={intro.alt} />
-								</Card.Root>
-							</div>
-						</Carousel.Item>
-					{/each}
-				</Carousel.Content>
-				<Carousel.Next />
-			</Carousel.Root>
-		</section>
-	{/if}
-</Layout>
+{#if userMode === UserMode.requester}
+	<section
+		id="suggestion"
+		class="flex flex-col items-center justify-center p-10 my-10 space-y-8 text-center bg-accent text-accent-foreground">
+		<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
+		<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
+		<div class="space-y-0">
+			<P>의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.</P>
+			<P>물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다.</P>
+		</div>
+	</section>
+{/if}
+
+{#if introductions.length > 0}
+	<section id="introducing" class="relative flex justify-center mt-20 mb-10 px-17">
+		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
+			<Carousel.Previous />
+			<Carousel.Content class="w-full">
+				{#each introductions as intro}
+					<Carousel.Item>
+						<div class="p-1 aspect-video">
+							<Card.Root class="aspect-video">
+								<img class="size-full" src={intro.src} alt={intro.alt} />
+							</Card.Root>
+						</div>
+					</Carousel.Item>
+				{/each}
+			</Carousel.Content>
+			<Carousel.Next />
+		</Carousel.Root>
+	</section>
+{/if}
