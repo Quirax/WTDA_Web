@@ -388,7 +388,7 @@
 	title="계정 비활성화 완료"
 	description="계정을 비활성화하였습니다. 그동안 뭐하지공방과 함께해주셔서 감사합니다."
 	onAction={() => {
-		goto('/');
+		window.location.href = '/';
 	}}
 	bind:open={openAfterDeactivationAlert} />
 <AlertDialog

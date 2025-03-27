@@ -112,6 +112,9 @@ export const actions: Actions = {
 			// Invalidate session
 			await auth.invalidateSession(event.locals.session.id);
 			auth.deleteSessionTokenCookie(event);
+
+			event.locals.user = null;
+			event.locals.session = null;
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

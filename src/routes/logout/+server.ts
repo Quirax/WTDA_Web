@@ -10,5 +10,8 @@ export const GET: RequestHandler = async (event) => {
 	await auth.invalidateSession(event.locals.session.id);
 	auth.deleteSessionTokenCookie(event);
 
+	event.locals.user = null;
+	event.locals.session = null;
+
 	return redirect(302, '/');
 };
