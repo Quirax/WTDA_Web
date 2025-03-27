@@ -7,8 +7,9 @@
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { formSchema, type FormSchema } from '$lib/schema/login';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
-	import Layout, { type Alert } from '$stories/Layout.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -29,24 +30,15 @@
 		},
 	}: Props = $props();
 
-	let openAlert = $state(false);
-	let alertData = $state<Alert | undefined>(undefined);
+	let openUserNotFoundAlert = $state(false);
+	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				if (result.status === 404)
-					alertData = {
-						title: '입력하신 이메일 또는 비밀번호가 틀렸습니다.',
-						description: userNotFoundDesc,
-					};
-				else
-					alertData = {
-						title: '로그인 처리 도중 오류가 발생했습니다.',
-						description: '고객센터에 문의해주시기 바랍니다.',
-					};
-				openAlert = true;
+				if (result.status === 404) openUserNotFoundAlert = true;
+				else openOtherErrorAlert = true;
 				cancel();
 			}
 		},
@@ -69,34 +61,43 @@
 	</Ul>
 {/snippet}
 
-<Layout title="로그인" bind:openAlert alert={alertData}>
-	<Section>
-		<H2>로그인</H2>
-		<form method="POST" use:enhance class="w-2/3" action="?">
-			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>이메일</Form.Label>
-						<Input {...props} bind:value={$formData.email} {...$constraints.email} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>비밀번호</Form.Label>
-						<Input
-							{...props}
-							type="password"
-							bind:value={$formData.password}
-							{...$constraints.password} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Form.Button>로그인</Form.Button>
-			<Button href="/login/reset-password">비밀번호 재설정</Button>
-		</form>
-	</Section>
-</Layout>
+<Header title="로그인" />
+
+<Section>
+	<H2>로그인</H2>
+	<form method="POST" use:enhance class="w-2/3" action="?">
+		<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>이메일</Form.Label>
+					<Input {...props} bind:value={$formData.email} {...$constraints.email} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+		<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>비밀번호</Form.Label>
+					<Input
+						{...props}
+						type="password"
+						bind:value={$formData.password}
+						{...$constraints.password} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+		<Form.Button>로그인</Form.Button>
+		<Button href="/login/reset-password">비밀번호 재설정</Button>
+	</form>
+</Section>
+
+<AlertDialog
+	title="입력하신 이메일 또는 비밀번호가 틀렸습니다."
+	description={userNotFoundDesc}
+	bind:open={openUserNotFoundAlert} />
+<AlertDialog
+	title="로그인 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openOtherErrorAlert} />

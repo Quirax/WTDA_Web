@@ -77,8 +77,6 @@ export const actions: Actions = {
 
 		if (password) set = { ...set, passwordHash: await getPasswordHash(password) };
 
-		console.log(set);
-
 		try {
 			await db.update(table.user).set(set).where(eq(table.user.id, event.locals.user.id));
 		} catch (e: any) {

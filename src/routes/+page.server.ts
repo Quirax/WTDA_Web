@@ -6,8 +6,5 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user?.status === UserStatus.REQUIRED_EMAIL_CONFIRM)
 		throw redirect(302, '/register/email-confirm');
 
-	return {
-		user: locals.user,
-		session: locals.session,
-	};
+	return {};
 };

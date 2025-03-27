@@ -11,7 +11,6 @@
 <script lang="ts">
 	import { formSchema, userSchema, type FormSchema, type UserSchema } from '$lib/schema/userInfo';
 
-	import Layout from '../../Layout.svelte';
 	import Section from '../../components/Section.svelte';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import * as Form from '$lib/components/ui/form';
@@ -28,6 +27,8 @@
 	import Cropper from '$lib/components/cropper';
 	import Dropzone from 'svelte-file-dropzone';
 	import { X } from 'lucide-svelte';
+	import Header from '$stories/components/Header.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -36,8 +37,8 @@
 
 	const { data, for: userInfoFor }: Props = $props();
 
-	let openAlert = $state(false);
 	let title = $state('');
+	let openErrorAlert = $state(false);
 
 	switch (userInfoFor) {
 		case UserInfoFor.REGISTRATION: {
@@ -45,11 +46,11 @@
 			break;
 		}
 		case UserInfoFor.INFO_VIEW: {
-			title = '회원정보';
+			title = '사용자 정보';
 			break;
 		}
 		case UserInfoFor.INFO_EDIT: {
-			title = '회원정보 변경';
+			title = '사용자 정보 변경';
 			break;
 		}
 	}
@@ -59,7 +60,7 @@
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
-				openAlert = true;
+				openErrorAlert = true;
 				cancel();
 			}
 		},
@@ -115,215 +116,212 @@
 	};
 </script>
 
-<Layout
-	{title}
-	showSearchPanel={userInfoFor !== UserInfoFor.REGISTRATION}
-	showUserPanel={userInfoFor !== UserInfoFor.REGISTRATION}
-	bind:openAlert
-	alert={{
-		title: `${title} 처리 도중 오류가 발생했습니다.`,
-		description: '고객센터에 문의해주시기 바랍니다.',
-	}}>
-	<Section>
-		<H2>{title}</H2>
-		<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
-			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="email" class="flex flex-col mt-4 space-y-1">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
-							<!-- prettier-ignore -->
-							<Input
+<Header {title} />
+
+<Section>
+	<H2>{title}</H2>
+	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
+		{#if userInfoFor === UserInfoFor.REGISTRATION}
+			<Form.Field {form} name="email" class="flex flex-col mt-4 space-y-1">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
+						<!-- prettier-ignore -->
+						<Input
 								{...props}
 								bind:value={($formData as Infer<FormSchema>).email}
 								{...$constraints.email} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			{/if}
-			{#if userInfoFor !== UserInfoFor.INFO_VIEW}
-				<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>
-								{#if userInfoFor !== UserInfoFor.INFO_EDIT}
-									<Badge variant="destructive">필수</Badge>
-								{/if}
-								비밀번호
-							</Form.Label>
-							<Input
-								{...props}
-								type="password"
-								bind:value={$formData.password}
-								{...$constraints.password}
-								placeholder="(기존 비밀번호 유지)" />
-						{/snippet}
-					</Form.Control>
-					<Form.Description>변경하려는 경우에만 입력, 최소 8자 이상</Form.Description>
-					<Form.FieldErrors />
-				</Form.Field>
-				<Form.Field {form} name="passwordConfirm" class="flex flex-col mt-4 space-y-1">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>
-								{#if userInfoFor !== UserInfoFor.INFO_EDIT}
-									<Badge variant="destructive">필수</Badge>
-								{/if}
-								비밀번호 확인
-							</Form.Label>
-							<Input
-								{...props}
-								type="password"
-								bind:value={$formData.passwordConfirm}
-								{...$constraints.passwordConfirm}
-								placeholder="(기존 비밀번호 유지)" />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			{/if}
-			<Form.Field {form} name="username" class="flex flex-col my-4 space-y-1">
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
+		{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+			<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>
-							{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+							{#if userInfoFor !== UserInfoFor.INFO_EDIT}
 								<Badge variant="destructive">필수</Badge>
 							{/if}
-							닉네임
+							비밀번호
 						</Form.Label>
 						<Input
 							{...props}
-							bind:value={$formData.username}
-							{...$constraints.username}
-							class="text-foreground opacity-100!"
-							disabled={userInfoFor !== UserInfoFor.INFO_EDIT} />
+							type="password"
+							bind:value={$formData.password}
+							{...$constraints.password}
+							placeholder="(기존 비밀번호 유지)" />
+					{/snippet}
+				</Form.Control>
+				<Form.Description>변경하려는 경우에만 입력, 최소 8자 이상</Form.Description>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="passwordConfirm" class="flex flex-col mt-4 space-y-1">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>
+							{#if userInfoFor !== UserInfoFor.INFO_EDIT}
+								<Badge variant="destructive">필수</Badge>
+							{/if}
+							비밀번호 확인
+						</Form.Label>
+						<Input
+							{...props}
+							type="password"
+							bind:value={$formData.passwordConfirm}
+							{...$constraints.passwordConfirm}
+							placeholder="(기존 비밀번호 유지)" />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
+		<Form.Field {form} name="username" class="flex flex-col my-4 space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>
+						{#if userInfoFor !== UserInfoFor.INFO_VIEW}
+							<Badge variant="destructive">필수</Badge>
+						{/if}
+						닉네임
+					</Form.Label>
+					<Input
+						{...props}
+						bind:value={$formData.username}
+						{...$constraints.username}
+						class="text-foreground opacity-100!"
+						disabled={userInfoFor !== UserInfoFor.INFO_EDIT} />
+				{/snippet}
+			</Form.Control>
+			{#if userInfoFor === UserInfoFor.INFO_EDIT}
+				<Form.Description>최대 20자</Form.Description>
+				<Form.FieldErrors />
+			{/if}
+		</Form.Field>
+		{#if userInfoFor !== UserInfoFor.REGISTRATION}
+			<Form.Field {form} name="profileImage" class="flex flex-col my-4 space-y-1">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>프로필 이미지</Form.Label>
+						{#if ($formData as Infer<UserSchema>).profileImage}
+							<div class="relative border rounded-full size-50">
+								<img
+									src={($formData as Infer<UserSchema>).profileImage}
+									alt="프로필 이미지"
+									class="rounded-full size-full" />
+								{#if userInfoFor === UserInfoFor.INFO_EDIT}
+									<Button
+										variant="outline"
+										size="icon"
+										onclick={removeProfileImage}
+										class="absolute top-0 right-0 size-7">
+										<X />
+									</Button>
+									<input
+										name={props.name}
+										value={($formData as Infer<UserSchema>).profileImage}
+										hidden />
+								{/if}
+							</div>
+						{:else if userInfoFor === UserInfoFor.INFO_EDIT}
+							<Dropzone id={props.id} accept={imageFormat} on:drop={onDropFile} multiple={false}>
+								<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
+							</Dropzone>
+							<input name={props.name} value="" hidden />
+						{:else}
+							<User class="border size-50" />
+						{/if}
 					{/snippet}
 				</Form.Control>
 				{#if userInfoFor === UserInfoFor.INFO_EDIT}
-					<Form.Description>최대 20자</Form.Description>
+					<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
 					<Form.FieldErrors />
 				{/if}
 			</Form.Field>
-			{#if userInfoFor !== UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="profileImage" class="flex flex-col my-4 space-y-1">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>프로필 이미지</Form.Label>
-							{#if ($formData as Infer<UserSchema>).profileImage}
-								<div class="relative border rounded-full size-50">
-									<img
-										src={($formData as Infer<UserSchema>).profileImage}
-										alt="프로필 이미지"
-										class="rounded-full size-full" />
-									{#if userInfoFor === UserInfoFor.INFO_EDIT}
-										<Button
-											variant="outline"
-											size="icon"
-											onclick={removeProfileImage}
-											class="absolute top-0 right-0 size-7">
-											<X />
-										</Button>
-										<input
-											name={props.name}
-											value={($formData as Infer<UserSchema>).profileImage}
-											hidden />
-									{/if}
-								</div>
-							{:else if userInfoFor === UserInfoFor.INFO_EDIT}
-								<Dropzone id={props.id} accept={imageFormat} on:drop={onDropFile} multiple={false}>
-									<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
-								</Dropzone>
-								<input name={props.name} value="" hidden />
-							{:else}
-								<User class="border size-50" />
-							{/if}
-						{/snippet}
-					</Form.Control>
-					{#if userInfoFor === UserInfoFor.INFO_EDIT}
-						<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
-						<Form.FieldErrors />
-					{/if}
-				</Form.Field>
-			{/if}
-			<div class="mb-4 border-2">
-				{#if userInfoFor === UserInfoFor.REGISTRATION}
-					<Form.Field {form} name="agree_eula" class="p-4">
-						<div class="flex flex-row items-center space-x-3 space-y-0">
-							<Form.Control>
-								{#snippet children({ props })}
-									<!-- prettier-ignore -->
-									<Checkbox {...props} bind:checked={($formData as Infer<FormSchema>).agree_eula} />
-									<div class="space-y-1 leading-none">
-										<Form.Label>
-											<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
-										</Form.Label>
-									</div>
-									<!-- Checkbox 사용 시 별도의 hidden field 필요 -->
-									<!-- ref: https://stackoverflow.com/a/78404901 -->
-									<input
-										name={props.name}
-										value={($formData as Infer<FormSchema>).agree_eula}
-										hidden />
-								{/snippet}
-							</Form.Control>
-						</div>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field {form} name="agree_privacypolicy" class="p-4">
-						<div class="flex flex-row items-center space-x-3 space-y-0">
-							<Form.Control>
-								{#snippet children({ props })}
-									<!-- prettier-ignore -->
-									<Checkbox
-										{...props}
-										bind:checked={($formData as Infer<FormSchema>).agree_privacypolicy} />
-									<div class="space-y-1 leading-none">
-										<Form.Label>
-											<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
-										</Form.Label>
-									</div>
-									<input
-										name={props.name}
-										value={($formData as Infer<FormSchema>).agree_privacypolicy}
-										hidden />
-								{/snippet}
-							</Form.Control>
-						</div>
-						<Form.FieldErrors />
-					</Form.Field>
-				{/if}
-				<Form.Field {form} name="agree_marketing" class="p-4">
+		{/if}
+		<div class="mb-4 border-2">
+			{#if userInfoFor === UserInfoFor.REGISTRATION}
+				<Form.Field {form} name="agree_eula" class="p-4">
 					<div class="flex flex-row items-center space-x-3 space-y-0">
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
-								<Checkbox
-										{...props}
-										bind:checked={($formData as Infer<FormSchema>).agree_marketing} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+								<Checkbox {...props} bind:checked={($formData as Infer<FormSchema>).agree_eula} />
 								<div class="space-y-1 leading-none">
-									<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
+									<Form.Label>
+										<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
+									</Form.Label>
 								</div>
+								<!-- Checkbox 사용 시 별도의 hidden field 필요 -->
+								<!-- ref: https://stackoverflow.com/a/78404901 -->
 								<input
 									name={props.name}
-									value={($formData as Infer<FormSchema>).agree_marketing}
+									value={($formData as Infer<FormSchema>).agree_eula}
 									hidden />
 							{/snippet}
 						</Form.Control>
 					</div>
 					<Form.FieldErrors />
 				</Form.Field>
-			</div>
-			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Button>가입하기</Form.Button>
-			{:else if userInfoFor === UserInfoFor.INFO_VIEW}
-				<Button href="/user/info/auth">변경하기</Button>
-			{:else}
-				<Form.Button>저장하기</Form.Button>
+				<Form.Field {form} name="agree_privacypolicy" class="p-4">
+					<div class="flex flex-row items-center space-x-3 space-y-0">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox
+										{...props}
+										bind:checked={($formData as Infer<FormSchema>).agree_privacypolicy} />
+								<div class="space-y-1 leading-none">
+									<Form.Label>
+										<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
+									</Form.Label>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<FormSchema>).agree_privacypolicy}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
 			{/if}
-		</form>
-	</Section>
-</Layout>
+			<Form.Field {form} name="agree_marketing" class="p-4">
+				<div class="flex flex-row items-center space-x-3 space-y-0">
+					<Form.Control>
+						{#snippet children({ props })}
+							<!-- prettier-ignore -->
+							<Checkbox
+										{...props}
+										bind:checked={($formData as Infer<FormSchema>).agree_marketing} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
+							</div>
+							<input
+								name={props.name}
+								value={($formData as Infer<FormSchema>).agree_marketing}
+								hidden />
+						{/snippet}
+					</Form.Control>
+				</div>
+				<Form.FieldErrors />
+			</Form.Field>
+		</div>
+		{#if userInfoFor === UserInfoFor.REGISTRATION}
+			<Form.Button>가입하기</Form.Button>
+		{:else if userInfoFor === UserInfoFor.INFO_VIEW}
+			<Button href="/user/info/auth">변경하기</Button>
+		{:else}
+			<Form.Button>저장하기</Form.Button>
+		{/if}
+	</form>
+</Section>
+
+<AlertDialog
+	title={`${title} 처리 도중 오류가 발생했습니다.`}
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorAlert} />
 
 <Dialog.Root bind:open={openCropper}>
 	<Dialog.Content class="sm:max-w-[425px]">

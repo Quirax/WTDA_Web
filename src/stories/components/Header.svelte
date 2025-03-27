@@ -7,39 +7,39 @@
 	import UserAvatar from './Avatar.svelte';
 
 	import './header.css';
-	import logo from '../assets/logo.png';
-	import { fn } from '@storybook/test';
-	import { userContext } from '$lib/context';
+	import { userStore } from '$lib/context';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		title?: string;
-		onLogin?: () => void;
-		onLogout?: () => void;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
 	}
 
-	const {
-		onLogin = fn(),
-		onLogout = fn(),
-		title = '뭐하지공방',
-		showSearchPanel = true,
-		showUserPanel = true,
-	}: Props = $props();
+	const { title = '뭐하지공방', showSearchPanel = true, showUserPanel = true }: Props = $props();
 
-	const user = userContext.v;
+	let user = $state<App.User>(null);
+
+	userStore.subscribe((v) => (user = v));
+
+	const onLogin = () => {
+		goto('/login');
+	};
+	const onLogout = () => {
+		goto('/logout');
+	};
 </script>
 
-<header class="bg-background border-b-2">
-	<div class="flex h-16 items-center justify-between px-4">
+<header class="border-b-2 bg-background">
+	<div class="flex items-center justify-between h-16 px-4">
 		<div class="flex items-center">
-			<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
-				<LogoAvatar.Root class="bg-white p-1">
-					<LogoAvatar.Image src={logo} alt="뭐하지공방 로고" />
+			<a href="/" class="relative rounded-full size-9" aria-label="Logo">
+				<LogoAvatar.Root class="p-1 bg-white">
+					<LogoAvatar.Image src="/logo.png" alt="뭐하지공방 로고" />
 					<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
 				</LogoAvatar.Root>
 			</a>
-			<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
+			<div class="items-center hidden mx-6 space-x-4 font-bold sm:flex lg:space-x-6">
 				{title}
 			</div>
 		</div>
@@ -52,12 +52,12 @@
 			{/if}{#if showUserPanel}
 				{#if user}
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger class="m-0 p-0">
+						<DropdownMenu.Trigger class="p-0 m-0">
 							{#snippet child({ props })}
 								<Button
 									{...props}
 									variant="ghost"
-									class="size-9 rounded-full p-0"
+									class="p-0 rounded-full size-9"
 									aria-label="User Menu">
 									<UserAvatar class="size-9" {user} />
 								</Button>
@@ -66,15 +66,13 @@
 						<DropdownMenu.Content class="w-56" align="end">
 							<DropdownMenu.Label class="font-normal">
 								<div class="flex flex-col space-y-1">
-									<p class="text-sm leading-none font-medium">{user.username}</p>
-									<p class="text-muted-foreground text-xs leading-none">{user.email}</p>
+									<p class="text-sm font-medium leading-none">{user.username}</p>
+									<p class="text-xs leading-none text-muted-foreground">{user.email}</p>
 								</div>
 							</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item onclick={() => (window.location.href = '/user/info')}>
-									내 정보
-								</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/user/info')}>내 정보</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
