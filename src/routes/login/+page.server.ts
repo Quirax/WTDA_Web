@@ -6,7 +6,7 @@ import { formSchema } from '$lib/schema/login';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import * as auth from '$lib/server/auth';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import { UserStatus } from '../../app';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -27,7 +27,10 @@ export const actions: Actions = {
 
 		const { email, password } = form.data;
 
-		const results = await db.select().from(table.user).where(eq(table.user.email, email));
+		const results = await db
+			.select()
+			.from(table.user)
+			.where(and(eq(table.user.email, email), ne(table.user.status, UserStatus.DEACTIVATED))); // Prevent deactivated user to be login
 
 		const existingUser = results.at(0);
 		if (!existingUser) {

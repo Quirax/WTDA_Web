@@ -4,11 +4,12 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, ne } from 'drizzle-orm';
 import * as mailauth from '$lib/server/mail/auth';
 import { formSchema } from '$lib/schema/emailConfirm';
 import { sendEmailConfirm } from '$lib/server/mail';
-import { EmailConfirmFor } from '@app';
+import { EmailConfirmFor, UserStatus } from '@app';
+import { and } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user) throw redirect(302, '/');
@@ -25,7 +26,10 @@ export const actions: Actions = {
 		const email = formData.get('email') as string;
 
 		try {
-			const results = await db.select().from(table.user).where(eq(table.user.email, email));
+			const results = await db
+				.select()
+				.from(table.user)
+				.where(and(eq(table.user.email, email), ne(table.user.status, UserStatus.DEACTIVATED))); // Prevent deactivated user to be login
 
 			const existingUser = results.at(0);
 			if (!existingUser) {

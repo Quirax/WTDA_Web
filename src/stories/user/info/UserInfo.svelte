@@ -29,6 +29,9 @@
 	import { X } from 'lucide-svelte';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import Ul from '$lib/components/typo/ul.svelte';
+	import P from '$lib/components/typo/p.svelte';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -113,6 +116,24 @@
 			$formData.profileImage = '';
 			return $formData;
 		});
+	};
+
+	let openBeforeDeactivationAlert = $state(false);
+	let openAfterDeactivationAlert = $state(false);
+	let openErrorOnDeactivationAlert = $state(false);
+
+	const onDeactivation = async () => {
+		const result = await fetch('?/deactivate', {
+			method: 'post',
+			body: new FormData(),
+		}).then((r) => r.json());
+
+		if ([200, 204].indexOf(result.status || 0) === -1) {
+			if (result.status !== 302) openErrorOnDeactivationAlert = true;
+			return;
+		}
+
+		openAfterDeactivationAlert = true;
 	};
 </script>
 
@@ -314,14 +335,66 @@
 			<Button href="/user/info/auth">변경하기</Button>
 		{:else}
 			<Form.Button>저장하기</Form.Button>
+			<Button variant="destructive" onclick={() => (openBeforeDeactivationAlert = true)}>
+				계정 비활성화하기
+			</Button>
 		{/if}
 	</form>
 </Section>
+
+{#snippet WarningBeforeDeactivation()}
+	<Ul>
+		<li>
+			<span class="font-bold text-destructive">
+				프로필과 남아있는 모든 게시물(커미션 타입, 의뢰 등)은 그대로 보존됩니다.
+			</span>
+			(단, 프로필 이미지와 닉네임은 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.)
+			이를 원하지 않으시는 경우
+			<span class="font-bold text-foreground">
+				먼저 프로필을 초기화하고 게시물을 직접 삭제하시기 바랍니다.
+			</span>
+		</li>
+		<li>
+			다른 사용자와 진행하던 <span class="font-bold text-foreground">
+				모든 커미션은 모두 취소되며, 즉시 환불 조치됩니다.
+			</span>
+		</li>
+		<li>
+			<span class="font-bold text-destructive">
+				적립된 모든 수익금과 사용하지 않은 포인트는 환불되지 않으며, 뭐하지공방에 귀속됩니다.
+			</span>
+			이를 원하지 않으시는 경우
+			<span class="font-bold text-foreground">먼저 수익금을 정산하시기 바랍니다.</span>
+		</li>
+		<li>
+			한 번 비활성화된 계정은 <span class="font-bold text-destructive">복구가 불가능하며,</span>
+			이 계정으로 다시 로그인할 수 없습니다.
+		</li>
+	</Ul>
+	<P>정말로 계정을 비활성화하시겠습니까?</P>
+{/snippet}
 
 <AlertDialog
 	title={`${title} 처리 도중 오류가 발생했습니다.`}
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorAlert} />
+<AlertDialog
+	title="계정 비활성화 전 꼭 읽어보세요"
+	description={WarningBeforeDeactivation}
+	cancel={true}
+	onAction={onDeactivation}
+	bind:open={openBeforeDeactivationAlert} />
+<AlertDialog
+	title="계정 비활성화 완료"
+	description="계정을 비활성화하였습니다. 그동안 뭐하지공방과 함께해주셔서 감사합니다."
+	onAction={() => {
+		window.location.href = '/';
+	}}
+	bind:open={openAfterDeactivationAlert} />
+<AlertDialog
+	title="계정 비활성화 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnDeactivationAlert} />
 
 <Dialog.Root bind:open={openCropper}>
 	<Dialog.Content class="sm:max-w-[425px]">

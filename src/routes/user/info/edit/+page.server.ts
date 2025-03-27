@@ -8,6 +8,8 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { getPasswordHash } from '$lib/server/auth';
+import * as auth from '$lib/server/auth';
+import { UserStatus } from '@app';
 
 export const load = (async (event) => {
 	if (!event.locals.user) throw redirect(302, '/');
@@ -81,9 +83,43 @@ export const actions: Actions = {
 			await db.update(table.user).set(set).where(eq(table.user.id, event.locals.user.id));
 		} catch (e: any) {
 			console.error(e);
-			return fail(500, { message: 'An error has occurred', error: e, form });
+			return fail(500, { message: 'An error has occurred', form });
 		}
 
 		return redirect(302, '/user/info');
+	},
+
+	deactivate: async (event) => {
+		if (!event.locals.user) throw redirect(302, '/');
+		if (!event.locals.session) throw redirect(302, '/');
+
+		try {
+			// TODO: Disable all commission request and request suggestion
+
+			// TODO: Cancel all commission and refund
+
+			// TODO: Belong all remain gains and points to WTDA
+
+			await db
+				.update(table.user)
+				.set({
+					status: UserStatus.DEACTIVATED, // Deactivate
+					profileImage: null, // Remove profile image
+					username: `DELETED(${event.locals.user.id})`, // Change username
+				})
+				.where(eq(table.user.id, event.locals.user.id));
+
+			// Invalidate session
+			await auth.invalidateSession(event.locals.session.id);
+			auth.deleteSessionTokenCookie(event);
+
+			event.locals.user = null;
+			event.locals.session = null;
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Deletion of account completed' };
 	},
 };
