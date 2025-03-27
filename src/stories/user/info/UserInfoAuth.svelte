@@ -11,7 +11,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import Ul from '$lib/components/typo/ul.svelte';
-	import { layoutStore } from '$lib/context';
+	import Header from '$stories/components/Header.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -19,38 +20,15 @@
 
 	const { data }: Props = $props();
 
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = '사용자 정보 변경';
-
-			return newValue;
-		});
-	});
+	let openUserNotFoundAlert = $state(false);
+	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(passwordSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				layoutStore.update((value) => {
-					const newValue = { ...value };
-
-					if (result.status === 404)
-						newValue.alert = {
-							title: '입력하신 비밀번호가 틀렸습니다.',
-							description: userNotFoundDesc,
-						};
-					else
-						newValue.alert = {
-							title: '비밀번호 확인 도중 오류가 발생했습니다.',
-							description: '고객센터에 문의해주시기 바랍니다.',
-						};
-
-					newValue.openAlert = true;
-
-					return newValue;
-				});
+				if (result.status === 404) openUserNotFoundAlert = true;
+				else openOtherErrorAlert = true;
 
 				cancel();
 			}
@@ -68,6 +46,8 @@
 		</li>
 	</Ul>
 {/snippet}
+
+<Header title="사용자 정보 변경" />
 
 <Section>
 	<H2>비밀번호 확인</H2>
@@ -90,3 +70,12 @@
 		<Form.Button>확인</Form.Button>
 	</form>
 </Section>
+
+<AlertDialog
+	title="입력하신 비밀번호가 틀렸습니다."
+	description={userNotFoundDesc}
+	bind:open={openUserNotFoundAlert} />
+<AlertDialog
+	title="비밀번호 확인 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openOtherErrorAlert} />

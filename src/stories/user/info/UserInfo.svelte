@@ -28,6 +28,8 @@
 	import Dropzone from 'svelte-file-dropzone';
 	import { X } from 'lucide-svelte';
 	import { layoutStore } from '$lib/context';
+	import Header from '$stories/components/Header.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -37,6 +39,7 @@
 	const { data, for: userInfoFor }: Props = $props();
 
 	let title = $state('');
+	let openErrorAlert = $state(false);
 
 	switch (userInfoFor) {
 		case UserInfoFor.REGISTRATION: {
@@ -53,34 +56,12 @@
 		}
 	}
 
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = title;
-			newValue.alert = {
-				title: `${title} 처리 도중 오류가 발생했습니다.`,
-				description: '고객센터에 문의해주시기 바랍니다.',
-			};
-			newValue.showSearchPanel = userInfoFor !== UserInfoFor.REGISTRATION;
-			newValue.showUserPanel = userInfoFor !== UserInfoFor.REGISTRATION;
-
-			return newValue;
-		});
-	});
-
 	const form = superForm(data, {
 		validators: zodClient(userInfoFor === UserInfoFor.REGISTRATION ? formSchema : userSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
-				layoutStore.update((value) => {
-					const newValue = { ...value };
-
-					newValue.openAlert = true;
-
-					return newValue;
-				});
+				openErrorAlert = true;
 				cancel();
 			}
 		},
@@ -135,6 +116,8 @@
 		});
 	};
 </script>
+
+<Header {title} />
 
 <Section>
 	<H2>{title}</H2>
@@ -335,6 +318,11 @@
 		{/if}
 	</form>
 </Section>
+
+<AlertDialog
+	title={`${title} 처리 도중 오류가 발생했습니다.`}
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorAlert} />
 
 <Dialog.Root bind:open={openCropper}>
 	<Dialog.Content class="sm:max-w-[425px]">

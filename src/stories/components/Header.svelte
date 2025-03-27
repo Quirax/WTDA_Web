@@ -7,30 +7,27 @@
 	import UserAvatar from './Avatar.svelte';
 
 	import './header.css';
-	import logo from '../assets/logo.png';
-	import { fn } from '@storybook/test';
 	import { userStore } from '$lib/context';
 	import { goto } from '$app/navigation';
 
 	interface Props {
 		title?: string;
-		onLogin?: () => void;
-		onLogout?: () => void;
 		showSearchPanel?: boolean;
 		showUserPanel?: boolean;
 	}
 
-	const {
-		onLogin = fn(),
-		onLogout = fn(),
-		title = '뭐하지공방',
-		showSearchPanel = true,
-		showUserPanel = true,
-	}: Props = $props();
+	const { title = '뭐하지공방', showSearchPanel = true, showUserPanel = true }: Props = $props();
 
 	let user = $state<App.User>(null);
 
 	userStore.subscribe((v) => (user = v));
+
+	const onLogin = () => {
+		goto('/login');
+	};
+	const onLogout = () => {
+		goto('/logout');
+	};
 </script>
 
 <header class="border-b-2 bg-background">
