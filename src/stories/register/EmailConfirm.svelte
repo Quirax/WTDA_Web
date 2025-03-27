@@ -128,9 +128,9 @@
 <Section>
 	<H2>{descriptions.heading}</H2>
 	<P>{descriptions.desc}</P>
-	<form method="POST" class="w-2/3" action="?/do" use:enhance>
+	<form method="POST" class="w-full sm:w-2/3" action="?/do" use:enhance>
 		{#if confirmFor === EmailConfirmFor.RESET_PASSWORD}
-			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
+			<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>비밀번호를 재설정할 이메일 주소</Form.Label>
@@ -145,13 +145,13 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<div class="my-4 flex flex-col space-y-1">
-			<div class="text-sm leading-none font-medium">
+		<div class="flex flex-col my-4 space-y-1">
+			<div class="text-sm font-medium leading-none">
 				아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 			</div>
 		</div>
 		<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
-		<Form.Field {form} name="confirmCode" class="my-4 flex flex-col space-y-1">
+		<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>

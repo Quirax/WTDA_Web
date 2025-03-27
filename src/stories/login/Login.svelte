@@ -65,8 +65,8 @@
 
 <Section>
 	<H2>로그인</H2>
-	<form method="POST" use:enhance class="w-2/3" action="?">
-		<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
+	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
+		<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>이메일</Form.Label>
@@ -75,7 +75,7 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
+		<Form.Field {form} name="password" class="flex flex-col mb-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>비밀번호</Form.Label>

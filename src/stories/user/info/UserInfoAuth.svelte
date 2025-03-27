@@ -52,7 +52,7 @@
 <Section>
 	<H2>비밀번호 확인</H2>
 	<P>본인확인을 위해 비밀번호를 입력하십시오</P>
-	<form method="POST" use:enhance class="w-2/3" action="?">
+	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
 		<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}

@@ -47,8 +47,8 @@
 <Section>
 	<H2>비밀번호 재설정</H2>
 	<P>새로운 비밀번호를 입력하십시오</P>
-	<form method="POST" use:enhance class="w-2/3" action="?">
-		<Form.Field {form} name="password" class="my-4 flex flex-col space-y-1">
+	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
+		<Form.Field {form} name="password" class="flex flex-col my-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>새 비밀번호</Form.Label>
@@ -62,7 +62,7 @@
 			<Form.Description>최소 8자 이상</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="passwordConfirm" class="mb-4 flex flex-col space-y-1">
+		<Form.Field {form} name="passwordConfirm" class="flex flex-col mb-4 space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>비밀번호 확인</Form.Label>
