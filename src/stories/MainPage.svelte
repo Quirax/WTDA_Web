@@ -14,7 +14,7 @@
 	import Avatar from './components/Avatar.svelte';
 
 	import './MainPage.css';
-	import { layoutStore } from '$lib/context';
+	import Header from './components/Header.svelte';
 
 	interface Props {
 		recentCommissionTypes?: App.CommisionType[];
@@ -29,17 +29,10 @@
 
 	const { recentCommissionTypes = [], recentRequests = [], introductions = [] }: Props = $props();
 
-	$effect.pre(() => {
-		layoutStore.set({
-			title: '뭐하지공방',
-			showSearchPanel: true,
-			showUserPanel: true,
-			openAlert: false,
-		});
-	});
-
 	let userMode = $state<UserMode>(UserMode.requester);
 </script>
+
+<Header title="뭐하지공방" />
 
 <section
 	id="search"

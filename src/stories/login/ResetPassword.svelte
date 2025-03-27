@@ -11,6 +11,8 @@
 	import P from '$lib/components/typo/p.svelte';
 	import { layoutStore } from '$lib/context';
 	import { goto } from '$app/navigation';
+	import Header from '$stories/components/Header.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -18,19 +20,10 @@
 
 	const { data }: Props = $props();
 
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = '비밀번호 재설정';
-			newValue.showSearchPanel = false;
-			newValue.showUserPanel = false;
-
-			return newValue;
-		});
-	});
-
 	let disableButton = $state(false);
+
+	let openFailedAlert = $state(false);
+	let openSucceedAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(passwordSchema),
@@ -38,34 +31,19 @@
 			disableButton = true;
 		},
 		onResult({ result, cancel }) {
-			layoutStore.update((value) => {
-				const newValue = { ...value };
-
-				if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-					newValue.alert = {
-						title: '비밀번호 재설정 도중 오류가 발생했습니다.',
-						description: '고객센터에 문의해주시기 바랍니다.',
-					};
-					disableButton = false;
-					cancel();
-				} else {
-					newValue.alert = {
-						title: '비밀번호가 재설정되었습니다.',
-						description: '변경된 비밀번호로 다시 로그인하시기 바랍니다.',
-						onAction: () => {
-							goto('/login');
-						},
-					};
-				}
-
-				newValue.openAlert = true;
-
-				return newValue;
-			});
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				openFailedAlert = true;
+				disableButton = false;
+				cancel();
+			} else {
+				openSucceedAlert = true;
+			}
 		},
 	});
 	const { form: formData, enhance, constraints } = form;
 </script>
+
+<Header title="비밀번호 재설정" showSearchPanel={false} showUserPanel={false} />
 
 <Section>
 	<H2>비밀번호 재설정</H2>
@@ -101,3 +79,15 @@
 		<Form.Button disabled={disableButton}>비밀번호 재설정</Form.Button>
 	</form>
 </Section>
+
+<AlertDialog
+	title="비밀번호 재설정 도중 오류가 발생했습니다."
+	description="비밀번호 재설정 도중 오류가 발생했습니다."
+	bind:open={openFailedAlert} />
+<AlertDialog
+	title="비밀번호가 재설정되었습니다."
+	description="변경된 비밀번호로 다시 로그인하시기 바랍니다."
+	onAction={() => {
+		goto('/login');
+	}}
+	bind:open={openSucceedAlert} />

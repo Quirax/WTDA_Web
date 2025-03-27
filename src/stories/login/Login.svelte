@@ -8,6 +8,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { layoutStore } from '$lib/context';
 	import { formSchema, type FormSchema } from '$lib/schema/login';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -29,38 +31,15 @@
 		},
 	}: Props = $props();
 
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = '로그인';
-
-			return newValue;
-		});
-	});
+	let openUserNotFoundAlert = $state(false);
+	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				layoutStore.update((value) => {
-					const newValue = { ...value };
-
-					if (result.status === 404)
-						newValue.alert = {
-							title: '입력하신 이메일 또는 비밀번호가 틀렸습니다.',
-							description: userNotFoundDesc,
-						};
-					else
-						newValue.alert = {
-							title: '로그인 처리 도중 오류가 발생했습니다.',
-							description: '고객센터에 문의해주시기 바랍니다.',
-						};
-
-					newValue.openAlert = true;
-
-					return newValue;
-				});
+				if (result.status === 404) openUserNotFoundAlert = true;
+				else openOtherErrorAlert = true;
 				cancel();
 			}
 		},
@@ -82,6 +61,8 @@
 		</li>
 	</Ul>
 {/snippet}
+
+<Header title="로그인" />
 
 <Section>
 	<H2>로그인</H2>
@@ -112,3 +93,12 @@
 		<Button href="/login/reset-password">비밀번호 재설정</Button>
 	</form>
 </Section>
+
+<AlertDialog
+	title="입력하신 이메일 또는 비밀번호가 틀렸습니다."
+	description={userNotFoundDesc}
+	bind:open={openUserNotFoundAlert} />
+<AlertDialog
+	title="로그인 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openOtherErrorAlert} />

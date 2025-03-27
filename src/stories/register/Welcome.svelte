@@ -6,25 +6,16 @@
 	import P from '$lib/components/typo/p.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { layoutStore } from '$lib/context';
+	import Header from '$stories/components/Header.svelte';
 
 	interface Props {
 		username: string;
 	}
 
 	const { username = '' }: Props = $props();
-
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = '환영합니다!';
-			newValue.showSearchPanel = false;
-			newValue.showUserPanel = false;
-
-			return newValue;
-		});
-	});
 </script>
+
+<Header title="환영합니다!" />
 
 <section
 	id="search"

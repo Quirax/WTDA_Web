@@ -14,6 +14,8 @@
 	import { emailExpiresIn } from '$lib/config';
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { layoutStore } from '$lib/context';
+	import Header from '$stories/components/Header.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -54,34 +56,13 @@
 
 	let descriptions = $derived(setDescriptions());
 
-	$effect.pre(() => {
-		layoutStore.update((value) => {
-			const newValue = { ...value };
-
-			newValue.title = descriptions.title;
-			newValue.showSearchPanel = false;
-			newValue.showUserPanel = false;
-
-			return newValue;
-		});
-	});
+	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				layoutStore.update((value) => {
-					const newValue = { ...value };
-
-					newValue.alert = {
-						title: '이메일 인증 처리 도중 오류가 발생했습니다.',
-						description: '고객센터에 문의해주시기 바랍니다.',
-					};
-					newValue.openAlert = true;
-
-					return newValue;
-				});
-
+				openOtherErrorAlert = true;
 				cancel();
 			}
 		},
@@ -99,6 +80,9 @@
 
 	let email = $state('');
 
+	let openUserNotFoundAlert = $state(false);
+	let openSendErrorAlert = $state(false);
+
 	const onSend = async () => {
 		const formData = new FormData();
 
@@ -114,23 +98,9 @@
 		}).then((r) => r.json());
 
 		if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-			layoutStore.update((value) => {
-				const newValue = { ...value };
-
-				if (result.status === 404)
-					newValue.alert = {
-						title: '해당 이메일을 사용하는 사용자가 없습니다.',
-						description: userNotFoundDesc,
-					};
-				else
-					newValue.alert = {
-						title: '인증메일을 보내는 도중 오류가 발생했습니다.',
-						description: '고객센터에 문의해주시기 바랍니다.',
-					};
-				newValue.openAlert = true;
-
-				return newValue;
-			});
+			if (result.status === 404) openUserNotFoundAlert = true;
+			else openSendErrorAlert = true;
+			expiresIn = 0;
 			return;
 		}
 
@@ -153,6 +123,8 @@
 		</li>
 	</Ul>
 {/snippet}
+
+<Header title={descriptions.title} showSearchPanel={false} showUserPanel={false} />
 
 <Section>
 	<H2>{descriptions.heading}</H2>
@@ -201,3 +173,16 @@
 		<Form.Button type="submit" disabled={expiresIn <= 0}>인증완료</Form.Button>
 	</form>
 </Section>
+
+<AlertDialog
+	title="해당 이메일을 사용하는 사용자가 없습니다."
+	description={userNotFoundDesc}
+	bind:open={openUserNotFoundAlert} />
+<AlertDialog
+	title="이메일 인증 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openOtherErrorAlert} />
+<AlertDialog
+	title="인증메일을 보내는 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openSendErrorAlert} />
