@@ -10,6 +10,7 @@
 	import Footer from './components/Footer.svelte';
 	import type { Snippet } from 'svelte';
 	import { layoutStore } from '$lib/context';
+	import { goto } from '$app/navigation';
 
 	export interface Alert {
 		title: string;
