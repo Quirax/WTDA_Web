@@ -46,6 +46,9 @@ export const actions: Actions = {
 		const session = await auth.createSession(sessionToken, existingUser.id);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
+		event.locals.user = existingUser;
+		event.locals.session = session;
+
 		if (existingUser.status === UserStatus.REQUIRED_EMAIL_CONFIRM)
 			return redirect(302, '/register/email-confirm');
 		else return redirect(302, '/');
