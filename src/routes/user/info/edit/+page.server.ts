@@ -9,6 +9,7 @@ import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { getPasswordHash } from '$lib/server/auth';
 import * as auth from '$lib/server/auth';
+import { UserStatus } from '@app';
 
 export const load = (async (event) => {
 	if (!event.locals.user) throw redirect(302, '/');
@@ -88,12 +89,27 @@ export const actions: Actions = {
 		return redirect(302, '/user/info');
 	},
 
-	delete: async (event) => {
+	deactivate: async (event) => {
 		if (!event.locals.user) throw redirect(302, '/');
 		if (!event.locals.session) throw redirect(302, '/');
 
 		try {
-			// await db.delete(table.user).where(eq(table.user.id, event.locals.user.id));
+			// TODO: Disable all commission request and request suggestion
+
+			// TODO: Cancel all commission and refund
+
+			// TODO: Belong all remain gains and points to WTDA
+
+			await db
+				.update(table.user)
+				.set({
+					status: UserStatus.DEACTIVATED, // Deactivate
+					profileImage: null, // Remove profile image
+					username: `DELETED(${event.locals.user.id})`, // Change username
+				})
+				.where(eq(table.user.id, event.locals.user.id));
+
+			// Invalidate session
 			await auth.invalidateSession(event.locals.session.id);
 			auth.deleteSessionTokenCookie(event);
 		} catch (e: any) {

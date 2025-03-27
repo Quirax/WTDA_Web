@@ -31,6 +31,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import Ul from '$lib/components/typo/ul.svelte';
 	import P from '$lib/components/typo/p.svelte';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -117,10 +118,22 @@
 		});
 	};
 
-	let openDeactivationAlert = $state(false);
+	let openBeforeDeactivationAlert = $state(false);
+	let openAfterDeactivationAlert = $state(false);
+	let openErrorOnDeactivationAlert = $state(false);
 
-	const onDeactivation = () => {
-		alert('악!');
+	const onDeactivation = async () => {
+		const result = await fetch('?/deactivate', {
+			method: 'post',
+			body: new FormData(),
+		}).then((r) => r.json());
+
+		if ([200, 204].indexOf(result.status || 0) === -1) {
+			if (result.status !== 302) openErrorOnDeactivationAlert = true;
+			return;
+		}
+
+		openAfterDeactivationAlert = true;
 	};
 </script>
 
@@ -322,7 +335,7 @@
 			<Button href="/user/info/auth">변경하기</Button>
 		{:else}
 			<Form.Button>저장하기</Form.Button>
-			<Button variant="destructive" onclick={() => (openDeactivationAlert = true)}>
+			<Button variant="destructive" onclick={() => (openBeforeDeactivationAlert = true)}>
 				계정 비활성화하기
 			</Button>
 		{/if}
@@ -335,8 +348,8 @@
 			<span class="font-bold text-destructive">
 				프로필과 남아있는 모든 게시물(커미션 타입, 의뢰 등)은 그대로 보존됩니다.
 			</span>
-			(단, 프로필 이미지는 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.) 이를
-			원하지 않으시는 경우
+			(단, 프로필 이미지와 닉네임은 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.)
+			이를 원하지 않으시는 경우
 			<span class="font-bold text-foreground">
 				먼저 프로필을 초기화하고 게시물을 직접 삭제하시기 바랍니다.
 			</span>
@@ -370,7 +383,18 @@
 	description={WarningBeforeDeactivation}
 	cancel={true}
 	onAction={onDeactivation}
-	bind:open={openDeactivationAlert} />
+	bind:open={openBeforeDeactivationAlert} />
+<AlertDialog
+	title="계정 비활성화 완료"
+	description="계정을 비활성화하였습니다. 그동안 뭐하지공방과 함께해주셔서 감사합니다."
+	onAction={() => {
+		goto('/');
+	}}
+	bind:open={openAfterDeactivationAlert} />
+<AlertDialog
+	title="계정 비활성화 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnDeactivationAlert} />
 
 <Dialog.Root bind:open={openCropper}>
 	<Dialog.Content class="sm:max-w-[425px]">
