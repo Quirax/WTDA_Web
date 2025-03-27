@@ -10,6 +10,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import P from '$lib/components/typo/p.svelte';
 	import { layoutStore } from '$lib/context';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -52,7 +53,7 @@
 						title: '비밀번호가 재설정되었습니다.',
 						description: '변경된 비밀번호로 다시 로그인하시기 바랍니다.',
 						onAction: () => {
-							window.location.href = '/login';
+							goto('/login');
 						},
 					};
 				}

@@ -60,10 +60,10 @@
 	});
 
 	const onLogin = () => {
-		window.location.href = '/login';
+		goto('/login');
 	};
 	const onLogout = () => {
-		window.location.href = '/logout';
+		goto('/logout');
 	};
 </script>
 
