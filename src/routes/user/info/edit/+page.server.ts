@@ -8,6 +8,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { getPasswordHash } from '$lib/server/auth';
+import * as auth from '$lib/server/auth';
 
 export const load = (async (event) => {
 	if (!event.locals.user) throw redirect(302, '/');
@@ -81,9 +82,25 @@ export const actions: Actions = {
 			await db.update(table.user).set(set).where(eq(table.user.id, event.locals.user.id));
 		} catch (e: any) {
 			console.error(e);
-			return fail(500, { message: 'An error has occurred', error: e, form });
+			return fail(500, { message: 'An error has occurred', form });
 		}
 
 		return redirect(302, '/user/info');
+	},
+
+	delete: async (event) => {
+		if (!event.locals.user) throw redirect(302, '/');
+		if (!event.locals.session) throw redirect(302, '/');
+
+		try {
+			// await db.delete(table.user).where(eq(table.user.id, event.locals.user.id));
+			await auth.invalidateSession(event.locals.session.id);
+			auth.deleteSessionTokenCookie(event);
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Deletion of account completed' };
 	},
 };
