@@ -6,7 +6,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { layoutStore } from '$lib/context';
 	import { formSchema, type FormSchema } from '$lib/schema/login';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import Header from '$stories/components/Header.svelte';
@@ -67,7 +66,7 @@
 <Section>
 	<H2>로그인</H2>
 	<form method="POST" use:enhance class="w-2/3" action="?">
-		<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
+		<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>이메일</Form.Label>
@@ -76,7 +75,7 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="password" class="flex flex-col mb-4 space-y-1">
+		<Form.Field {form} name="password" class="mb-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>비밀번호</Form.Label>

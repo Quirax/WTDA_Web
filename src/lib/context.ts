@@ -54,6 +54,3 @@ class Reconstructive<T extends object> {
 
 export const userStore = writable<App.User>();
 export const sessionStore = writable<App.Session>();
-
-// ref: https://stackoverflow.com/a/74089977
-export const layoutStore = writable<ComponentProps<typeof Layout>>();

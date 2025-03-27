@@ -27,7 +27,6 @@
 	import Cropper from '$lib/components/cropper';
 	import Dropzone from 'svelte-file-dropzone';
 	import { X } from 'lucide-svelte';
-	import { layoutStore } from '$lib/context';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
