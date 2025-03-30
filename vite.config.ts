@@ -69,6 +69,8 @@ export default defineConfig({
 		],
 	},
 	optimizeDeps: {
-		holdUntilCrawlEnd: true,
+		// https://vite.dev/config/dep-optimization-options
+		noDiscovery: true,
+		include: undefined,
 	},
 });
