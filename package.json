@@ -12,7 +12,7 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run && npm run test:e2e",
+		"test": "yarn run test:unit -- --run && yarn run test:e2e",
 		"test:e2e": "playwright test",
 		"db:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit migrate",
@@ -88,5 +88,9 @@
 		"simple-icons": "^14.9.0",
 		"svelte-crop-window": "^0.1.1",
 		"svelte-file-dropzone": "^2.0.9"
-	}
+	},
+	"main": "index.js",
+	"repository": "https://github.com/What-To-Do-Atelier/WTDA_Web.git",
+	"author": "Quirax Lee <quiraxical@gmail.com>",
+	"license": "MIT"
 }

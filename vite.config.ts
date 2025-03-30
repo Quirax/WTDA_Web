@@ -68,9 +68,4 @@ export default defineConfig({
 			},
 		],
 	},
-	optimizeDeps: {
-		// https://vite.dev/config/dep-optimization-options
-		noDiscovery: true,
-		include: undefined,
-	},
 });
