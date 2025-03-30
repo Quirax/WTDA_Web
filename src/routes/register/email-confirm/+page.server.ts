@@ -41,7 +41,8 @@ export const actions: Actions = {
 				result,
 			};
 		} catch (e: any) {
-			return fail(500, { message: 'An error has occurred', error: e });
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
@@ -71,7 +72,8 @@ export const actions: Actions = {
 				.set({ status: UserStatus.NOT_AUTHENTICATED })
 				.where(eq(table.user.id, emailConfirm.userId));
 		} catch (e: any) {
-			return fail(500, { message: 'An error has occurred', error: e, form });
+			console.error(e);
+			return fail(500, { message: 'An error has occurred', form });
 		}
 
 		return redirect(302, '/register/welcome');

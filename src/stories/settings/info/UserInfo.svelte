@@ -172,10 +172,14 @@
 							type="password"
 							bind:value={$formData.password}
 							{...$constraints.password}
-							placeholder="(기존 비밀번호 유지)" />
+							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT && '(기존 비밀번호 유지)') ||
+								''} />
 					{/snippet}
 				</Form.Control>
-				<Form.Description>변경하려는 경우에만 입력, 최소 8자 이상</Form.Description>
+				<Form.Description>
+					{(userInfoFor === UserInfoFor.INFO_EDIT && '변경하려는 경우에만 입력, ') || ''}최소 8자
+					이상
+				</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 			<Form.Field {form} name="passwordConfirm" class="flex flex-col mt-4 space-y-1">
@@ -192,7 +196,8 @@
 							type="password"
 							bind:value={$formData.passwordConfirm}
 							{...$constraints.passwordConfirm}
-							placeholder="(기존 비밀번호 유지)" />
+							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT && '(기존 비밀번호 유지)') ||
+								''} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -212,7 +217,7 @@
 						bind:value={$formData.username}
 						{...$constraints.username}
 						class="text-foreground opacity-100!"
-						disabled={userInfoFor !== UserInfoFor.INFO_EDIT} />
+						disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
 				{/snippet}
 			</Form.Control>
 			{#if userInfoFor === UserInfoFor.INFO_EDIT}
