@@ -1,5 +1,5 @@
 <script lang="ts">
-	import UserInfoAuth from '$stories/user/info/UserInfoAuth.svelte';
+	import UserInfoAuth from '$stories/settings/info/UserInfoAuth.svelte';
 	import type { PageServerData } from './$types';
 
 	let { data }: { data: PageServerData } = $props();

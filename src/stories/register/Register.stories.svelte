@@ -2,7 +2,7 @@
 
 <script module>
 	import { defineMeta } from '@storybook/addon-svelte-csf';
-	import UserInfo, { UserInfoFor } from '../user/info/UserInfo.svelte';
+	import UserInfo, { UserInfoFor } from '../settings/info/UserInfo.svelte';
 
 	// More on how to set up stories at: https://storybook.js.org/docs/writing-stories
 	const { Story } = defineMeta({

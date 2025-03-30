@@ -332,7 +332,7 @@
 		{#if userInfoFor === UserInfoFor.REGISTRATION}
 			<Form.Button>가입하기</Form.Button>
 		{:else if userInfoFor === UserInfoFor.INFO_VIEW}
-			<Button href="/user/info/auth">변경하기</Button>
+			<Button href="/settings/info/auth">변경하기</Button>
 		{:else}
 			<Form.Button>저장하기</Form.Button>
 			<Button variant="destructive" onclick={() => (openBeforeDeactivationAlert = true)}>

@@ -47,6 +47,6 @@ export const actions: Actions = {
 			path: '/',
 		});
 
-		return redirect(302, '/user/info/edit');
+		return redirect(302, '/settings/info/edit');
 	},
 };
