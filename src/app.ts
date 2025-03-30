@@ -3,6 +3,10 @@
 
 declare global {
 	namespace App {
+		interface Preferences {
+			agree_marketing: boolean;
+		}
+
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
 		type Session = import('$lib/server/auth').SessionValidationResult['session'];
 
