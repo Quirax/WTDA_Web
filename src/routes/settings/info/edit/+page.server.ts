@@ -16,7 +16,7 @@ export const load = (async (event) => {
 
 	const userInfoEditToken = event.cookies.get(_userInfoEditCookie);
 
-	if (!userInfoEditToken) throw redirect(302, '/user/info');
+	if (!userInfoEditToken) throw redirect(302, '/settings/info');
 
 	event.cookies.delete(_userInfoEditCookie, {
 		path: '/',
@@ -86,7 +86,7 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred', form });
 		}
 
-		return redirect(302, '/user/info');
+		return redirect(302, '/settings/info');
 	},
 
 	deactivate: async (event) => {

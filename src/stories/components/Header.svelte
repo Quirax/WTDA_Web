@@ -72,7 +72,9 @@
 							</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item onclick={() => goto('/user/info')}>내 정보</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/settings/info')}>
+									내 정보
+								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
