@@ -256,7 +256,7 @@
 							</Dropzone>
 							<input name={props.name} value="" hidden />
 						{:else}
-							<User class="border size-50" />
+							<User class="border rounded-full size-50" />
 						{/if}
 					{/snippet}
 				</Form.Control>
