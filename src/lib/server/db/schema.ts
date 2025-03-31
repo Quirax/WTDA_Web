@@ -14,7 +14,8 @@ export const user = pgTable('user', {
 	// fallbackInitial: text('fallback_initial').notNull(), // 이니셜
 	email: text('email').notNull().unique(), // 이메일
 	status: statusEnum().notNull().default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
-	preferences: json().$type<Partial<App.Preferences>>(),
+	preferences: json('preferences').$type<Partial<App.Preferences>>().notNull().default({}),
+	profile: json('profile').$type<Partial<App.Profile>>().notNull().default({}),
 });
 
 export const session = pgTable('session', {

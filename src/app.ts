@@ -7,6 +7,10 @@ declare global {
 			agree_marketing: boolean;
 		}
 
+		interface Profile {
+			headerImage: string;
+		}
+
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
 		type Session = import('$lib/server/auth').SessionValidationResult['session'];
 
