@@ -23,6 +23,7 @@
 
 <main class="flex">
 	<section class="box-border w-100 p-6">
+		<section>사용자 정보 설정 버튼</section>
 		<section class="flex w-full justify-center">
 			<div class="aspect-square w-50 overflow-hidden rounded-full border">
 				{#if user.profileImage}
@@ -32,13 +33,12 @@
 				{/if}
 			</div>
 		</section>
-		<section>각종 기본 정보</section>
-		<section>SNS 및 타 사이트 링크</section>
-		<section>사용자 정보 설정 버튼</section>
+		<section>닉네임</section>
+		<section>메시지하기(+ 문의 가능 시간, 평균 응답 시간) 공유 기타(차단, 신고)</section>
 		<section>남은 슬롯 갯수</section>
-		<section>신뢰점수</section>
-		<section>문의 가능 시간</section>
-		<section>통계(총 작업 수, 평균응답시간)</section>
+		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
+		<section>소개</section>
+		<section>SNS 및 타 사이트 링크</section>
 	</section>
 	<section>
 		<section>공지사항</section>
