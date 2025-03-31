@@ -2,6 +2,7 @@
 
 <script lang="ts">
 	import Header from '$stories/components/Header.svelte';
+	import User from 'lucide-svelte/icons/user';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -15,11 +16,19 @@
 <img
 	src={'https://pbs.twimg.com/profile_banners/761549578210463744/1578316989'}
 	alt="{user.username} 님의 헤더 이미지"
-	class="aspect-9/1 w-full" />
+	class="w-full aspect-9/1" />
 
 <main class="flex">
-	<section>
-		<section>프로필 이미지</section>
+	<section class="box-border p-6 w-100">
+		<section class="flex justify-center w-full">
+			<div class="overflow-hidden border rounded-full w-50 aspect-square">
+				{#if user.profileImage}
+					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
+				{:else}
+					<User class="size-full" />
+				{/if}
+			</div>
+		</section>
 		<section>각종 기본 정보</section>
 		<section>SNS 및 타 사이트 링크</section>
 		<section>사용자 정보 설정 버튼</section>
