@@ -13,15 +13,18 @@
 
 <Header title={user.username} />
 
-<img
-	src={'https://pbs.twimg.com/profile_banners/761549578210463744/1578316989'}
-	alt="{user.username} 님의 헤더 이미지"
-	class="w-full aspect-9/1" />
+<section class="aspect-9/1 w-full">
+	{#if user.profile.headerImage}
+		<img src={user.profile.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
+	{:else}
+		<div class="bg-primary size-full bg-[url(/background-pattern-banner.png)]"></div>
+	{/if}
+</section>
 
 <main class="flex">
-	<section class="box-border p-6 w-100">
-		<section class="flex justify-center w-full">
-			<div class="overflow-hidden border rounded-full w-50 aspect-square">
+	<section class="box-border w-100 p-6">
+		<section class="flex w-full justify-center">
+			<div class="aspect-square w-50 overflow-hidden rounded-full border">
 				{#if user.profileImage}
 					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
 				{:else}

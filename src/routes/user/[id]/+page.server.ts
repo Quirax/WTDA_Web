@@ -20,6 +20,7 @@ export const load = (async ({ params, locals }) => {
 				profileImage: table.user.profileImage,
 				email: table.user.email,
 				preferences: table.user.preferences,
+				profile: table.user.profile,
 			})
 			.from(table.user)
 			.where(eq(table.user.id, id))
