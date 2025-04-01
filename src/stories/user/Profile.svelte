@@ -16,6 +16,8 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
 	import * as Alert from '$lib/components/ui/alert/index.js';
+	import H2 from '$lib/components/typo/h2.svelte';
+	import H3 from '$lib/components/typo/h3.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -53,7 +55,7 @@
 				{/if}
 			</div>
 		</section>
-		<h2 class="text-center text-2xl font-bold">{user.username}</h2>
+		<H2 class="border-none text-center">{user.username}</H2>
 		<section class="flex">
 			<Button class="w-full flex-1 text-lg">
 				<MessageSquare />
@@ -88,7 +90,7 @@
 		</Alert.Root>
 		<section class="space-y-2">
 			<div>
-				<h3 class="inline-block text-xl font-bold">남은 슬롯 갯수</h3>
+				<H3 class="inline-block">남은 슬롯 갯수</H3>
 				<span>{openedSlot}/{maxSlot}</span>
 			</div>
 			<div class="space-y-2 space-x-2">
@@ -101,7 +103,7 @@
 		</section>
 		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
 		<section class="space-y-2">
-			<h3 class="text-center text-xl font-bold">소개</h3>
+			<H3 class="text-center">소개</H3>
 			<article class="border p-4">
 				{#if user.profile.introduction}
 					{@html sanitizeHtml(user.profile.introduction)}
@@ -110,7 +112,9 @@
 				{/if}
 			</article>
 		</section>
-		<section>SNS 및 타 사이트 링크</section>
+		<section>
+			<!-- 링크 -->
+		</section>
 	</section>
 	<section>
 		<section>공지사항</section>
