@@ -145,7 +145,7 @@
 		</section>
 		{#if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
-				<!-- 링크 -->
+				<H3 class="hidden">링크</H3>
 				{#each user.profile.links || [] as link}
 					<div>
 						<Link class="bg-primary inline-block size-5 rounded-full p-0.5 text-white" />
