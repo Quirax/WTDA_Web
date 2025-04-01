@@ -12,6 +12,7 @@
 		CircleCheck,
 		MessageSquare,
 		Clock,
+		Link,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
@@ -113,9 +114,23 @@
 				{/if}
 			</article>
 		</section>
-		<section>
-			<!-- 링크 -->
-		</section>
+		{#if (user.profile.links || []).length > 0}
+			<section class="grid grid-cols-2 gap-2 border p-4">
+				<!-- 링크 -->
+				{#each user.profile.links || [] as link}
+					<div>
+						<Link class="bg-primary inline-block size-5 rounded-full p-0.5 text-white" />
+						<Button
+							variant="link"
+							href={link.href}
+							target={link.target}
+							class="text-md text-foreground align-middle">
+							{link.text}
+						</Button>
+					</div>
+				{/each}
+			</section>
+		{/if}
 	</section>
 	<section>
 		<section>공지사항</section>

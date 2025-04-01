@@ -1,7 +1,7 @@
 import type { SimpleIcon } from 'simple-icons';
 import { siX, siMastodon, siBluesky } from 'simple-icons';
 
-type Link = {
+export type Link = {
 	href: string;
 	target?: string;
 	text: string;

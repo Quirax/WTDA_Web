@@ -1,6 +1,8 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
+import type { Link } from '$lib/config';
+
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
 		? Acc[number]
@@ -25,6 +27,7 @@ declare global {
 			headerImage: string;
 			introduction: string;
 			contactAvailable: boolean | Range<NumberEnumerate<24>>;
+			links: Link[];
 		}
 
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
