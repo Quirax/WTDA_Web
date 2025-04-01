@@ -3,7 +3,15 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Header from '$stories/components/Header.svelte';
-	import { Share2, User, EllipsisVertical, Pencil, CircleX, CircleCheck } from 'lucide-svelte';
+	import {
+		Share2,
+		User,
+		EllipsisVertical,
+		Pencil,
+		CircleX,
+		CircleCheck,
+		MessageSquare,
+	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
 
@@ -45,7 +53,10 @@
 		<h2 class="text-center text-2xl font-bold">{user.username}</h2>
 		<section class="flex">
 			<div class="flex-1">
-				<Button class="w-full text-lg">메시지하기</Button>
+				<Button class="w-full text-lg">
+					<MessageSquare />
+					메시지하기
+				</Button>
 				<div>(+ 문의 가능 시간, 평균 응답 시간)</div>
 			</div>
 			<Button size="icon" variant="outline"><Share2 /></Button>
