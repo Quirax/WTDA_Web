@@ -22,12 +22,16 @@
 	import H3 from '$lib/components/typo/h3.svelte';
 	import { durationString } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import { userStore } from '$lib/context';
 
 	interface Props extends ReturnType<typeof $props> {
-		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
+		user: Omit<NonNullable<App.User>, 'status'>;
 	}
 
 	const { user }: Props = $props();
+
+	let me = $state<App.User>(null);
+	userStore.subscribe((v) => (me = v));
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -50,9 +54,11 @@
 
 <main class="flex">
 	<section class="bg-background relative box-border w-100 space-y-4 p-6">
-		<Button size="icon" variant="outline" class="absolute top-6 right-6 rounded-full">
-			<Pencil /><!-- Edit Profile -->
-		</Button>
+		{#if me && me.id === user.id}
+			<Button size="icon" variant="outline" class="absolute top-6 right-6 rounded-full">
+				<Pencil /><!-- Edit Profile -->
+			</Button>
+		{/if}
 		<section class="flex w-full justify-center">
 			<div class="aspect-square w-50 overflow-hidden rounded-full border">
 				{#if user.profileImage}

@@ -21,6 +21,7 @@ export const load = (async ({ params, locals }) => {
 				email: table.user.email,
 				preferences: table.user.preferences,
 				profile: table.user.profile,
+				id: table.user.id,
 			})
 			.from(table.user)
 			.where(eq(table.user.id, id))
