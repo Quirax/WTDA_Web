@@ -13,6 +13,7 @@
 		Clock,
 		Link,
 		CircleDashed,
+		ChevronRight,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
@@ -20,6 +21,7 @@
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
 	import { durationString } from '$lib/utils';
+	import * as Table from '$lib/components/ui/table/index.js';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -31,6 +33,9 @@
 	const maxSlot = 4,
 		openedSlot = 3;
 	const avgRespTime = 15 * 60 * 1000;
+	const numOfCommission = 10,
+		avgWorkTime = 7 * 24 * 60 * 60 * 1000,
+		completionRatio = 10 / 10;
 </script>
 
 <Header title={user.username} />
@@ -103,7 +108,31 @@
 				{/each}
 			</div>
 		</section>
-		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
+		<section class="relative border p-4">
+			<H3 class="hidden">통계</H3>
+			<Table.Root>
+				<Table.Body>
+					<Table.Row>
+						<Table.Head>총 커미션 수</Table.Head>
+						<Table.Cell>{numOfCommission}건</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Head>평균 작업 시간</Table.Head>
+						<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
+					</Table.Row>
+					<Table.Row>
+						<Table.Head>완료율</Table.Head>
+						<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table.Root>
+			<div class="text-right">
+				<Button variant="link">
+					자세히 보기
+					<ChevronRight class="size-4" />
+				</Button>
+			</div>
+		</section>
 		<section class="space-y-2">
 			<H3 class="text-center">소개</H3>
 			<article class="border p-4">
