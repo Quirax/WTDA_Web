@@ -22,7 +22,7 @@
 </section>
 
 <main class="flex">
-	<section class="box-border w-100 p-6">
+	<section class="box-border w-100 space-y-4 p-6">
 		<section>사용자 정보 설정 버튼</section>
 		<section class="flex w-full justify-center">
 			<div class="aspect-square w-50 overflow-hidden rounded-full border">
@@ -33,7 +33,7 @@
 				{/if}
 			</div>
 		</section>
-		<section>닉네임</section>
+		<h2 class="text-center text-2xl font-bold">{user.username}</h2>
 		<section>메시지하기(+ 문의 가능 시간, 평균 응답 시간) 공유 기타(차단, 신고)</section>
 		<section>남은 슬롯 갯수</section>
 		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
