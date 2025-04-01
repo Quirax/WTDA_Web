@@ -189,8 +189,8 @@
 				<ChevronRight class="size-4" />
 			</Button>
 		</section>
-		<section>포트폴리오</section>
 		<section>커미션 타입</section>
 		<section>대기중인 의뢰</section>
+		<section>포트폴리오</section>
 	</section>
 </main>
