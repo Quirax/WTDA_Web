@@ -18,6 +18,7 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
+	import { durationString } from '$lib/utils';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -28,7 +29,7 @@
 	// TODO: get values from server
 	const maxSlot = 4,
 		openedSlot = 3;
-	const avgRespMinutes = 15;
+	const avgRespTime = 15 * 60 * 1000;
 </script>
 
 <Header title={user.username} />
@@ -86,7 +87,7 @@
 					{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
 				{/if}
 			</Alert.Title>
-			<Alert.Description>평균 응답 시간: 약 {avgRespMinutes}분</Alert.Description>
+			<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
 		</Alert.Root>
 		<section class="space-y-2">
 			<div>

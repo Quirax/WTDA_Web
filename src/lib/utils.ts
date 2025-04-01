@@ -11,3 +11,37 @@ export function enumToPgEnum<T extends Record<string, any>>(
 ): [T[keyof T], ...T[keyof T][]] {
 	return Object.values(enumeration).map((value: any) => `${value}`) as any;
 }
+
+const Min2Ms = 60 * 1000;
+
+const DurationStringConditions = Object.freeze([
+	{ maxDuration: Min2Ms, output: () => `1분 미만` },
+	{ maxDuration: 60 * Min2Ms, output: (time: number) => `약 ${time}분` },
+	{ maxDuration: 24 * 60 * Min2Ms, output: (time: number) => `약 ${time}시간` },
+	{
+		maxDuration: 30 * 24 * 60 * Min2Ms,
+		output: (time: number) => `약 ${time}일`,
+	},
+	{
+		maxDuration: 12 * 30 * 24 * 60 * Min2Ms,
+		output: (time: number) => `약 ${time}개월`,
+	},
+	{
+		maxDuration: undefined,
+		output: (time: number) => `약 ${time}년`,
+	},
+]);
+
+// ref: https://inpa.tistory.com/entry/JS-%F0%9F%9A%80-reduce-break-%ED%95%98%EB%8A%94-%EB%B2%95-How-to-early-break-reduce
+export function durationString(ms: number) {
+	return DurationStringConditions.slice(0).reduce((_, cur, i, arr) => {
+		if (!cur.maxDuration || ms < cur.maxDuration) {
+			const minDuration = i === 0 ? 0 : arr[i - 1].maxDuration!;
+			arr.splice(1);
+			if (minDuration > 0) return cur.output(Math.ceil(ms / minDuration));
+			else return cur.output(0);
+		}
+
+		return '';
+	}, '');
+}
