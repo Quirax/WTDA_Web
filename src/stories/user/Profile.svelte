@@ -253,6 +253,34 @@
 				{/each}
 			</section>
 		</section>
-		<section>포트폴리오</section>
+		<section>
+			<H3>포트폴리오</H3>
+			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+				{#each Array(10)
+					.fill(undefined)
+					.map( (_, i) => ({ thumbnail: DocsImage, title: `포트폴리오 ${i + 1}`, author: { id: 'quiraxical', username: 'Quirax Lee', profileImage: ProfileImage, email: '', status: UserStatus.REQUIRED_EMAIL_CONFIRM }, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
+					<Card.Root>
+						<img
+							src={article?.thumbnail}
+							alt={article?.title}
+							class="aspect-video w-full object-cover" />
+						<Card.Header>
+							<Card.Title>{article?.title}</Card.Title>
+							<Card.Description class="text-right">
+								by
+								<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
+								{article?.author.username}
+							</Card.Description>
+						</Card.Header>
+						<Card.Content>
+							<Badge class="m-1">#{article?.category}</Badge>
+							{#each article?.tags?.slice(0, 3) || [] as tag}
+								<Badge class="m-1" variant="secondary">#{tag}</Badge>
+							{/each}
+						</Card.Content>
+					</Card.Root>
+				{/each}
+			</section>
+		</section>
 	</section>
 </main>
