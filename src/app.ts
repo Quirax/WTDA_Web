@@ -2,7 +2,21 @@
 // for information about these interfaces
 
 declare global {
+	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
+		? Acc[number]
+		: NumberEnumerate<N, [...Acc, Acc['length']]>;
+
+	type NumberRange<F extends number, T extends number> = Exclude<
+		NumberEnumerate<T>,
+		NumberEnumerate<F>
+	>;
+
 	namespace App {
+		interface Range<T> {
+			from: T;
+			to: T;
+		}
+
 		interface Preferences {
 			agree_marketing: boolean;
 		}
@@ -10,6 +24,7 @@ declare global {
 		interface Profile {
 			headerImage: string;
 			introduction: string;
+			contactAvailable: boolean | Range<NumberEnumerate<24>>;
 		}
 
 		type User = import('$lib/server/auth').SessionValidationResult['user'];

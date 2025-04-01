@@ -11,9 +11,11 @@
 		CircleX,
 		CircleCheck,
 		MessageSquare,
+		Clock,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
+	import * as Alert from '$lib/components/ui/alert/index.js';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -24,6 +26,7 @@
 	// TODO: get values from server
 	const maxSlot = 4,
 		openedSlot = 3;
+	const avgRespMinutes = 15;
 </script>
 
 <Header title={user.username} />
@@ -52,13 +55,10 @@
 		</section>
 		<h2 class="text-center text-2xl font-bold">{user.username}</h2>
 		<section class="flex">
-			<div class="flex-1">
-				<Button class="w-full text-lg">
-					<MessageSquare />
-					메시지하기
-				</Button>
-				<div>(+ 문의 가능 시간, 평균 응답 시간)</div>
-			</div>
+			<Button class="w-full flex-1 text-lg">
+				<MessageSquare />
+				메시지하기
+			</Button>
 			<Button size="icon" variant="outline"><Share2 /></Button>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger class="m-0 p-0">
@@ -72,6 +72,20 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		</section>
+		<Alert.Root>
+			<Clock class="size-4" />
+			<Alert.Title>
+				문의 가능 시간:
+				{#if !user.profile.contactAvailable}
+					미설정
+				{:else if typeof user.profile.contactAvailable === 'boolean'}
+					상시
+				{:else}
+					{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
+				{/if}
+			</Alert.Title>
+			<Alert.Description>평균 응답 시간: 약 {avgRespMinutes}분</Alert.Description>
+		</Alert.Root>
 		<section class="space-y-2">
 			<div>
 				<h3 class="inline-block text-xl font-bold">남은 슬롯 갯수</h3>
