@@ -23,6 +23,7 @@
 	import { durationString } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -53,19 +54,19 @@
 </section>
 
 <main class="flex">
-	<section class="bg-background relative box-border w-100 space-y-4 p-6">
-		<section class="flex w-full justify-center">
-			<div class="aspect-square w-50 overflow-hidden rounded-full border">
+	<section class="bg-background relative box-border w-80 space-y-4 p-6">
+		<section class="flex w-full flex-col items-center space-y-2">
+			<div class="aspect-square w-30 overflow-hidden rounded-full border">
 				{#if user.profileImage}
 					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
 				{:else}
 					<User class="size-full" />
 				{/if}
 			</div>
+			<H2 class="border-none text-center text-2xl">{user.username}</H2>
 		</section>
-		<H2 class="border-none text-center">{user.username}</H2>
 		<section class="flex">
-			<Button class="w-full flex-1 text-lg">
+			<Button class="w-full flex-1">
 				<MessageSquare />
 				메시지하기
 			</Button>
@@ -97,9 +98,9 @@
 			<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
 		</Alert.Root>
 		<section class="space-y-2">
-			<div>
-				<H3 class="inline-block">남은 슬롯 갯수</H3>
-				<span>{openedSlot}/{maxSlot}</span>
+			<div class="flex items-center space-x-2">
+				<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
+				<Badge>{openedSlot}/{maxSlot}</Badge>
 			</div>
 			<div class="space-y-2 space-x-2">
 				{#each Array(openedSlot)}
@@ -135,7 +136,7 @@
 			</div>
 		</section>
 		<section class="space-y-2">
-			<H3 class="text-center">소개</H3>
+			<H3 class="text-center text-xl">소개</H3>
 			<article class="border p-4">
 				{#if user.profile.introduction}
 					{@html sanitizeHtml(user.profile.introduction)}
