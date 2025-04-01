@@ -8,11 +8,11 @@
 		User,
 		EllipsisVertical,
 		Pencil,
-		CircleX,
 		CircleCheck,
 		MessageSquare,
 		Clock,
 		Link,
+		CircleDashed,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
@@ -97,9 +97,9 @@
 			</div>
 			<div class="space-y-2 space-x-2">
 				{#each Array(openedSlot)}
-					<CircleCheck class="inline size-10 align-top text-green-700" />
+					<CircleDashed class="inline size-10 align-top text-green-700" />
 				{/each}{#each Array(maxSlot - openedSlot)}
-					<CircleX class="inline size-10 align-top text-red-700" />
+					<CircleCheck class="inline size-10 align-top text-stone-700" />
 				{/each}
 			</div>
 		</section>
