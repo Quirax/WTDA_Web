@@ -49,7 +49,7 @@
 </section>
 
 <main class="flex">
-	<section class="relative box-border w-100 space-y-4 p-6">
+	<section class="bg-background relative box-border w-100 space-y-4 p-6">
 		<Button size="icon" variant="outline" class="absolute top-6 right-6 rounded-full">
 			<Pencil /><!-- Edit Profile -->
 		</Button>
