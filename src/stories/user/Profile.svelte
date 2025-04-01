@@ -54,11 +54,6 @@
 
 <main class="flex">
 	<section class="bg-background relative box-border w-100 space-y-4 p-6">
-		{#if me && me.id === user.id}
-			<Button size="icon" variant="outline" class="absolute top-6 right-6 rounded-full">
-				<Pencil /><!-- Edit Profile -->
-			</Button>
-		{/if}
 		<section class="flex w-full justify-center">
 			<div class="aspect-square w-50 overflow-hidden rounded-full border">
 				{#if user.profileImage}
@@ -165,6 +160,15 @@
 					</div>
 				{/each}
 			</section>
+		{/if}
+		{#if me && me.id === user.id}
+			<Button
+				size="icon"
+				variant="outline"
+				class="absolute top-6 right-6 rounded-full"
+				aria-label="프로필 수정">
+				<Pencil /><!-- Edit Profile -->
+			</Button>
 		{/if}
 	</section>
 	<section>
