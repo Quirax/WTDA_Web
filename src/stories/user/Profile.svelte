@@ -1,8 +1,12 @@
 <svelte:options runes />
 
 <script lang="ts">
+	import Button from '$lib/components/ui/button/button.svelte';
 	import Header from '$stories/components/Header.svelte';
+	import Share2 from 'lucide-svelte/icons/share-2';
 	import User from 'lucide-svelte/icons/user';
+	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -34,7 +38,24 @@
 			</div>
 		</section>
 		<h2 class="text-center text-2xl font-bold">{user.username}</h2>
-		<section>메시지하기(+ 문의 가능 시간, 평균 응답 시간) 공유 기타(차단, 신고)</section>
+		<section class="flex">
+			<div class="flex-1">
+				<Button class="w-full text-lg">메시지하기</Button>
+				<div>(+ 문의 가능 시간, 평균 응답 시간)</div>
+			</div>
+			<Button size="icon" variant="outline"><Share2 /></Button>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger class="m-0 p-0">
+					{#snippet child({ props })}
+						<Button {...props} variant="outline" size="icon"><EllipsisVertical /></Button>
+					{/snippet}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content class="w-56" align="end">
+					<DropdownMenu.Item onclick={() => {}}>차단하기</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		</section>
 		<section>남은 슬롯 갯수</section>
 		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
 		<section>소개</section>
