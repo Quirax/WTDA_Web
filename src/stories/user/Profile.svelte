@@ -24,6 +24,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -173,7 +174,21 @@
 		{/if}
 	</section>
 	<section class="m-4 w-full">
-		<section>공지사항</section>
+		<section class="bg-accent text-accent-foreground flex border p-2">
+			<h3 class="flex-none font-bold">공지사항</h3>
+			<Separator orientation="vertical" class="mx-2 flex-none" />
+			<p class="w-full">
+				<Button variant="link" class="text-accent-foreground">오늘의 공지사항</Button>
+				<span class="text-muted-foreground text-sm">2025-04-01 12:34</span>
+			</p>
+			<Button variant="link">
+				과거 공지사항 보기
+				{#if me && me.id === user.id}
+					&middot; 수정하기
+				{/if}
+				<ChevronRight class="size-4" />
+			</Button>
+		</section>
 		<section>포트폴리오</section>
 		<section>커미션 타입</section>
 		<section>대기중인 의뢰</section>
