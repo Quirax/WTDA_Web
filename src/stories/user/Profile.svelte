@@ -7,6 +7,7 @@
 	import User from 'lucide-svelte/icons/user';
 	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import sanitizeHtml from 'sanitize-html';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'id' | 'status'>;
@@ -58,7 +59,16 @@
 		</section>
 		<section>남은 슬롯 갯수</section>
 		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
-		<section>소개</section>
+		<section class="space-y-2">
+			<h3 class="text-center text-xl font-bold">소개</h3>
+			<article class="border p-4">
+				{#if user.profile.introduction}
+					{@html sanitizeHtml(user.profile.introduction)}
+				{:else}
+					<span class="italic">자기소개가 없습니다.</span>
+				{/if}
+			</article>
+		</section>
 		<section>SNS 및 타 사이트 링크</section>
 	</section>
 	<section>

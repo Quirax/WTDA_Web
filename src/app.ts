@@ -9,6 +9,7 @@ declare global {
 
 		interface Profile {
 			headerImage: string;
+			introduction: string;
 		}
 
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
