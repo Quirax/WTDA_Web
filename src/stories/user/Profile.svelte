@@ -3,10 +3,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Header from '$stories/components/Header.svelte';
-	import Share2 from 'lucide-svelte/icons/share-2';
-	import User from 'lucide-svelte/icons/user';
-	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
-	import Pencil from 'lucide-svelte/icons/pencil';
+	import { Share2, User, EllipsisVertical, Pencil, CircleX, CircleCheck } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
 
@@ -15,6 +12,10 @@
 	}
 
 	const { user }: Props = $props();
+
+	// TODO: get values from server
+	const maxSlot = 4,
+		openedSlot = 3;
 </script>
 
 <Header title={user.username} />
@@ -60,7 +61,19 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		</section>
-		<section>남은 슬롯 갯수</section>
+		<section class="space-y-2">
+			<div>
+				<h3 class="inline-block text-xl font-bold">남은 슬롯 갯수</h3>
+				<span>{openedSlot}/{maxSlot}</span>
+			</div>
+			<div class="space-y-2 space-x-2">
+				{#each Array(openedSlot)}
+					<CircleCheck class="inline size-10 align-top text-green-700" />
+				{/each}{#each Array(maxSlot - openedSlot)}
+					<CircleX class="inline size-10 align-top text-red-700" />
+				{/each}
+			</div>
+		</section>
 		<section>통계(신뢰점수, 총 작업 수, 총 커미션 취소 건수)</section>
 		<section class="space-y-2">
 			<h3 class="text-center text-xl font-bold">소개</h3>
