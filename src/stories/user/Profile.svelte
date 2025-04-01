@@ -6,6 +6,7 @@
 	import Share2 from 'lucide-svelte/icons/share-2';
 	import User from 'lucide-svelte/icons/user';
 	import EllipsisVertical from 'lucide-svelte/icons/ellipsis-vertical';
+	import Pencil from 'lucide-svelte/icons/pencil';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
 
@@ -27,8 +28,10 @@
 </section>
 
 <main class="flex">
-	<section class="box-border w-100 space-y-4 p-6">
-		<section>사용자 정보 설정 버튼</section>
+	<section class="relative box-border w-100 space-y-4 p-6">
+		<Button size="icon" variant="outline" class="absolute top-6 right-6 rounded-full">
+			<Pencil /><!-- Edit Profile -->
+		</Button>
 		<section class="flex w-full justify-center">
 			<div class="aspect-square w-50 overflow-hidden rounded-full border">
 				{#if user.profileImage}
