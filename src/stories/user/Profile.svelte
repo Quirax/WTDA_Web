@@ -54,7 +54,7 @@
 </section>
 
 <main class="flex">
-	<section class="bg-background relative box-border w-80 space-y-4 p-6">
+	<section class="bg-background relative box-border w-80 flex-none space-y-4 p-6">
 		<section class="flex w-full flex-col items-center space-y-2">
 			<div class="aspect-square w-30 overflow-hidden rounded-full border">
 				{#if user.profileImage}
@@ -172,7 +172,7 @@
 			</Button>
 		{/if}
 	</section>
-	<section>
+	<section class="m-4 w-full">
 		<section>공지사항</section>
 		<section>포트폴리오</section>
 		<section>커미션 타입</section>
