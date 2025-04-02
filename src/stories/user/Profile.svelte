@@ -215,21 +215,16 @@
 						{formatDatetimeString(announcements.createDate)}
 					</span>
 				</p>
-				<Button variant="link">
+				<Button variant="link" class="flex-none">
 					과거 공지사항 보기
-					{#if me && me.id === user.id}
-						&middot; 새 공지사항 쓰기
-					{/if}
 					<ChevronRight class="size-4" />
 				</Button>
 			{:else}
 				<p class="text-muted-foreground w-full italic">등록된 공지사항이 없습니다</p>
-				{#if me && me.id === user.id}
-					<Button variant="link">
-						새 공지사항 쓰기
-						<ChevronRight class="size-4" />
-					</Button>
-				{/if}
+			{/if}
+			{#if me && me.id === user.id}
+				<Separator orientation="vertical" class="mx-2 flex-none" />
+				<Button variant="link" class="flex-none"><Pencil />새 공지사항 쓰기</Button>
 			{/if}
 		</section>
 		<section class="space-y-4">

@@ -19,4 +19,12 @@
 ```
 -->
 
-<Profile user={data.user} announcements={data.profileAnnouncements} />
+<Profile
+	user={data.user}
+	announcements={data.profileAnnouncements || {
+		id: 'asdf',
+		userId: data.user.id,
+		title: '오늘의 공지사항입니다!',
+		content: '아무말 대잔치중',
+		createDate: new Date(),
+	}} />
