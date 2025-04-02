@@ -33,6 +33,8 @@ declare global {
 		type User = import('$lib/server/auth').SessionValidationResult['user'];
 		type Session = import('$lib/server/auth').SessionValidationResult['session'];
 
+		type ProfileAnnouncements = import('$lib/server/db/schema').ProfileAnnouncements;
+
 		interface Articles {
 			thumbnail: string;
 			title: string;

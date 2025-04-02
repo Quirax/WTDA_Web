@@ -20,7 +20,7 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import { durationString } from '$lib/utils';
+	import { durationString, formatDatetimeString } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -32,14 +32,15 @@
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
+		announcements?: App.ProfileAnnouncements;
 	}
 
-	const { user }: Props = $props();
+	const { user, announcements }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
-	let openStatDialog = $state(true);
+	let openStatDialog = $state(false);
 
 	const statChartOption: echarts.EChartsOption = {
 		tooltip: {
@@ -207,17 +208,29 @@
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
 			<Separator orientation="vertical" class="mx-2 flex-none" />
-			<p class="w-full">
-				<Button variant="link" class="text-accent-foreground">오늘의 공지사항</Button>
-				<span class="text-muted-foreground text-sm">2025-04-01 12:34</span>
-			</p>
-			<Button variant="link">
-				과거 공지사항 보기
+			{#if announcements}
+				<p class="w-full">
+					<Button variant="link" class="text-accent-foreground">{announcements.title}</Button>
+					<span class="text-muted-foreground text-sm">
+						{formatDatetimeString(announcements.createDate)}
+					</span>
+				</p>
+				<Button variant="link">
+					과거 공지사항 보기
+					{#if me && me.id === user.id}
+						&middot; 새 공지사항 쓰기
+					{/if}
+					<ChevronRight class="size-4" />
+				</Button>
+			{:else}
+				<p class="text-muted-foreground w-full italic">등록된 공지사항이 없습니다</p>
 				{#if me && me.id === user.id}
-					&middot; 수정하기
+					<Button variant="link">
+						새 공지사항 쓰기
+						<ChevronRight class="size-4" />
+					</Button>
 				{/if}
-				<ChevronRight class="size-4" />
-			</Button>
+			{/if}
 		</section>
 		<section class="space-y-4">
 			<H3>커미션 타입</H3>

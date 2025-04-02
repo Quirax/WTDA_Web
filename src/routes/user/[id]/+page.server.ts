@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -29,7 +29,19 @@ export const load = (async ({ params, locals }) => {
 
 	if (!user) throw error(404, { message: 'Cannot find matched user' });
 
+	const profileAnnouncements = (
+		await db
+			.select()
+			.from(table.profileAnnouncements)
+			.where(eq(table.profileAnnouncements.userId, id))
+			// ref: https://stackoverflow.com/a/79132920
+			.orderBy(desc(table.profileAnnouncements.createDate))
+			// ref: https://orm.drizzle.team/docs/select#limit--offset
+			.limit(1)
+	).at(0);
+
 	return {
 		user,
+		profileAnnouncements,
 	};
 }) satisfies PageServerLoad;

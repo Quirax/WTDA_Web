@@ -3,7 +3,7 @@ import { pgTable, text, timestamp, pgEnum, json } from 'drizzle-orm/pg-core';
 import { EmailConfirmFor, UserStatus } from '../../../app';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
-export const emailConfirmFor = pgEnum('emailConfirmFor', enumToPgEnum(EmailConfirmFor));
+export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -26,7 +26,7 @@ export const session = pgTable('session', {
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull(),
 });
 
-export const emailConfirm = pgTable('emailConfirm', {
+export const emailConfirm = pgTable('email_confirm', {
 	id: text('id').primaryKey(),
 	userId: text('user_id')
 		.notNull()
@@ -36,6 +36,18 @@ export const emailConfirm = pgTable('emailConfirm', {
 	confirmCode: text('confirm_code').notNull(),
 });
 
+export const profileAnnouncements = pgTable('profile_announcements', {
+	id: text('id').primaryKey(),
+	userId: text('user_id')
+		.notNull()
+		.references(() => user.id),
+	title: text('title').notNull(),
+	content: text('content').notNull().default(''),
+	// ref: https://orm.drizzle.team/docs/guides/timestamp-default-value
+	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type EmailConfirm = typeof emailConfirm.$inferSelect;
+export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;

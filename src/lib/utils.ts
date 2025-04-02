@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
+import { date } from 'drizzle-orm/mysql-core';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -44,4 +45,16 @@ export function durationString(ms: number) {
 
 		return '';
 	}, '');
+}
+
+export function formatDateString(date: Date) {
+	return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}.`;
+}
+
+export function formatTimeString(time: Date) {
+	return `${time.getHours() >= 12 ? '오후' : '오전'} ${time.getHours() % 12 || 12}:${time.getMinutes().toString().padStart(2, '0')}`;
+}
+
+export function formatDatetimeString(datetime: Date) {
+	return `${formatDateString(datetime)} ${formatTimeString(datetime)}`;
 }

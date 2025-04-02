@@ -12,6 +12,7 @@
 
 	const { option, series, ...restProps }: Props = $props();
 
+	// ref: https://svelte.dev/docs/svelte/use
 	const drawChart: Action = (container) => {
 		$effect(() => {
 			let chart = echarts.init(container);
