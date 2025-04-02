@@ -28,6 +28,7 @@ declare global {
 			introduction: string;
 			contactAvailable: boolean | Range<NumberEnumerate<24>>;
 			links: Link[];
+			accentColor: string;
 		}
 
 		type User = import('$lib/server/auth').SessionValidationResult['user'];

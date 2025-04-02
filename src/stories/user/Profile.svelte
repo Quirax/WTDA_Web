@@ -77,15 +77,17 @@
 
 <Header title={user.username} />
 
-<section class="aspect-9/1 w-full">
+<section
+	class="aspect-9/1 w-full"
+	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
 	{#if user.profile.headerImage}
 		<img src={user.profile.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
 	{:else}
-		<div class="bg-primary size-full bg-[url(/background-pattern-banner.png)]"></div>
+		<div class="size-full bg-(--primary-color) bg-[url(/background-pattern-banner.png)]"></div>
 	{/if}
 </section>
 
-<main class="flex">
+<main class="flex" style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
 	<section class="bg-background relative box-border w-80 flex-none space-y-4 p-6">
 		<section class="flex w-full flex-col items-center space-y-2">
 			<div class="aspect-square w-30 overflow-hidden rounded-full border">
@@ -98,7 +100,7 @@
 			<H2 class="border-none text-center text-2xl">{user.username}</H2>
 		</section>
 		<section class="flex">
-			<Button class="w-full flex-1">
+			<Button class="w-full flex-1 bg-(--primary-color)">
 				<MessageSquare />
 				메시지하기
 			</Button>
@@ -132,7 +134,7 @@
 		<section class="space-y-2">
 			<div class="flex items-center space-x-2">
 				<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
-				<Badge>{openedSlot}/{maxSlot}</Badge>
+				<Badge class="bg-(--primary-color)">{openedSlot}/{maxSlot}</Badge>
 			</div>
 			<div class="space-y-2 space-x-2">
 				{#each Array(openedSlot)}
@@ -161,7 +163,10 @@
 				</Table.Body>
 			</Table.Root>
 			<div class="text-right">
-				<Button variant="link" onclick={() => (openStatDialog = true)}>
+				<Button
+					variant="link"
+					onclick={() => (openStatDialog = true)}
+					class="text-(--primary-color)">
 					자세히 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -182,7 +187,7 @@
 				<H3 class="hidden">링크</H3>
 				{#each user.profile.links || [] as link}
 					<div>
-						<Link class="bg-primary inline-block size-5 rounded-full p-0.5 text-white" />
+						<Link class="inline-block size-5 rounded-full bg-(--primary-color) p-0.5 text-white" />
 						<Button
 							variant="link"
 							href={link.href}
@@ -215,7 +220,7 @@
 						{formatDatetimeString(announcements.createDate)}
 					</span>
 				</p>
-				<Button variant="link" class="flex-none">
+				<Button variant="link" class="flex-none text-(--primary-color)">
 					과거 공지사항 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -224,7 +229,9 @@
 			{/if}
 			{#if me && me.id === user.id}
 				<Separator orientation="vertical" class="mx-2 flex-none" />
-				<Button variant="link" class="flex-none"><Pencil />새 공지사항 쓰기</Button>
+				<Button variant="link" class="flex-none text-(--primary-color)">
+					<Pencil />새 공지사항 쓰기
+				</Button>
 			{/if}
 		</section>
 		<section class="space-y-4">
@@ -242,7 +249,7 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -251,7 +258,7 @@
 				{/each}
 			</section>
 			<div class="text-right">
-				<Button variant="link">
+				<Button variant="link" class="text-(--primary-color)">
 					더 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -272,7 +279,7 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -281,7 +288,7 @@
 				{/each}
 			</section>
 			<div class="text-right">
-				<Button variant="link">
+				<Button variant="link" class="text-(--primary-color)">
 					더 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -302,7 +309,7 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -311,7 +318,7 @@
 				{/each}
 			</section>
 			<div class="text-right">
-				<Button variant="link">
+				<Button variant="link" class="text-(--primary-color)">
 					더 보기
 					<ChevronRight class="size-4" />
 				</Button>
