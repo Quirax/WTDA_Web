@@ -195,9 +195,9 @@
 				<ChevronRight class="size-4" />
 			</Button>
 		</section>
-		<section>
+		<section class="space-y-4">
 			<H3>커미션 타입</H3>
-			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `커미션 ${i + 1}`, author: { id: 'quiraxical', username: 'Quirax Lee', profileImage: ProfileImage, email: '', status: UserStatus.REQUIRED_EMAIL_CONFIRM }, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
@@ -223,8 +223,14 @@
 					</Card.Root>
 				{/each}
 			</section>
+			<div class="text-right">
+				<Button variant="link">
+					더 보기
+					<ChevronRight class="size-4" />
+				</Button>
+			</div>
 		</section>
-		<section>
+		<section class="space-y-4">
 			<H3>대기중인 의뢰</H3>
 			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
@@ -252,8 +258,14 @@
 					</Card.Root>
 				{/each}
 			</section>
+			<div class="text-right">
+				<Button variant="link">
+					더 보기
+					<ChevronRight class="size-4" />
+				</Button>
+			</div>
 		</section>
-		<section>
+		<section class="space-y-4">
 			<H3>포트폴리오</H3>
 			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
@@ -281,6 +293,12 @@
 					</Card.Root>
 				{/each}
 			</section>
+			<div class="text-right">
+				<Button variant="link">
+					더 보기
+					<ChevronRight class="size-4" />
+				</Button>
+			</div>
 		</section>
 	</section>
 </main>
