@@ -26,11 +26,8 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import Avatar from '$stories/components/Avatar.svelte';
-
 	import DocsImage from '../assets/docs.png';
-	import ProfileImage from '../assets/profile_example.png';
-	import { UserStatus } from '@app';
+	import * as Dialog from '$lib/components/ui/dialog';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -40,6 +37,8 @@
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
+
+	let openStatDialog = $state(false)
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -136,7 +135,7 @@
 				</Table.Body>
 			</Table.Root>
 			<div class="text-right">
-				<Button variant="link">
+				<Button variant="link" onclick={() => openStatDialog = true}>
 					자세히 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -227,7 +226,7 @@
 		</section>
 		<section class="space-y-4">
 			<H3>대기중인 의뢰</H3>
-			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `의뢰 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
@@ -257,7 +256,7 @@
 		</section>
 		<section class="space-y-4">
 			<H3>포트폴리오</H3>
-			<section class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `포트폴리오 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
@@ -287,3 +286,38 @@
 		</section>
 	</section>
 </main>
+
+<Dialog.Root bind:open={openStatDialog}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>상세 통계</Dialog.Title>
+			<Dialog.Description>
+				{user.username} 님의 커미션 활동 통계입니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Table.Root>
+			<Table.Body>
+				<Table.Row>
+					<Table.Head>총 커미션 수</Table.Head>
+					<Table.Cell>{numOfCommission}건</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Head>타입별 커미션 수</Table.Head>
+					<Table.Cell>AAAAAAAAA</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Head>평균 응답 시간</Table.Head>
+					<Table.Cell>{durationString(avgRespTime)}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Head>평균 작업 시간</Table.Head>
+					<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Head>완료율</Table.Head>
+					<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
+				</Table.Row>
+			</Table.Body>
+		</Table.Root>
+	</Dialog.Content>
+</Dialog.Root>
