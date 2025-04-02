@@ -28,6 +28,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import DocsImage from '../assets/docs.png';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import Chart from '$lib/components/chart/chart.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -38,7 +39,13 @@
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
-	let openStatDialog = $state(false)
+	let openStatDialog = $state(true);
+
+	const statChartOption: echarts.EChartsOption = {
+		tooltip: {
+			trigger: 'item',
+		},
+	};
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -47,6 +54,24 @@
 	const numOfCommission = 10,
 		avgWorkTime = 7 * 24 * 60 * 60 * 1000,
 		completionRatio = 10 / 10;
+	const statChartData: echarts.SeriesOption = {
+		name: '커미션 수',
+		type: 'pie',
+		radius: ['40%', '70%'],
+		avoidLabelOverlap: false,
+		label: {
+			show: false,
+			position: 'center',
+		},
+		labelLine: {
+			show: false,
+		},
+		data: [
+			{ value: 1048, name: '커미션 1' },
+			{ value: 735, name: '커미션 2' },
+			{ value: 580, name: '커미션 3' },
+		],
+	};
 </script>
 
 <Header title={user.username} />
@@ -135,7 +160,7 @@
 				</Table.Body>
 			</Table.Root>
 			<div class="text-right">
-				<Button variant="link" onclick={() => openStatDialog = true}>
+				<Button variant="link" onclick={() => (openStatDialog = true)}>
 					자세히 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -303,7 +328,9 @@
 				</Table.Row>
 				<Table.Row>
 					<Table.Head>타입별 커미션 수</Table.Head>
-					<Table.Cell>AAAAAAAAA</Table.Cell>
+					<Table.Cell>
+						<Chart class="size-50" option={statChartOption} series={[statChartData]} />
+					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
 					<Table.Head>평균 응답 시간</Table.Head>

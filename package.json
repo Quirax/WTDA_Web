@@ -84,6 +84,7 @@
 		"@willingtonortiz/svelte-simple-icons": "^0.0.3",
 		"drizzle-orm": "^0.40.0",
 		"drizzle-zod": "^0.7.0",
+		"echarts": "^5.6.0",
 		"nodemailer": "^6.10.0",
 		"postgres": "^3.4.5",
 		"sanitize-html": "^2.15.0",
