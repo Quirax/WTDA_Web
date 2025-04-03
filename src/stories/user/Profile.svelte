@@ -391,22 +391,26 @@
 				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
 			</Drawer.Description>
 		</Drawer.Header>
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					<Table.Head class="w-[5em]">번호</Table.Head>
-					<Table.Head>제목</Table.Head>
-					<Table.Head class="w-[13em]">작성일자</Table.Head>
-				</Table.Row>ㄴ
-			</Table.Header>
-			<Table.Body>
-				<Table.Row>
-					<Table.Cell>1</Table.Cell>
-					<Table.Cell>와랄랄라</Table.Cell>
-					<Table.Cell>{formatDatetimeString(new Date('2025-04-03 22:22'))}</Table.Cell>
-				</Table.Row>
-			</Table.Body>
-		</Table.Root>
+		{#if announcementsListDrawerState.status === AnnouncementsListStatus.COMPLETED}
+			<Table.Root>
+				<Table.Header>
+					<Table.Row>
+						<Table.Head class="w-[5em]">번호</Table.Head>
+						<Table.Head>제목</Table.Head>
+						<Table.Head class="w-[13em]">작성일자</Table.Head>
+					</Table.Row>ㄴ
+				</Table.Header>
+				<Table.Body>
+					<Table.Row>
+						<Table.Cell>1</Table.Cell>
+						<Table.Cell>와랄랄라</Table.Cell>
+						<Table.Cell>{formatDatetimeString(new Date('2025-04-03 22:22'))}</Table.Cell>
+					</Table.Row>
+				</Table.Body>
+			</Table.Root>
+		{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
+			로딩중
+		{/if}
 		<Drawer.Footer>
 			<Drawer.Close>닫기</Drawer.Close>
 		</Drawer.Footer>
