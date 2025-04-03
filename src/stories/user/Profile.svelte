@@ -21,7 +21,12 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import { durationString, formatDatetimeString, getValueFromResponseData } from '$lib/utils';
+	import {
+		durationString,
+		formatDatetimeString,
+		getValueFromResponseData,
+		isDesktop,
+	} from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -33,6 +38,8 @@
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { deserialize } from '$app/forms';
+	import Pagination from '$lib/components/pagination/pagination.svelte';
+	import { announcementsPerPage } from '$lib/config';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -55,14 +62,15 @@
 		open: false,
 		list: Array<{ title: string; createDate: Date }>(),
 		status: AnnouncementsListStatus.LOADING,
+		total: 0,
 	});
+	let announcementsListPage = $state(1);
 
-	const onOpenAnnouncementsListDrawer = async () => {
-		announcementsListDrawerState.open = true;
+	const getAnnouncementsList = async () => {
 		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
 
 		const formData = new FormData();
-		formData.append('page', '1');
+		formData.append('page', announcementsListPage.toString());
 
 		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
 		const result = await fetch('?/announcementsList', { method: 'post', body: formData })
@@ -75,10 +83,22 @@
 				createDate: Date;
 			}>;
 			announcementsListDrawerState.status = AnnouncementsListStatus.COMPLETED;
+			announcementsListDrawerState.total = result.data!.total as number;
 		} else {
 			announcementsListDrawerState.status = AnnouncementsListStatus.FAILED;
 		}
 	};
+
+	const onOpenAnnouncementsListDrawer = async () => {
+		announcementsListDrawerState.open = true;
+		announcementsListPage = 1;
+		await getAnnouncementsList();
+	};
+
+	$effect(() => {
+		console.log(announcementsListPage);
+		if (announcementsListPage) getAnnouncementsList();
+	});
 
 	const statChartOption: echarts.EChartsOption = {
 		tooltip: {
@@ -439,10 +459,14 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each Array(10)}
-						<Table.Row>
-							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
-							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
+					{#each Array(announcementsPerPage)}
+						<Table.Row style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
+							<Table.Cell>
+								<Skeleton class="h-(--height) w-full" />
+							</Table.Cell>
+							<Table.Cell>
+								<Skeleton class="h-(--height) w-full" />
+							</Table.Cell>
 						</Table.Row>
 					{/each}
 				</Table.Body>
@@ -453,6 +477,11 @@
 				<span>불러오는 도중 오류가 발생했습니다.</span>
 			</div>
 		{/if}
+		<Pagination
+			bind:page={announcementsListPage}
+			count={announcementsListDrawerState.total}
+			perPage={announcementsPerPage}
+			siblingCount={isDesktop() ? 1 : 0} />
 		<Drawer.Footer>
 			<Drawer.Close>닫기</Drawer.Close>
 		</Drawer.Footer>

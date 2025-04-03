@@ -54,15 +54,21 @@ export const actions: Actions = {
 
 		return {
 			message: 'Got announcements List',
+			total: 98,
 			list: Array(5)
 				.fill(undefined)
 				.map((_, idx) => ({
 					title: `공지 ${5 - idx}`,
-					createDate: new Date(`2025-04-03 ${idx + 9}:00`),
+					createDate: new Date(`2025-04-${page} ${idx + 9}:00`),
 				})),
 		};
 
 		try {
+			const total = await db.$count(
+				table.profileAnnouncements,
+				eq(table.profileAnnouncements.userId, id),
+			);
+
 			const announcements = await db
 				.select({
 					title: table.profileAnnouncements.title,
@@ -76,7 +82,7 @@ export const actions: Actions = {
 				.limit(announcementsPerPage)
 				.offset(announcementsPerPage * (page - 1));
 
-			return { message: 'Got announcements List', list: announcements };
+			return { message: 'Got announcements List', list: announcements, total };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

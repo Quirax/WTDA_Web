@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { date } from 'drizzle-orm/mysql-core';
+import { MediaQuery } from 'svelte/reactivity';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -65,4 +66,10 @@ export function getValueFromResponseData(data: any[], field: string) {
 	if (!fieldDict[field]) return undefined;
 
 	return data[fieldDict[field]];
+}
+
+export function isDesktop() {
+	const isDesktop = new MediaQuery('(min-width: 768px)');
+
+	return isDesktop.current;
 }
