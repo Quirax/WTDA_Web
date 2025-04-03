@@ -15,6 +15,7 @@
 		CircleDashed,
 		ChevronRight,
 		TriangleAlert,
+		NotepadTextDashed,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
@@ -63,14 +64,15 @@
 		list: Array<{ title: string; createDate: Date }>(),
 		status: AnnouncementsListStatus.LOADING,
 		total: 0,
+		page: 1,
 	});
-	let announcementsListPage = $state(1);
 
 	const getAnnouncementsList = async () => {
 		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
+		announcementsListDrawerState.list = [];
 
 		const formData = new FormData();
-		formData.append('page', announcementsListPage.toString());
+		formData.append('page', announcementsListDrawerState.page.toString());
 
 		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
 		const result = await fetch('?/announcementsList', { method: 'post', body: formData })
@@ -86,18 +88,20 @@
 			announcementsListDrawerState.total = result.data!.total as number;
 		} else {
 			announcementsListDrawerState.status = AnnouncementsListStatus.FAILED;
+			announcementsListDrawerState.total = 0;
 		}
 	};
 
 	const onOpenAnnouncementsListDrawer = async () => {
 		announcementsListDrawerState.open = true;
-		announcementsListPage = 1;
+		announcementsListDrawerState.page = 1;
+		announcementsListDrawerState.total = 0;
 		await getAnnouncementsList();
 	};
 
 	$effect(() => {
-		console.log(announcementsListPage);
-		if (announcementsListPage) getAnnouncementsList();
+		console.log(announcementsListDrawerState.page);
+		if (announcementsListDrawerState.page) getAnnouncementsList();
 	});
 
 	const statChartOption: echarts.EChartsOption = {
@@ -433,55 +437,66 @@
 				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
 			</Drawer.Description>
 		</Drawer.Header>
-		{#if announcementsListDrawerState.status === AnnouncementsListStatus.COMPLETED}
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>제목</Table.Head>
-						<Table.Head class="w-[13em]">작성일자</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each announcementsListDrawerState.list as item}
+		<div class="mb-2 p-4 pb-0">
+			{#if announcementsListDrawerState.status === AnnouncementsListStatus.COMPLETED}
+				{#if announcementsListDrawerState.list.length > 0}
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>제목</Table.Head>
+								<Table.Head class="w-[13em]">작성일자</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each announcementsListDrawerState.list as item}
+								<Table.Row>
+									<Table.Cell>{item.title}</Table.Cell>
+									<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				{:else}
+					<div class="text-muted-foreground flex flex-col items-center space-y-2">
+						<NotepadTextDashed class="size-12" />
+						<span>등록된 공지사항이 없습니다</span>
+					</div>
+				{/if}
+			{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
+				<Table.Root>
+					<Table.Header>
 						<Table.Row>
-							<Table.Cell>{item.title}</Table.Cell>
-							<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
+							<Table.Head>제목</Table.Head>
+							<Table.Head class="w-[13em]">작성일자</Table.Head>
 						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>제목</Table.Head>
-						<Table.Head class="w-[13em]">작성일자</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each Array(announcementsPerPage)}
-						<Table.Row style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
-							<Table.Cell>
-								<Skeleton class="h-(--height) w-full" />
-							</Table.Cell>
-							<Table.Cell>
-								<Skeleton class="h-(--height) w-full" />
-							</Table.Cell>
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		{:else}
-			<div class="text-muted-foreground flex flex-col items-center space-y-2">
-				<TriangleAlert class="size-12" />
-				<span>불러오는 도중 오류가 발생했습니다.</span>
-			</div>
+					</Table.Header>
+					<Table.Body>
+						{#each Array(announcementsPerPage)}
+							<Table.Row style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
+								<Table.Cell>
+									<Skeleton class="h-(--height) w-full" />
+								</Table.Cell>
+								<Table.Cell>
+									<Skeleton class="h-(--height) w-full" />
+								</Table.Cell>
+							</Table.Row>
+						{/each}
+					</Table.Body>
+				</Table.Root>
+			{:else}
+				<div class="text-muted-foreground flex flex-col items-center space-y-2">
+					<TriangleAlert class="size-12" />
+					<span>불러오는 도중 오류가 발생했습니다.</span>
+				</div>
+			{/if}
+		</div>
+		{#if announcementsListDrawerState.total > 0}
+			<Pagination
+				bind:page={announcementsListDrawerState.page}
+				count={announcementsListDrawerState.total}
+				perPage={announcementsPerPage}
+				siblingCount={isDesktop() ? 1 : 0} />
 		{/if}
-		<Pagination
-			bind:page={announcementsListPage}
-			count={announcementsListDrawerState.total}
-			perPage={announcementsPerPage}
-			siblingCount={isDesktop() ? 1 : 0} />
 		<Drawer.Footer>
 			<Drawer.Close>닫기</Drawer.Close>
 		</Drawer.Footer>
