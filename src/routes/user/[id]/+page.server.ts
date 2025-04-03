@@ -52,18 +52,6 @@ export const actions: Actions = {
 		const id = params.id;
 		const page = parseInt(((await request.formData()).get('page') as string | null) || '1');
 
-		return {
-			message: 'Got announcements List',
-			total: 98,
-			list: Array(5)
-				.fill(undefined)
-				.map((_, idx) => ({
-					id: idx,
-					title: `공지 ${5 - idx}`,
-					createDate: new Date(`2025-04-${page} ${idx + 9}:00`),
-				})),
-		};
-
 		try {
 			const total = await db.$count(
 				table.profileAnnouncements,
@@ -95,15 +83,6 @@ export const actions: Actions = {
 		const id = (await request.formData()).get('id') as string | null;
 
 		if (!id) return fail(400, { message: 'No announcement id is specified' });
-
-		return {
-			message: 'Got announcement',
-			announcement: {
-				content: '<b>공지입니다!</b> 잘 읽어주세요~',
-				title: `공지 1`,
-				createDate: new Date(),
-			},
-		};
 
 		try {
 			const announcement = (
