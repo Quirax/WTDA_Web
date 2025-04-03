@@ -101,12 +101,11 @@
 		announcementsListDrawerState.open = true;
 		announcementsListDrawerState.page = 1;
 		announcementsListDrawerState.total = 0;
-		await getAnnouncementsList();
 	};
 
 	$effect(() => {
-		console.log(announcementsListDrawerState.page);
-		if (announcementsListDrawerState.page) getAnnouncementsList();
+		if (announcementsListDrawerState.open && announcementsListDrawerState.page)
+			getAnnouncementsList();
 	});
 
 	// Announcement Dialog
@@ -128,7 +127,7 @@
 			.then((r) => r.text())
 			.then((r) => deserialize(r));
 
-		if (result.type === 'success') {
+		if (result.type === 'success' && result.data!.announcement) {
 			announcementDialogState.announcement = result.data!.announcement as {
 				title: string;
 				content: string;
