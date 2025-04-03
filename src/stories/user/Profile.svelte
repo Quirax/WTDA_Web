@@ -29,6 +29,7 @@
 	import DocsImage from '../assets/docs.png';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Chart from '$lib/components/chart/chart.svelte';
+	import * as Drawer from '$lib/components/ui/drawer/index.js';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -41,6 +42,21 @@
 	userStore.subscribe((v) => (me = v));
 
 	let openStatDialog = $state(false);
+
+	enum AnnouncementsListStatus {
+		LOADING,
+		FAILED,
+		COMPLETED,
+	}
+	let announcementsListDrawerState = $state({
+		open: false,
+		status: AnnouncementsListStatus.LOADING,
+	});
+
+	const onOpenAnnouncementsListDrawer = () => {
+		announcementsListDrawerState.open = true;
+		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
+	};
 
 	const statChartOption: echarts.EChartsOption = {
 		tooltip: {
@@ -220,7 +236,10 @@
 						{formatDatetimeString(announcements.createDate)}
 					</span>
 				</p>
-				<Button variant="link" class="flex-none text-(--primary-color)">
+				<Button
+					variant="link"
+					class="flex-none text-(--primary-color)"
+					onclick={onOpenAnnouncementsListDrawer}>
 					과거 공지사항 보기
 					<ChevronRight class="size-4" />
 				</Button>
@@ -363,3 +382,33 @@
 		</Table.Root>
 	</Dialog.Content>
 </Dialog.Root>
+
+<Drawer.Root bind:open={announcementsListDrawerState.open}>
+	<Drawer.Content>
+		<Drawer.Header>
+			<Drawer.Title>공지사항 변경 이력</Drawer.Title>
+			<Drawer.Description>
+				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
+			</Drawer.Description>
+		</Drawer.Header>
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head class="w-[5em]">번호</Table.Head>
+					<Table.Head>제목</Table.Head>
+					<Table.Head class="w-[13em]">작성일자</Table.Head>
+				</Table.Row>ㄴ
+			</Table.Header>
+			<Table.Body>
+				<Table.Row>
+					<Table.Cell>1</Table.Cell>
+					<Table.Cell>와랄랄라</Table.Cell>
+					<Table.Cell>{formatDatetimeString(new Date('2025-04-03 22:22'))}</Table.Cell>
+				</Table.Row>
+			</Table.Body>
+		</Table.Root>
+		<Drawer.Footer>
+			<Drawer.Close>닫기</Drawer.Close>
+		</Drawer.Footer>
+	</Drawer.Content>
+</Drawer.Root>

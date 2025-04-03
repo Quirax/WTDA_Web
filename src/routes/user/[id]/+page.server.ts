@@ -1,5 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
@@ -45,3 +45,9 @@ export const load = (async ({ params, locals }) => {
 		profileAnnouncements,
 	};
 }) satisfies PageServerLoad;
+
+export const actions: Actions = {
+	announcementsList: ({}) => {
+		return { message: 'Got announcements List' };
+	},
+};
