@@ -14,6 +14,7 @@
 		Link,
 		CircleDashed,
 		ChevronRight,
+		TriangleAlert,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import sanitizeHtml from 'sanitize-html';
@@ -30,6 +31,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Chart from '$lib/components/chart/chart.svelte';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
+	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -53,9 +55,17 @@
 		status: AnnouncementsListStatus.LOADING,
 	});
 
-	const onOpenAnnouncementsListDrawer = () => {
+	const onOpenAnnouncementsListDrawer = async () => {
 		announcementsListDrawerState.open = true;
 		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
+
+		const result = await fetch('?/announcementsList', { method: 'post', body: new FormData() });
+
+		const { status } = await result.json();
+
+		if (status !== 200) {
+			announcementsListDrawerState.status = AnnouncementsListStatus.FAILED;
+		}
 	};
 
 	const statChartOption: echarts.EChartsOption = {
@@ -398,7 +408,7 @@
 						<Table.Head class="w-[5em]">번호</Table.Head>
 						<Table.Head>제목</Table.Head>
 						<Table.Head class="w-[13em]">작성일자</Table.Head>
-					</Table.Row>ㄴ
+					</Table.Row>
 				</Table.Header>
 				<Table.Body>
 					<Table.Row>
@@ -409,7 +419,29 @@
 				</Table.Body>
 			</Table.Root>
 		{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
-			로딩중
+			<Table.Root>
+				<Table.Header>
+					<Table.Row>
+						<Table.Head class="w-[5em]">번호</Table.Head>
+						<Table.Head>제목</Table.Head>
+						<Table.Head class="w-[13em]">작성일자</Table.Head>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{#each Array(10)}
+						<Table.Row>
+							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
+							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
+							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		{:else}
+			<div class="text-muted-foreground flex flex-col items-center space-y-2">
+				<TriangleAlert class="size-12" />
+				<span>불러오는 도중 오류가 발생했습니다.</span>
+			</div>
 		{/if}
 		<Drawer.Footer>
 			<Drawer.Close>닫기</Drawer.Close>

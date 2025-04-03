@@ -1,4 +1,4 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -48,6 +48,8 @@ export const load = (async ({ params, locals }) => {
 
 export const actions: Actions = {
 	announcementsList: ({}) => {
+		return fail(500, { message: 'An error has occurred' });
+
 		return { message: 'Got announcements List' };
 	},
 };
