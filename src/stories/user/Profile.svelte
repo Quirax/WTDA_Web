@@ -41,6 +41,7 @@
 	import { deserialize } from '$app/forms';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
 	import { announcementsPerPage } from '$lib/config';
+	import { FetchStatus } from '@app';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -52,23 +53,26 @@
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
+	// Stat Dialog
 	let openStatDialog = $state(false);
 
-	enum AnnouncementsListStatus {
-		LOADING,
-		FAILED,
-		COMPLETED,
-	}
+	const statChartOption: echarts.EChartsOption = {
+		tooltip: {
+			trigger: 'item',
+		},
+	};
+
+	// Announcements List
 	let announcementsListDrawerState = $state({
 		open: false,
-		list: Array<{ title: string; createDate: Date }>(),
-		status: AnnouncementsListStatus.LOADING,
+		list: Array<{ id: string; title: string; createDate: Date }>(),
+		status: FetchStatus.LOADING,
 		total: 0,
 		page: 1,
 	});
 
 	const getAnnouncementsList = async () => {
-		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
+		announcementsListDrawerState.status = FetchStatus.LOADING;
 		announcementsListDrawerState.list = [];
 
 		const formData = new FormData();
@@ -83,11 +87,12 @@
 			announcementsListDrawerState.list = result.data!.list as Array<{
 				title: string;
 				createDate: Date;
+				id: string;
 			}>;
-			announcementsListDrawerState.status = AnnouncementsListStatus.COMPLETED;
+			announcementsListDrawerState.status = FetchStatus.COMPLETED;
 			announcementsListDrawerState.total = result.data!.total as number;
 		} else {
-			announcementsListDrawerState.status = AnnouncementsListStatus.FAILED;
+			announcementsListDrawerState.status = FetchStatus.FAILED;
 			announcementsListDrawerState.total = 0;
 		}
 	};
@@ -104,10 +109,35 @@
 		if (announcementsListDrawerState.page) getAnnouncementsList();
 	});
 
-	const statChartOption: echarts.EChartsOption = {
-		tooltip: {
-			trigger: 'item',
-		},
+	// Announcement Dialog
+	let announcementDialogState = $state({
+		open: false,
+		announcement: { title: '', content: '', createDate: new Date() },
+		status: FetchStatus.LOADING,
+	});
+
+	const openAnnouncementDialog = async (id: string) => {
+		announcementDialogState.open = true;
+		announcementDialogState.status = FetchStatus.LOADING;
+
+		const formData = new FormData();
+		formData.append('id', id);
+
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/announcement', { method: 'post', body: formData })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			announcementDialogState.announcement = result.data!.announcement as {
+				title: string;
+				content: string;
+				createDate: Date;
+			};
+			announcementDialogState.status = FetchStatus.COMPLETED;
+		} else {
+			announcementDialogState.status = FetchStatus.FAILED;
+		}
 	};
 
 	// TODO: get values from server
@@ -277,7 +307,12 @@
 			<Separator orientation="vertical" class="mx-2 flex-none" />
 			{#if announcements}
 				<p class="w-full">
-					<Button variant="link" class="text-accent-foreground">{announcements.title}</Button>
+					<Button
+						variant="link"
+						class="text-accent-foreground"
+						onclick={() => openAnnouncementDialog(announcements.id)}>
+						{announcements.title}
+					</Button>
 					<span class="text-muted-foreground text-sm">
 						{formatDatetimeString(announcements.createDate)}
 					</span>
@@ -438,7 +473,7 @@
 			</Drawer.Description>
 		</Drawer.Header>
 		<div class="mb-2 p-4 pb-0">
-			{#if announcementsListDrawerState.status === AnnouncementsListStatus.COMPLETED}
+			{#if announcementsListDrawerState.status === FetchStatus.COMPLETED}
 				{#if announcementsListDrawerState.list.length > 0}
 					<Table.Root>
 						<Table.Header>
@@ -450,7 +485,14 @@
 						<Table.Body>
 							{#each announcementsListDrawerState.list as item}
 								<Table.Row>
-									<Table.Cell>{item.title}</Table.Cell>
+									<Table.Cell>
+										<Button
+											variant="link"
+											class="text-accent-foreground"
+											onclick={() => openAnnouncementDialog(item.id)}>
+											{item.title}
+										</Button>
+									</Table.Cell>
 									<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
 								</Table.Row>
 							{/each}
@@ -462,7 +504,7 @@
 						<span>등록된 공지사항이 없습니다</span>
 					</div>
 				{/if}
-			{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
+			{:else if announcementsListDrawerState.status === FetchStatus.LOADING}
 				<Table.Root>
 					<Table.Header>
 						<Table.Row>
@@ -502,3 +544,37 @@
 		</Drawer.Footer>
 	</Drawer.Content>
 </Drawer.Root>
+
+<Dialog.Root bind:open={announcementDialogState.open}>
+	<Dialog.Content class="sm:max-w-[600px]">
+		<Dialog.Header>
+			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+				{#if announcementDialogState.status === FetchStatus.COMPLETED}
+					{announcementDialogState.announcement.title}
+				{:else}
+					<Skeleton class="h-(--height) w-full" />
+				{/if}
+			</Dialog.Title>
+			<Dialog.Description style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
+				작성일시: {#if announcementDialogState.status === FetchStatus.COMPLETED}
+					{formatDatetimeString(announcementDialogState.announcement.createDate)}
+				{:else}
+					<Skeleton class="inline-block h-(--height) w-[11em]" />
+				{/if}
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="h-100 overflow-y-scroll p-4 pb-0">
+			{#if announcementDialogState.status === FetchStatus.COMPLETED}
+				{announcementDialogState.announcement.content}
+			{:else if announcementDialogState.status === FetchStatus.FAILED}
+				<div
+					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
+					<TriangleAlert class="size-12" />
+					<span>불러오는 도중 오류가 발생했습니다.</span>
+				</div>
+			{:else}
+				<Skeleton class="size-full" />
+			{/if}
+		</div>
+	</Dialog.Content>
+</Dialog.Root>

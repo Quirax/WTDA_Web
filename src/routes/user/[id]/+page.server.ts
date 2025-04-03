@@ -58,6 +58,7 @@ export const actions: Actions = {
 			list: Array(5)
 				.fill(undefined)
 				.map((_, idx) => ({
+					id: idx,
 					title: `공지 ${5 - idx}`,
 					createDate: new Date(`2025-04-${page} ${idx + 9}:00`),
 				})),
@@ -71,6 +72,7 @@ export const actions: Actions = {
 
 			const announcements = await db
 				.select({
+					id: table.profileAnnouncements.id,
 					title: table.profileAnnouncements.title,
 					createDate: table.profileAnnouncements.createDate,
 				})
@@ -83,6 +85,39 @@ export const actions: Actions = {
 				.offset(announcementsPerPage * (page - 1));
 
 			return { message: 'Got announcements List', list: announcements, total };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
+
+	announcement: async ({ request }) => {
+		const id = (await request.formData()).get('id') as string | null;
+
+		if (!id) return fail(400, { message: 'No announcement id is specified' });
+
+		return {
+			message: 'Got announcement',
+			announcement: {
+				content: '<b>공지입니다!</b> 잘 읽어주세요~',
+				title: `공지 1`,
+				createDate: new Date(),
+			},
+		};
+
+		try {
+			const announcement = (
+				await db
+					.select({
+						content: table.profileAnnouncements.content,
+						title: table.profileAnnouncements.title,
+						createDate: table.profileAnnouncements.createDate,
+					})
+					.from(table.profileAnnouncements)
+					.where(eq(table.profileAnnouncements.id, id))
+			).at(0);
+
+			return { message: 'Got announcements List', announcement };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

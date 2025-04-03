@@ -67,3 +67,9 @@ export enum EmailConfirmFor {
 	REGISTRATION = 'REGISTRATION',
 	RESET_PASSWORD = 'RESET_PASSWORD',
 }
+
+export enum FetchStatus {
+	LOADING,
+	FAILED,
+	COMPLETED,
+}
