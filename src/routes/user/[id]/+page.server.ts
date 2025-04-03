@@ -3,6 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
+import { announcementsPerPage } from '$lib/config';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -47,9 +48,38 @@ export const load = (async ({ params, locals }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	announcementsList: ({}) => {
-		return fail(500, { message: 'An error has occurred' });
+	announcementsList: async ({ params, request }) => {
+		const id = params.id;
+		const page = parseInt(((await request.formData()).get('page') as string | null) || '1');
 
-		return { message: 'Got announcements List' };
+		return {
+			message: 'Got announcements List',
+			list: Array(5)
+				.fill(undefined)
+				.map((_, idx) => ({
+					title: `공지 ${5 - idx}`,
+					createDate: new Date(`2025-04-03 ${idx + 9}:00`),
+				})),
+		};
+
+		try {
+			const announcements = await db
+				.select({
+					title: table.profileAnnouncements.title,
+					createDate: table.profileAnnouncements.createDate,
+				})
+				.from(table.profileAnnouncements)
+				.where(eq(table.profileAnnouncements.userId, id))
+				// ref: https://stackoverflow.com/a/79132920
+				.orderBy(desc(table.profileAnnouncements.createDate))
+				// ref: https://orm.drizzle.team/docs/select#limit--offset
+				.limit(announcementsPerPage)
+				.offset(announcementsPerPage * (page - 1));
+
+			return { message: 'Got announcements List', list: announcements };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
 	},
 };

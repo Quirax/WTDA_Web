@@ -53,3 +53,5 @@ export const emailExpiresIn = 180; // 3 minutes = 180 seconds
 
 // ref: https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types
 export const imageFormat = '.apng, .png, .avif, .gif, .jpg, .jpeg, .jpe, .jif, .jfif, .svg, .webp';
+
+export const announcementsPerPage = 5;

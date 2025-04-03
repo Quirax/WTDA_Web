@@ -58,3 +58,11 @@ export function formatTimeString(time: Date) {
 export function formatDatetimeString(datetime: Date) {
 	return `${formatDateString(datetime)} ${formatTimeString(datetime)}`;
 }
+
+export function getValueFromResponseData(data: any[], field: string) {
+	const fieldDict = data[0];
+
+	if (!fieldDict[field]) return undefined;
+
+	return data[fieldDict[field]];
+}

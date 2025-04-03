@@ -21,7 +21,7 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import { durationString, formatDatetimeString } from '$lib/utils';
+	import { durationString, formatDatetimeString, getValueFromResponseData } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -32,6 +32,7 @@
 	import Chart from '$lib/components/chart/chart.svelte';
 	import * as Drawer from '$lib/components/ui/drawer/index.js';
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
+	import { deserialize } from '$app/forms';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -52,6 +53,7 @@
 	}
 	let announcementsListDrawerState = $state({
 		open: false,
+		list: Array<{ title: string; createDate: Date }>(),
 		status: AnnouncementsListStatus.LOADING,
 	});
 
@@ -59,11 +61,21 @@
 		announcementsListDrawerState.open = true;
 		announcementsListDrawerState.status = AnnouncementsListStatus.LOADING;
 
-		const result = await fetch('?/announcementsList', { method: 'post', body: new FormData() });
+		const formData = new FormData();
+		formData.append('page', '1');
 
-		const { status } = await result.json();
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/announcementsList', { method: 'post', body: formData })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
 
-		if (status !== 200) {
+		if (result.type === 'success') {
+			announcementsListDrawerState.list = result.data!.list as Array<{
+				title: string;
+				createDate: Date;
+			}>;
+			announcementsListDrawerState.status = AnnouncementsListStatus.COMPLETED;
+		} else {
 			announcementsListDrawerState.status = AnnouncementsListStatus.FAILED;
 		}
 	};
@@ -405,24 +417,23 @@
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						<Table.Head class="w-[5em]">번호</Table.Head>
 						<Table.Head>제목</Table.Head>
 						<Table.Head class="w-[13em]">작성일자</Table.Head>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					<Table.Row>
-						<Table.Cell>1</Table.Cell>
-						<Table.Cell>와랄랄라</Table.Cell>
-						<Table.Cell>{formatDatetimeString(new Date('2025-04-03 22:22'))}</Table.Cell>
-					</Table.Row>
+					{#each announcementsListDrawerState.list as item}
+						<Table.Row>
+							<Table.Cell>{item.title}</Table.Cell>
+							<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
+						</Table.Row>
+					{/each}
 				</Table.Body>
 			</Table.Root>
 		{:else if announcementsListDrawerState.status === AnnouncementsListStatus.LOADING}
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
-						<Table.Head class="w-[5em]">번호</Table.Head>
 						<Table.Head>제목</Table.Head>
 						<Table.Head class="w-[13em]">작성일자</Table.Head>
 					</Table.Row>
@@ -430,7 +441,6 @@
 				<Table.Body>
 					{#each Array(10)}
 						<Table.Row>
-							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
 							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
 							<Table.Cell><Skeleton class="h-[1em] w-full" /></Table.Cell>
 						</Table.Row>
