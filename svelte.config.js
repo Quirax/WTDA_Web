@@ -11,6 +11,10 @@ const config = {
 		adapter: adapter(),
 		alias: { $stories: 'src/stories', '@app': 'src/app.ts' },
 	},
+
+	vitePlugin: {
+		prebundleSvelteLibraries: true,
+	},
 };
 
 export default config;
