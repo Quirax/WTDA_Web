@@ -16,7 +16,7 @@
 		[{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
 		[{ indent: '-1' }, { indent: '+1' }],
 		[{ align: 'justify' }, { align: '' }, { align: 'center' }, { align: 'right' }], // text direction
-		['link', 'image', 'video', 'formula'],
+		['link', 'image', 'video' /*, 'formula'*/],
 		['clean'], // remove formatting button
 	];
 
