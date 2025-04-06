@@ -21,13 +21,7 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import {
-		durationString,
-		formatDatetimeString,
-		getValueFromResponseData,
-		isDesktop,
-		sanitizeHTML,
-	} from '$lib/utils';
+	import { durationString, formatDatetimeString, isDesktop, sanitizeHTML } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -42,6 +36,8 @@
 	import Pagination from '$lib/components/pagination/pagination.svelte';
 	import { announcementsPerPage } from '$lib/config';
 	import { FetchStatus } from '@app';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import Editor from '$lib/components/editor/editor.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -138,6 +134,9 @@
 			announcementDialogState.status = FetchStatus.FAILED;
 		}
 	};
+
+	// Announcement Editor
+	let openAnnouncementEditor = $state(false);
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -328,7 +327,10 @@
 			{/if}
 			{#if me && me.id === user.id}
 				<Separator orientation="vertical" class="mx-2 flex-none" />
-				<Button variant="link" class="flex-none text-(--primary-color)">
+				<Button
+					variant="link"
+					class="flex-none text-(--primary-color)"
+					onclick={() => (openAnnouncementEditor = true)}>
 					<Pencil />새 공지사항 쓰기
 				</Button>
 			{/if}
@@ -574,6 +576,42 @@
 			{:else}
 				<Skeleton class="size-full" />
 			{/if}
+		</div>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={openAnnouncementEditor}>
+	<Dialog.Content class="sm:max-w-[600px]">
+		<Dialog.Header>
+			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+				<!-- {#if announcementDialogState.status === FetchStatus.COMPLETED}
+					{announcementDialogState.announcement.title}
+				{:else}
+					<Skeleton class="h-(--height) w-full" />
+				{/if} -->
+				<Input placeholder="공지 제목을 입력하십시오." class="mt-4" />
+			</Dialog.Title>
+			<!-- <Dialog.Description style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
+				작성일시: {#if announcementDialogState.status === FetchStatus.COMPLETED}
+					{formatDatetimeString(announcementDialogState.announcement.createDate)}
+				{:else}
+					<Skeleton class="inline-block h-(--height) w-[11em]" />
+				{/if}
+			</Dialog.Description> -->
+		</Dialog.Header>
+		<div class="h-100 pb-0">
+			<!-- {#if announcementDialogState.status === FetchStatus.COMPLETED}
+				{announcementDialogState.announcement.content}
+			{:else if announcementDialogState.status === FetchStatus.FAILED}
+				<div
+					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
+					<TriangleAlert class="size-12" />
+					<span>불러오는 도중 오류가 발생했습니다.</span>
+				</div>
+			{:else}
+				<Skeleton class="size-full" />
+			{/if} -->
+			<Editor />
 		</div>
 	</Dialog.Content>
 </Dialog.Root>
