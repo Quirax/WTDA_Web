@@ -73,3 +73,6 @@ export function isDesktop() {
 
 	return isDesktop.current;
 }
+
+import DOMPurify from 'isomorphic-dompurify';
+export const sanitizeHTML = DOMPurify?.sanitize || (() => {});

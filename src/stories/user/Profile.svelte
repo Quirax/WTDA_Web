@@ -18,7 +18,6 @@
 		NotepadTextDashed,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import sanitizeHtml from 'sanitize-html';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
@@ -27,6 +26,7 @@
 		formatDatetimeString,
 		getValueFromResponseData,
 		isDesktop,
+		sanitizeHTML,
 	} from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
@@ -267,7 +267,7 @@
 			<H3 class="text-center text-xl">소개</H3>
 			<article class="border p-4">
 				{#if user.profile.introduction}
-					{@html sanitizeHtml(user.profile.introduction)}
+					{@html sanitizeHTML(user.profile.introduction)}
 				{:else}
 					<span class="italic">자기소개가 없습니다.</span>
 				{/if}
@@ -564,7 +564,7 @@
 		</Dialog.Header>
 		<div class="h-100 overflow-y-scroll p-4 pb-0">
 			{#if announcementDialogState.status === FetchStatus.COMPLETED}
-				{announcementDialogState.announcement.content}
+				{@html sanitizeHTML(announcementDialogState.announcement.content)}
 			{:else if announcementDialogState.status === FetchStatus.FAILED}
 				<div
 					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
