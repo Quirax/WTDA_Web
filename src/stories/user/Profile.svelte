@@ -584,34 +584,21 @@
 	<Dialog.Content class="sm:max-w-[600px]">
 		<Dialog.Header>
 			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
-				<!-- {#if announcementDialogState.status === FetchStatus.COMPLETED}
-					{announcementDialogState.announcement.title}
-				{:else}
-					<Skeleton class="h-(--height) w-full" />
-				{/if} -->
 				<Input placeholder="공지 제목을 입력하십시오." class="mt-4" />
 			</Dialog.Title>
-			<!-- <Dialog.Description style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
-				작성일시: {#if announcementDialogState.status === FetchStatus.COMPLETED}
-					{formatDatetimeString(announcementDialogState.announcement.createDate)}
-				{:else}
-					<Skeleton class="inline-block h-(--height) w-[11em]" />
-				{/if}
-			</Dialog.Description> -->
 		</Dialog.Header>
 		<div class="h-100 pb-0">
-			<!-- {#if announcementDialogState.status === FetchStatus.COMPLETED}
-				{announcementDialogState.announcement.content}
-			{:else if announcementDialogState.status === FetchStatus.FAILED}
-				<div
-					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
-					<TriangleAlert class="size-12" />
-					<span>불러오는 도중 오류가 발생했습니다.</span>
-				</div>
-			{:else}
-				<Skeleton class="size-full" />
-			{/if} -->
 			<Editor />
 		</div>
+		<Dialog.Footer>
+			<Button onclick={() => {}}>저장</Button>
+			<Button
+				onclick={() => {
+					openAnnouncementEditor = false;
+				}}
+				variant="secondary">
+				취소
+			</Button>
+		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

@@ -32,7 +32,7 @@
 				modules: {
 					toolbar: toolbarOptions,
 				},
-				placeholder: '내용을 입력하세요...', // TODO: props
+				placeholder: '내용을 입력하십시오...', // TODO: props
 				readOnly: false, // TODO: props
 				theme: 'snow',
 			};
