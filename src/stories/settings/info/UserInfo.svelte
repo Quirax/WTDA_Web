@@ -143,7 +143,7 @@
 	<H2>{title}</H2>
 	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
 		{#if userInfoFor === UserInfoFor.REGISTRATION}
-			<Form.Field {form} name="email" class="flex flex-col mt-4 space-y-1">
+			<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
@@ -158,7 +158,7 @@
 			</Form.Field>
 		{/if}
 		{#if userInfoFor !== UserInfoFor.INFO_VIEW}
-			<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
+			<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>
@@ -182,7 +182,7 @@
 				</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
-			<Form.Field {form} name="passwordConfirm" class="flex flex-col mt-4 space-y-1">
+			<Form.Field {form} name="passwordConfirm" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>
@@ -203,7 +203,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<Form.Field {form} name="username" class="flex flex-col my-4 space-y-1">
+		<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>
@@ -226,16 +226,16 @@
 			{/if}
 		</Form.Field>
 		{#if userInfoFor !== UserInfoFor.REGISTRATION}
-			<Form.Field {form} name="profileImage" class="flex flex-col my-4 space-y-1">
+			<Form.Field {form} name="profileImage" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>프로필 이미지</Form.Label>
 						{#if ($formData as Infer<UserSchema>).profileImage}
-							<div class="relative border rounded-full size-50">
+							<div class="relative size-50 rounded-full border">
 								<img
 									src={($formData as Infer<UserSchema>).profileImage}
 									alt="프로필 이미지"
-									class="rounded-full size-full" />
+									class="size-full rounded-full" />
 								{#if userInfoFor === UserInfoFor.INFO_EDIT}
 									<Button
 										variant="outline"
@@ -256,7 +256,7 @@
 							</Dropzone>
 							<input name={props.name} value="" hidden />
 						{:else}
-							<User class="border size-50" />
+							<User class="size-50 border" />
 						{/if}
 					{/snippet}
 				</Form.Control>
@@ -269,7 +269,7 @@
 		<div class="mb-4 border-2">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Field {form} name="agree_eula" class="p-4">
-					<div class="flex flex-row items-center space-x-3 space-y-0">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
@@ -291,7 +291,7 @@
 					<Form.FieldErrors />
 				</Form.Field>
 				<Form.Field {form} name="agree_privacypolicy" class="p-4">
-					<div class="flex flex-row items-center space-x-3 space-y-0">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
@@ -314,7 +314,7 @@
 				</Form.Field>
 			{/if}
 			<Form.Field {form} name="agree_marketing" class="p-4">
-				<div class="flex flex-row items-center space-x-3 space-y-0">
+				<div class="flex flex-row items-center space-y-0 space-x-3">
 					<Form.Control>
 						{#snippet children({ props })}
 							<!-- prettier-ignore -->
@@ -350,29 +350,30 @@
 {#snippet WarningBeforeDeactivation()}
 	<Ul>
 		<li>
-			<span class="font-bold text-destructive">
+			<span class="text-destructive font-bold">
 				프로필과 남아있는 모든 게시물(커미션 타입, 의뢰 등)은 그대로 보존됩니다.
 			</span>
 			(단, 프로필 이미지와 닉네임은 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.)
 			이를 원하지 않으시는 경우
-			<span class="font-bold text-foreground">
+			<span class="text-foreground font-bold">
 				먼저 프로필을 초기화하고 게시물을 직접 삭제하시기 바랍니다.
 			</span>
 		</li>
 		<li>
-			다른 사용자와 진행하던 <span class="font-bold text-foreground">
+			다른 사용자와 진행하던 <span class="text-foreground font-bold">
 				모든 커미션은 모두 취소되며, 즉시 환불 조치됩니다.
 			</span>
 		</li>
 		<li>
-			<span class="font-bold text-destructive">
-				적립된 모든 수익금과 사용하지 않은 포인트는 환불되지 않으며, 뭐하지공방에 귀속됩니다.
-			</span>
-			이를 원하지 않으시는 경우
-			<span class="font-bold text-foreground">먼저 수익금을 정산하시기 바랍니다.</span>
+			<span class="text-foreground font-bold">적립된 모든 수익금은 곧바로 정산이 진행됩니다.</span>
 		</li>
 		<li>
-			한 번 비활성화된 계정은 <span class="font-bold text-destructive">복구가 불가능하며,</span>
+			<span class="text-destructive font-bold">
+				사용하지 않은 포인트는 환불되지 않으며, 뭐하지공방에 귀속됩니다.
+			</span>
+		</li>
+		<li>
+			한 번 비활성화된 계정은 <span class="text-destructive font-bold">복구가 불가능하며,</span>
 			이 계정으로 다시 로그인할 수 없습니다.
 		</li>
 	</Ul>
