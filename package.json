@@ -93,6 +93,7 @@
 		"postgres": "^3.4.5",
 		"quill": "^2.0.3",
 		"simple-icons": "^14.9.0",
+		"svelte-awesome-color-picker": "^4.0.1",
 		"svelte-crop-window": "^0.1.1",
 		"svelte-file-dropzone": "^2.0.9"
 	},

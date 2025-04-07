@@ -44,6 +44,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
+	import ColorPicker from 'svelte-awesome-color-picker';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -439,6 +440,13 @@
 			</section>
 		{/if}
 
+		{#if profileEditMode}
+			<section class="space-y-2 border p-4">
+				<H3 class="text-xl">프로필에서 사용할 강조색</H3>
+				<ColorPicker isDialog={false} isAlpha={false} sliderDirection="horizontal" />
+			</section>
+		{/if}
+
 		{#if me && me.id === user.id}
 			{#if profileEditMode}
 				<div class="text-right">
@@ -770,3 +778,24 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<style lang="scss">
+	:global([aria-label='color picker']) {
+		margin: 0 !important;
+		border: none !important;
+		padding: 0 !important;
+		width: 100% !important;
+		--picker-width: 100%;
+		--picker-height: 100%;
+
+		:global(.h) {
+			width: 100%;
+			margin-left: 0 !important;
+		}
+
+		:global(.picker) {
+			height: unset !important;
+			aspect-ratio: 1;
+		}
+	}
+</style>
