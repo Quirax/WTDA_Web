@@ -98,7 +98,9 @@ export const actions: Actions = {
 
 			// TODO: Cancel all commission and refund
 
-			// TODO: Belong all remain gains and points to WTDA
+			// TODO: Settle up all remain gains
+
+			// TODO: Belong all remain points to WTDA
 
 			await db
 				.update(table.user)
