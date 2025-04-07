@@ -177,10 +177,26 @@
 <Header title={user.username} />
 
 <section
-	class="aspect-9/1 w-full"
+	class="relative aspect-9/1 w-full"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
 	{#if user.profile.headerImage}
 		<img src={user.profile.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
+		{#if profileEditMode}
+			<Button
+				variant="link"
+				class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100 active:opacity-100">
+				<span>이미지 제거</span>
+			</Button>
+		{/if}
+	{:else if profileEditMode}
+		<Dropzone
+			id={'props.id'}
+			accept={imageFormat}
+			on:drop={() => {}}
+			multiple={false}
+			class="dropzone size-full justify-center">
+			<p>여기로 헤더 이미지를 드래그하거나, 클릭하여 헤더 이미지를 선택하세요.</p>
+		</Dropzone>
 	{:else}
 		<div class="size-full bg-(--primary-color) bg-[url(/background-pattern-banner.png)]"></div>
 	{/if}
@@ -212,7 +228,7 @@
 										value={($formData as Infer<UserSchema>).profileImage}
 										hidden /> -->
 					<Dropzone id={'props.id'} accept={imageFormat} on:drop={() => {}} multiple={false}>
-						<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
+						<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
 					</Dropzone>
 				{/if}
 				<Input
