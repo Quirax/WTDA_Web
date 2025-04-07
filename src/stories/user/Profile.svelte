@@ -43,6 +43,7 @@
 	import Dropzone from 'svelte-file-dropzone';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { MediaQuery } from 'svelte/reactivity';
+	import X from '@lucide/svelte/icons/x';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -395,7 +396,32 @@
 				</article>
 			{/if}
 		</section>
-		{#if (user.profile.links || []).length > 0}
+
+		{#if profileEditMode}
+			<section class="space-y-2 border p-4">
+				<H3 class="text-xl">링크</H3>
+				{#each user.profile.links || [] as link}
+					<div>
+						<Link class="inline-block size-5 rounded-full bg-(--primary-color) p-0.5 text-white" />
+						<Button
+							variant="link"
+							href={link.href}
+							target={link.target}
+							class="text-md text-foreground align-middle">
+							{link.text}
+						</Button>
+					</div>
+				{/each}
+				<div class="flex items-center space-x-2">
+					<Input placeholder="표시 명칭" />
+					<Input placeholder="URL" />
+					<Button variant="outline" size="icon" onclick={() => {}} class="flex-none">
+						<X />
+					</Button>
+				</div>
+				<Button variant="outline" class="w-full">링크 추가</Button>
+			</section>
+		{:else if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
 				<H3 class="hidden">링크</H3>
 				{#each user.profile.links || [] as link}
@@ -412,6 +438,7 @@
 				{/each}
 			</section>
 		{/if}
+
 		{#if me && me.id === user.id}
 			{#if profileEditMode}
 				<div class="text-right">
