@@ -185,8 +185,10 @@
 	{/if}
 </section>
 
-<main class="flex" style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
-	<section class="bg-background relative box-border w-80 flex-none space-y-4 p-6">
+<main
+	class="flex flex-col lg:flex-row"
+	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
+	<section class="bg-background relative box-border w-full flex-none space-y-4 p-6 lg:w-80">
 		<section class="flex w-full flex-col items-center space-y-2">
 			<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
 				{#if user.profileImage}
@@ -258,10 +260,10 @@
 					<RadioGroup.Item value="always" id="contact-available-always" />
 					<Label for="contact-available-always">상시</Label>
 				</div>
-				<div class="flex items-start space-x-2">
+				<div class="flex items-start space-x-2 max-lg:items-center">
 					<RadioGroup.Item value="certain-time" id="contact-available-certain-time" />
-					<Label for="contact-available-certain-time">
-						<div>특정 시간:</div>
+					<Label for="contact-available-certain-time" class="items-center max-lg:flex">
+						<div>특정 시간:&nbsp;</div>
 						<div class="mt-2 flex items-center">
 							<Select.Root type="single">
 								<Select.Trigger class="w-[5em]">23</Select.Trigger>
@@ -411,7 +413,7 @@
 			{/if}
 		{/if}
 	</section>
-	<section class="m-4 w-full space-y-8">
+	<section class="w-full space-y-8 p-4">
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
 			<Separator orientation="vertical" class="mx-2 flex-none" />
@@ -449,7 +451,7 @@
 		</section>
 		<section class="space-y-4">
 			<H3>커미션 타입</H3>
-			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `커미션 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
@@ -479,7 +481,7 @@
 		</section>
 		<section class="space-y-4">
 			<H3>대기중인 의뢰</H3>
-			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `의뢰 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
@@ -509,7 +511,7 @@
 		</section>
 		<section class="space-y-4">
 			<H3>포트폴리오</H3>
-			<section class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+			<section class="grid gap-4 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
 				{#each Array(10)
 					.fill(undefined)
 					.map( (_, i) => ({ thumbnail: DocsImage, title: `포트폴리오 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
