@@ -34,10 +34,14 @@
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { deserialize } from '$app/forms';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
-	import { announcementsPerPage } from '$lib/config';
+	import { announcementsPerPage, imageFormat } from '$lib/config';
 	import { FetchStatus } from '@app';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from '$lib/components/editor/editor.svelte';
+	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import Dropzone from 'svelte-file-dropzone';
+	import * as Select from '$lib/components/ui/select/index.js';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -138,8 +142,12 @@
 	// Announcement Editor
 	let openAnnouncementEditor = $state(false);
 
+	// Profile Edit Mode
+	let profileEditMode = $state(false);
+
 	// TODO: get values from server
 	const maxSlot = 4,
+		maxOpenSlot = maxSlot,
 		openedSlot = 3;
 	const avgRespTime = 15 * 60 * 1000;
 	const numOfCommission = 10,
@@ -180,97 +188,193 @@
 <main class="flex" style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
 	<section class="bg-background relative box-border w-80 flex-none space-y-4 p-6">
 		<section class="flex w-full flex-col items-center space-y-2">
-			<div class="aspect-square w-30 overflow-hidden rounded-full border">
+			<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
 				{#if user.profileImage}
 					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
+					{#if profileEditMode}
+						<Button
+							variant="link"
+							class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
+							<span>이미지 제거</span>
+						</Button>
+					{/if}
 				{:else}
 					<User class="size-full" />
 				{/if}
 			</div>
-			<H2 class="border-none text-center text-2xl">{user.username}</H2>
-		</section>
-		<section class="flex">
-			<Button class="w-full flex-1 bg-(--primary-color)">
-				<MessageSquare />
-				메시지하기
-			</Button>
-			<Button size="icon" variant="outline"><Share2 /></Button>
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class="m-0 p-0">
-					{#snippet child({ props })}
-						<Button {...props} variant="outline" size="icon"><EllipsisVertical /></Button>
-					{/snippet}
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content class="w-56" align="end">
-					<DropdownMenu.Item onclick={() => {}}>차단하기</DropdownMenu.Item>
-					<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
-		</section>
-		<Alert.Root>
-			<Clock class="size-4" />
-			<Alert.Title>
-				문의 가능 시간:
-				{#if !user.profile.contactAvailable}
-					미설정
-				{:else if typeof user.profile.contactAvailable === 'boolean'}
-					상시
-				{:else}
-					{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
+			{#if profileEditMode}
+				{#if !user.profileImage}
+					<!-- <input
+										name={props.name}
+										value={($formData as Infer<UserSchema>).profileImage}
+										hidden /> -->
+					<Dropzone id={'props.id'} accept={imageFormat} on:drop={() => {}} multiple={false}>
+						<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
+					</Dropzone>
 				{/if}
-			</Alert.Title>
-			<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
-		</Alert.Root>
-		<section class="space-y-2">
-			<div class="flex items-center space-x-2">
-				<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
-				<Badge class="bg-(--primary-color)">{openedSlot}/{maxSlot}</Badge>
-			</div>
-			<div class="space-y-2 space-x-2">
-				{#each Array(openedSlot)}
-					<CircleDashed class="inline size-10 align-top text-green-700" />
-				{/each}{#each Array(maxSlot - openedSlot)}
-					<CircleCheck class="inline size-10 align-top text-stone-700" />
-				{/each}
-			</div>
+				<Input
+					class="text-center text-2xl font-bold md:text-2xl"
+					placeholder="닉네임"
+					value={user.username} />
+			{:else}
+				<H2 class="border-none text-center text-2xl">{user.username}</H2>
+			{/if}
 		</section>
-		<section class="relative border p-4">
-			<H3 class="hidden">통계</H3>
-			<Table.Root>
-				<Table.Body>
-					<Table.Row>
-						<Table.Head>총 커미션 수</Table.Head>
-						<Table.Cell>{numOfCommission}건</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>평균 작업 시간</Table.Head>
-						<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>완료율</Table.Head>
-						<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
-					</Table.Row>
-				</Table.Body>
-			</Table.Root>
-			<div class="text-right">
-				<Button
-					variant="link"
-					onclick={() => (openStatDialog = true)}
-					class="text-(--primary-color)">
-					자세히 보기
-					<ChevronRight class="size-4" />
+
+		{#if !profileEditMode}
+			<section class="flex">
+				<Button class="w-full flex-1 bg-(--primary-color)">
+					<MessageSquare />
+					메시지하기
 				</Button>
+				<Button size="icon" variant="outline"><Share2 /></Button>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class="m-0 p-0">
+						{#snippet child({ props })}
+							<Button {...props} variant="outline" size="icon"><EllipsisVertical /></Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content class="w-56" align="end">
+						<DropdownMenu.Item onclick={() => {}}>차단하기</DropdownMenu.Item>
+						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</section>
+		{/if}
+
+		{#if profileEditMode}
+			<H3 class="text-xl">문의 가능 시간</H3>
+			<RadioGroup.Root
+				value={!user.profile.contactAvailable
+					? 'undefined'
+					: typeof user.profile.contactAvailable === 'boolean'
+						? 'always'
+						: 'certain-time'}>
+				<div class="flex items-center space-x-2">
+					<RadioGroup.Item value="undefined" id="contact-available-undefined" />
+					<Label for="contact-available-undefined">미설정</Label>
+				</div>
+				<div class="flex items-center space-x-2">
+					<RadioGroup.Item value="always" id="contact-available-always" />
+					<Label for="contact-available-always">상시</Label>
+				</div>
+				<div class="flex items-start space-x-2">
+					<RadioGroup.Item value="certain-time" id="contact-available-certain-time" />
+					<Label for="contact-available-certain-time">
+						<div>특정 시간:</div>
+						<div class="mt-2 flex items-center">
+							<Select.Root type="single">
+								<Select.Trigger class="w-[5em]">23</Select.Trigger>
+								<Select.Content>
+									{#each Array(24) as _, hour}
+										<Select.Item value={hour.toString()}>{hour}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+							<span>시 ~</span>
+							<Select.Root type="single">
+								<Select.Trigger class="w-[5em]">23</Select.Trigger>
+								<Select.Content>
+									{#each Array(24) as _, hour}
+										<Select.Item value={hour.toString()}>{hour}</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+							<span>시</span>
+						</div>
+					</Label>
+				</div>
+			</RadioGroup.Root>
+		{:else}
+			<Alert.Root>
+				<Clock class="size-4" />
+				<Alert.Title>
+					문의 가능 시간:
+					{#if !user.profile.contactAvailable}
+						미설정
+					{:else if typeof user.profile.contactAvailable === 'boolean'}
+						상시
+					{:else}
+						{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
+					{/if}
+				</Alert.Title>
+				<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
+			</Alert.Root>
+		{/if}
+
+		{#if profileEditMode}
+			<H3 class="text-xl">최대 슬롯 갯수</H3>
+			<div class="mt-2 flex items-center">
+				<Select.Root type="single">
+					<Select.Trigger class="w-[5em]">{maxOpenSlot}</Select.Trigger>
+					<Select.Content>
+						{#each Array(maxSlot + 1) as _, slot}
+							<Select.Item value={slot.toString()}>{slot}</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+				<span>개</span>
 			</div>
-		</section>
+		{:else}
+			<section class="space-y-2">
+				<div class="flex items-center space-x-2">
+					<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
+					<Badge class="bg-(--primary-color)">{openedSlot}/{maxOpenSlot}</Badge>
+				</div>
+				<div class="space-y-2 space-x-2">
+					{#each Array(openedSlot)}
+						<CircleDashed class="inline size-10 align-top text-green-700" />
+					{/each}{#each Array(maxOpenSlot - openedSlot)}
+						<CircleCheck class="inline size-10 align-top text-stone-700" />
+					{/each}
+				</div>
+			</section>
+		{/if}
+
+		{#if !profileEditMode}
+			<section class="relative border p-4">
+				<H3 class="hidden">통계</H3>
+				<Table.Root>
+					<Table.Body>
+						<Table.Row>
+							<Table.Head>총 커미션 수</Table.Head>
+							<Table.Cell>{numOfCommission}건</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Head>평균 작업 시간</Table.Head>
+							<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
+						</Table.Row>
+						<Table.Row>
+							<Table.Head>완료율</Table.Head>
+							<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
+						</Table.Row>
+					</Table.Body>
+				</Table.Root>
+				<div class="text-right">
+					<Button
+						variant="link"
+						onclick={() => (openStatDialog = true)}
+						class="text-(--primary-color)">
+						자세히 보기
+						<ChevronRight class="size-4" />
+					</Button>
+				</div>
+			</section>
+		{/if}
+
 		<section class="space-y-2">
 			<H3 class="text-center text-xl">소개</H3>
-			<article class="border p-4">
-				{#if user.profile.introduction}
-					{@html sanitizeHTML(user.profile.introduction)}
-				{:else}
-					<span class="italic">자기소개가 없습니다.</span>
-				{/if}
-			</article>
+			{#if profileEditMode}
+				<Editor />
+			{:else}
+				<article class="border p-4">
+					{#if user.profile.introduction}
+						{@html sanitizeHTML(user.profile.introduction)}
+					{:else}
+						<span class="italic">자기소개가 없습니다.</span>
+					{/if}
+				</article>
+			{/if}
 		</section>
 		{#if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
@@ -290,13 +394,21 @@
 			</section>
 		{/if}
 		{#if me && me.id === user.id}
-			<Button
-				size="icon"
-				variant="outline"
-				class="absolute top-6 right-6 rounded-full"
-				aria-label="프로필 수정">
-				<Pencil /><!-- Edit Profile -->
-			</Button>
+			{#if profileEditMode}
+				<div class="text-right">
+					<Button variant="default">저장</Button>
+					<Button variant="secondary" onclick={() => (profileEditMode = false)}>취소</Button>
+				</div>
+			{:else}
+				<Button
+					size="icon"
+					variant="outline"
+					class="absolute top-6 right-6 rounded-full"
+					aria-label="프로필 수정"
+					onclick={() => (profileEditMode = true)}>
+					<Pencil />
+				</Button>
+			{/if}
 		{/if}
 	</section>
 	<section class="m-4 w-full space-y-8">
