@@ -417,37 +417,45 @@
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
 			<Separator orientation="vertical" class="mx-2 flex-none" />
-			{#if announcements}
-				<p class="w-full">
+			<div class="flex w-full flex-col">
+				{#if announcements}
+					<p class="w-full overflow-hidden text-ellipsis whitespace-nowrap">
+						<Button
+							variant="link"
+							class="text-accent-foreground"
+							onclick={() => openAnnouncementDialog(announcements.id)}>
+							{announcements.title}
+						</Button>
+						<span class="text-muted-foreground text-sm">
+							{formatDatetimeString(announcements.createDate)}
+						</span>
+					</p>
+				{:else}
+					<p
+						class="text-muted-foreground w-full overflow-hidden text-ellipsis whitespace-nowrap italic">
+						등록된 공지사항이 없습니다
+					</p>
+				{/if}
+				<Separator orientation="horizontal" class="my-2 flex-none" />
+				<div class="flex justify-end">
 					<Button
 						variant="link"
-						class="text-accent-foreground"
-						onclick={() => openAnnouncementDialog(announcements.id)}>
-						{announcements.title}
+						class="flex-none text-(--primary-color)"
+						onclick={onOpenAnnouncementsListDrawer}>
+						과거 공지사항 보기
+						<ChevronRight class="size-4" />
 					</Button>
-					<span class="text-muted-foreground text-sm">
-						{formatDatetimeString(announcements.createDate)}
-					</span>
-				</p>
-				<Button
-					variant="link"
-					class="flex-none text-(--primary-color)"
-					onclick={onOpenAnnouncementsListDrawer}>
-					과거 공지사항 보기
-					<ChevronRight class="size-4" />
-				</Button>
-			{:else}
-				<p class="text-muted-foreground w-full italic">등록된 공지사항이 없습니다</p>
-			{/if}
-			{#if me && me.id === user.id}
-				<Separator orientation="vertical" class="mx-2 flex-none" />
-				<Button
-					variant="link"
-					class="flex-none text-(--primary-color)"
-					onclick={() => (openAnnouncementEditor = true)}>
-					<Pencil />새 공지사항 쓰기
-				</Button>
-			{/if}
+					{#if me && me.id === user.id}
+						<Separator orientation="vertical" class="mx-2 flex-none" />
+						<Button
+							variant="link"
+							class="flex-none text-(--primary-color)"
+							onclick={() => (openAnnouncementEditor = true)}>
+							<Pencil />새 공지사항 쓰기
+						</Button>
+					{/if}
+				</div>
+			</div>
 		</section>
 		<section class="space-y-4">
 			<H3>커미션 타입</H3>
