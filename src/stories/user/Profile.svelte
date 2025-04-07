@@ -42,6 +42,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import Dropzone from 'svelte-file-dropzone';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import { MediaQuery } from 'svelte/reactivity';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -437,7 +438,7 @@
 					</p>
 				{/if}
 				<Separator orientation="horizontal" class="my-2 flex-none" />
-				<div class="flex justify-end">
+				<div class="flex max-sm:flex-col max-sm:items-end sm:justify-end">
 					<Button
 						variant="link"
 						class="flex-none text-(--primary-color)"
@@ -446,10 +447,12 @@
 						<ChevronRight class="size-4" />
 					</Button>
 					{#if me && me.id === user.id}
-						<Separator orientation="vertical" class="mx-2 flex-none" />
+						{#if new MediaQuery('width >= 40rem').current}
+							<Separator orientation="vertical" class="mx-2 flex-none" />
+						{/if}
 						<Button
 							variant="link"
-							class="flex-none text-(--primary-color)"
+							class="flex-none text-(--primary-color) max-sm:mt-2"
 							onclick={() => (openAnnouncementEditor = true)}>
 							<Pencil />새 공지사항 쓰기
 						</Button>
