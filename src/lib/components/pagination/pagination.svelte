@@ -1,10 +1,7 @@
 <script lang="ts">
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	// import { MediaQuery } from 'svelte/reactivity';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
-
-	// const isDesktop = new MediaQuery('(min-width: 768px)');
 
 	interface Props extends ReturnType<typeof $props> {
 		count: number;
@@ -14,11 +11,6 @@
 	}
 
 	let { count, perPage, siblingCount, page = $bindable(1) }: Props = $props();
-
-	// const count = 20;
-
-	// const perPage = $derived(isDesktop.current ? 3 : 8);
-	// const siblingCount = $derived(isDesktop.current ? 1 : 0);
 </script>
 
 <Pagination.Root {count} {perPage} {siblingCount} bind:page>
