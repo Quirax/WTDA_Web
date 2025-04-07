@@ -38,6 +38,8 @@ export async function validateSessionToken(token: string) {
 				profileImage: table.user.profileImage,
 				email: table.user.email,
 				status: table.user.status,
+				preferences: table.user.preferences,
+				profile: table.user.profile,
 			},
 			session: table.session,
 		})
