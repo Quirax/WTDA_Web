@@ -45,16 +45,45 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
 	import ColorPicker from 'svelte-awesome-color-picker';
+	import { profileSchema, type ProfileSchema } from '$lib/schema/profile';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Form from '$lib/components/ui/form';
+	import { invalidate } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
+		profileFormData: SuperValidated<Infer<ProfileSchema>>;
 	}
 
-	const { user, announcements }: Props = $props();
+	const { user, announcements, profileFormData }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
+
+	// Profile form
+	const profileForm = superForm(profileFormData, {
+		validators: zodClient(profileSchema),
+		dataType: 'json',
+		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
+		onResult({ result, cancel }) {
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				// openErrorAlert = true;
+				cancel();
+			} else {
+				invalidate('/user');
+				profileEditMode = false;
+			}
+		},
+	});
+
+	const {
+		form: profileData,
+		enhance: profileEnhance,
+		constraints: profileConstraints,
+	} = profileForm;
 
 	// Stat Dialog
 	let openStatDialog = $state(false);
@@ -207,36 +236,71 @@
 <main
 	class="flex flex-col lg:flex-row"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
-	<section class="bg-background relative box-border w-full flex-none space-y-4 p-6 lg:w-80">
+	<form
+		class="bg-background relative box-border w-full flex-none space-y-4 p-6 lg:w-80"
+		method="POST"
+		use:profileEnhance
+		action="?/update">
 		<section class="flex w-full flex-col items-center space-y-2">
-			<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
-				{#if user.profileImage}
-					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
-					{#if profileEditMode}
-						<Button
-							variant="link"
-							class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
-							<span>이미지 제거</span>
-						</Button>
-					{/if}
-				{:else}
-					<User class="size-full" />
-				{/if}
-			</div>
-			{#if profileEditMode}
-				{#if !user.profileImage}
-					<!-- <input
+			<Form.Field
+				form={profileForm}
+				name="profileImage"
+				class="flex w-full flex-col items-center space-y-2">
+				<Form.Control>
+					{#snippet children({ props })}
+						<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
+							{#if $profileData.profileImage}
+								<img
+									src={$profileData.profileImage}
+									alt="{user.username} 님의 프로필 이미지"
+									class="size-full" />
+								{#if profileEditMode}
+									<Button
+										variant="link"
+										class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
+										<span>이미지 제거</span>
+									</Button>
+									<input name={props.name} value={$profileData.profileImage} hidden />
+								{/if}
+							{:else}
+								<User class="size-full" />
+							{/if}
+						</div>
+						{#if profileEditMode && !user.profileImage}
+							<!-- <input
 										name={props.name}
 										value={($formData as Infer<UserSchema>).profileImage}
 										hidden /> -->
-					<Dropzone id={'props.id'} accept={imageFormat} on:drop={() => {}} multiple={false}>
-						<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
-					</Dropzone>
+							<Dropzone id={props.id} accept={imageFormat} on:drop={() => {}} multiple={false}>
+								<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
+							</Dropzone>
+							<input name={props.name} value="" hidden />
+						{/if}
+					{/snippet}
+				</Form.Control>
+				{#if profileEditMode}
+					<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
+					<Form.FieldErrors />
 				{/if}
-				<Input
-					class="text-center text-2xl font-bold md:text-2xl"
-					placeholder="닉네임"
-					value={user.username} />
+			</Form.Field>
+
+			{#if profileEditMode}
+				<Form.Field form={profileForm} name="username">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Input
+								{...props}
+								class="text-center text-2xl font-bold md:text-2xl"
+								placeholder="닉네임"
+								bind:value={$profileData.username}
+								{...$profileConstraints.username} />
+						{/snippet}
+					</Form.Control>
+					{#if profileEditMode}
+						<Form.Description>최대 20자</Form.Description>
+						<Form.FieldErrors />
+					{/if}
+				</Form.Field>
 			{:else}
 				<H2 class="border-none text-center text-2xl">{user.username}</H2>
 			{/if}
@@ -450,7 +514,7 @@
 		{#if me && me.id === user.id}
 			{#if profileEditMode}
 				<div class="text-right">
-					<Button variant="default">저장</Button>
+					<Form.Button variant="default">저장</Form.Button>
 					<Button variant="secondary" onclick={() => (profileEditMode = false)}>취소</Button>
 				</div>
 			{:else}
@@ -464,7 +528,7 @@
 				</Button>
 			{/if}
 		{/if}
-	</section>
+	</form>
 	<section class="w-full space-y-8 p-4">
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>

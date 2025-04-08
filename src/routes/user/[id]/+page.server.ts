@@ -4,6 +4,9 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { announcementsPerPage } from '$lib/config';
+import { profileSchema } from '../../../lib/schema/profile';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -44,10 +47,66 @@ export const load = (async ({ params, locals }) => {
 	return {
 		user,
 		profileAnnouncements,
+		profileForm: await superValidate(zod(profileSchema), {
+			defaults: {
+				username: user.username,
+				profileImage: user.profileImage,
+				headerImage: user.profile.headerImage,
+				introduction: user.profile.introduction,
+				contactAvailable: user.profile.contactAvailable || null,
+				links: user.profile.links,
+				accentColor: user.profile.accentColor,
+			},
+		}),
 	};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
+	update: async (event) => {
+		if (!event.locals.user) throw redirect(302, '/');
+
+		const form = await superValidate(event.request, zod(profileSchema));
+
+		if (!form.valid) {
+			return fail(400, { message: 'The form is not valid.', form });
+		}
+
+		const {
+			username,
+			profileImage,
+			headerImage,
+			introduction,
+			contactAvailable,
+			links,
+			accentColor,
+		} = form.data;
+
+		let set: Partial<{
+			username: typeof username;
+			profileImage: typeof profileImage;
+			profile: Partial<App.Profile>;
+		}> = {
+			username,
+			profileImage,
+			profile: {
+				headerImage: headerImage === null ? undefined : headerImage,
+				introduction,
+				contactAvailable: contactAvailable === null ? undefined : contactAvailable,
+				links: links === null ? undefined : links,
+				accentColor,
+			},
+		};
+
+		try {
+			await db.update(table.user).set(set).where(eq(table.user.id, event.locals.user.id));
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred', form });
+		}
+
+		return { message: 'Updated successfully', form };
+	},
+
 	announcementsList: async ({ params, request }) => {
 		const id = params.id;
 		const page = parseInt(((await request.formData()).get('page') as string | null) || '1');
