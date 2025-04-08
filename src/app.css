@@ -105,16 +105,22 @@
 
 	/* Headings */
 	.html h1 {
+		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
 	}
 	.html h2 {
+		@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
 	}
 	.html h3 {
+		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
 	}
 	.html h4 {
+		@apply scroll-m-20 text-xl font-semibold tracking-tight;
 	}
 	.html h5 {
+		@apply scroll-m-20 text-lg font-semibold tracking-tight;
 	}
 	.html h6 {
+		@apply scroll-m-20 text-base font-semibold tracking-tight;
 	}
 
 	/* Fonts */
@@ -141,16 +147,20 @@
 
 	/* Sections */
 	.html blockquote {
+		@apply mt-6 border-l-2 pl-6 italic;
 	}
 
 	.html pre {
+		@apply mt-6 mb-4 overflow-x-auto rounded-lg border bg-zinc-950 p-4 text-[#E1E4E8] dark:bg-zinc-900;
 	}
 
 	/* Lists */
 	.html ol {
+		@apply my-6 ml-6 list-decimal [&>li]:mt-2;
 	}
 
 	.html ul {
+		@apply my-6 ml-6 list-disc [&>li]:mt-2;
 	}
 
 	.html ul li[data-list='unchecked'] {
@@ -174,5 +184,6 @@
 
 	/* Elements */
 	.html a {
+		@apply text-primary underline-offset-4 hover:underline;
 	}
 }
