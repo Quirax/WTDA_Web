@@ -7,6 +7,7 @@ import { announcementsPerPage } from '$lib/config';
 import { profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
+import { sanitizeHTML } from '$lib/utils';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -90,7 +91,7 @@ export const actions: Actions = {
 			profileImage,
 			profile: {
 				headerImage: headerImage === null ? undefined : headerImage,
-				introduction,
+				introduction: sanitizeHTML(introduction || ''),
 				contactAvailable: contactAvailable === null ? undefined : contactAvailable,
 				links: links === null ? undefined : links,
 				accentColor,
