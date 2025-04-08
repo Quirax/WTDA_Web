@@ -6,6 +6,8 @@ import { defineConfig } from 'vite';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/experimental-addon-test/vitest-plugin';
+import basicSsl from '@vitejs/plugin-basic-ssl';
+
 const dirname =
 	typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
@@ -18,6 +20,14 @@ export default defineConfig({
 			outdir: './src/lib/paraglide',
 		}),
 		tailwindcss(),
+		process.env.NODE_ENV === 'development'
+			? basicSsl({
+					/** name of certification */
+					name: 'dev',
+					/** custom trust domains */
+					domains: ['192.169.0.3'],
+				})
+			: undefined,
 	],
 	test: {
 		workspace: [
