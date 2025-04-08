@@ -163,12 +163,6 @@
 		@apply my-6 ml-6 list-disc [&>li]:mt-2;
 	}
 
-	.html ul li[data-list='unchecked'] {
-	}
-
-	.html ul li[data-list='checked'] {
-	}
-
 	/* Align */
 	.html .ql-align-center {
 		@apply text-center;

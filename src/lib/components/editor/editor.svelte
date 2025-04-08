@@ -15,7 +15,7 @@
 		[{ color: [] }, { background: [] }],
 		[{ script: 'super' }, { script: 'sub' }],
 		['blockquote', 'code-block'],
-		[{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+		[{ list: 'ordered' }, { list: 'bullet' }],
 		[{ indent: '-1' }, { indent: '+1' }],
 		[{ align: 'justify' }, { align: '' }, { align: 'center' }, { align: 'right' }], // text direction
 		['link', 'image', 'video' /*, 'formula'*/],
