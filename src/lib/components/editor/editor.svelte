@@ -4,6 +4,8 @@
 
 	import 'quill/dist/quill.snow.css';
 
+	let { value = $bindable() } = $props();
+
 	let holder = $state<HTMLElement>();
 
 	const toolbarOptions = [
@@ -25,7 +27,6 @@
 		if (!holder) return;
 
 		import('quill').then(async ({ default: Quill }) => {
-			console.log(holder?.offsetTop);
 			const options: QuillOptions = {
 				bounds: holder,
 				debug: 'warn',
@@ -38,6 +39,11 @@
 			};
 
 			const quill = new Quill(holder!, options);
+			quill.clipboard.dangerouslyPasteHTML(value); // ref: https://developer-lte.tistory.com/entry/Quill-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%88%98%EC%A0%95-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-%EC%9E%AC%ED%99%9C%EC%9A%A9
+
+			quill.on('editor-change', () => {
+				value = quill.getSemanticHTML();
+			});
 
 			holder!.parentElement!.classList.add('ql-ko');
 		});

@@ -95,3 +95,84 @@
 		background-image: url('/background-pattern-dark.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
 	}
 }
+
+@layer base {
+	.html *:empty::before {
+		/* ref: https://stackoverflow.com/a/66457550 */
+		content: '';
+		display: inline-block;
+	}
+
+	/* Headings */
+	.html h1 {
+	}
+	.html h2 {
+	}
+	.html h3 {
+	}
+	.html h4 {
+	}
+	.html h5 {
+	}
+	.html h6 {
+	}
+
+	/* Fonts */
+	.html .ql-font-serif {
+		@apply font-serif;
+	}
+
+	.html .ql-font-monospace {
+		@apply font-mono;
+	}
+
+	/* Sizes */
+	.html .ql-size-small {
+		@apply text-sm;
+	}
+
+	.html .ql-size-large {
+		@apply text-lg;
+	}
+
+	.html .ql-size-huge {
+		@apply text-xl;
+	}
+
+	/* Sections */
+	.html blockquote {
+	}
+
+	.html pre {
+	}
+
+	/* Lists */
+	.html ol {
+	}
+
+	.html ul {
+	}
+
+	.html ul li[data-list='unchecked'] {
+	}
+
+	.html ul li[data-list='checked'] {
+	}
+
+	/* Align */
+	.html .ql-align-center {
+		@apply text-center;
+	}
+
+	.html .ql-align-right {
+		@apply text-right;
+	}
+
+	.html .ql-align-justify {
+		@apply text-justify;
+	}
+
+	/* Elements */
+	.html a {
+	}
+}

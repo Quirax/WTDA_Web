@@ -450,9 +450,17 @@
 		<section class="space-y-2">
 			<H3 class="text-center text-xl">소개</H3>
 			{#if profileEditMode}
-				<Editor />
+				<Form.Field form={profileForm} name="introduction">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Editor bind:value={$profileData.introduction} />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
 			{:else}
-				<article class="border p-4">
+				<article class="html border p-4">
 					{#if user.profile.introduction}
 						{@html sanitizeHTML(user.profile.introduction)}
 					{:else}
