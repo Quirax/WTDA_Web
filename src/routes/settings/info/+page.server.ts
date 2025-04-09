@@ -14,8 +14,6 @@ export const load = (async ({ locals }) => {
 		await db
 			.select({
 				user: {
-					username: table.user.username,
-					profileImage: table.user.profileImage,
 					preferences: table.user.preferences,
 				},
 			})
@@ -28,8 +26,6 @@ export const load = (async ({ locals }) => {
 	return {
 		form: await superValidate(zod(userSchema), {
 			defaults: {
-				username: results.user.username,
-				profileImage: results.user.profileImage,
 				agree_marketing:
 					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
 					false,

@@ -14,8 +14,6 @@ const formObject = z.object({
 const userObject = z.object({
 	password: z.string().optional(),
 	passwordConfirm: z.string().optional(),
-	username: z.string().nonempty('닉네임이 필요합니다').max(20, '닉네임은 20자를 넘을 수 없습니다.'),
-	profileImage: z.string().url().or(z.string().length(0)).nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
 	agree_marketing: z.boolean().default(false),
 });
 
@@ -86,8 +84,7 @@ export const userSchema = userObject
 		message: '비밀번호는 최소 8자 이상이어야 합니다.',
 		path: ['passwordConfirm'],
 	})
-	.refine(passwordConfirm.pred, passwordConfirm.error)
-	.refine(uniqueUsername.pred, uniqueUsername.error);
+	.refine(passwordConfirm.pred, passwordConfirm.error);
 
 export type UserSchema = typeof userSchema;
 

@@ -70,54 +70,6 @@
 	});
 	const { form: formData, enhance, constraints } = form;
 
-	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
-	// ref: https://stackoverflow.com/a/11058858
-	let sourceImage = $state<string>();
-	let openCropper = $state(false);
-
-	const onDropFile = ({ detail }: any) => {
-		const { acceptedFiles } = detail;
-
-		let imageFile = acceptedFiles[0];
-
-		if (!imageFile) return;
-
-		let reader = new FileReader();
-		reader.onload = (e) => {
-			if (!e.target?.result) sourceImage = '';
-			else if (typeof e.target.result === 'string') sourceImage = e.target.result;
-			else sourceImage = String.fromCharCode(...new Uint16Array(e.target.result));
-
-			openCropper = true;
-		};
-		reader.readAsDataURL(imageFile);
-	};
-
-	let cropper = $state<ReturnType<typeof Cropper>>();
-
-	// ref: https://superforms.rocks/concepts/tainted
-	const onSetProfileImage = () => {
-		if (!cropper) return;
-
-		cropper.getImage().then((destImage) => {
-			if (!destImage) return;
-
-			formData.update(($formData: Infer<UserSchema>) => {
-				$formData.profileImage = destImage;
-				return $formData;
-			});
-
-			openCropper = false;
-		});
-	};
-
-	const removeProfileImage = () => {
-		formData.update(($formData: Infer<UserSchema>) => {
-			$formData.profileImage = '';
-			return $formData;
-		});
-	};
-
 	let openBeforeDeactivationAlert = $state(false);
 	let openAfterDeactivationAlert = $state(false);
 	let openErrorOnDeactivationAlert = $state(false);
@@ -203,70 +155,27 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>
-						{#if userInfoFor !== UserInfoFor.INFO_VIEW}
-							<Badge variant="destructive">필수</Badge>
-						{/if}
-						닉네임
-					</Form.Label>
-					<Input
-						{...props}
-						bind:value={$formData.username}
-						{...$constraints.username}
-						class="text-foreground opacity-100!"
-						disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
-				{/snippet}
-			</Form.Control>
-			{#if userInfoFor === UserInfoFor.INFO_EDIT}
-				<Form.Description>최대 20자</Form.Description>
-				<Form.FieldErrors />
-			{/if}
-		</Form.Field>
-		{#if userInfoFor !== UserInfoFor.REGISTRATION}
-			<Form.Field {form} name="profileImage" class="my-4 flex flex-col space-y-1">
+		{#if userInfoFor === UserInfoFor.REGISTRATION}
+			<Form.Field {form} name="username" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label>프로필 이미지</Form.Label>
-						{#if ($formData as Infer<UserSchema>).profileImage}
-							<div class="relative size-50 rounded-full border">
-								<img
-									src={($formData as Infer<UserSchema>).profileImage}
-									alt="프로필 이미지"
-									class="size-full rounded-full" />
-								{#if userInfoFor === UserInfoFor.INFO_EDIT}
-									<Button
-										variant="outline"
-										size="icon"
-										onclick={removeProfileImage}
-										class="absolute top-0 right-0 size-7">
-										<X />
-									</Button>
-									<input
-										name={props.name}
-										value={($formData as Infer<UserSchema>).profileImage}
-										hidden />
-								{/if}
-							</div>
-						{:else if userInfoFor === UserInfoFor.INFO_EDIT}
-							<Dropzone id={props.id} accept={imageFormat} on:drop={onDropFile} multiple={false}>
-								<p>여기로 이미지를 드래그하거나, 클릭하여 이미지를 선택하세요.</p>
-							</Dropzone>
-							<input name={props.name} value="" hidden />
-						{:else}
-							<User class="size-50 border" />
-						{/if}
+						<Form.Label>
+							<Badge variant="destructive">필수</Badge>
+							닉네임
+						</Form.Label>
+						<!-- prettier-ignore -->
+						<Input
+							{...props}
+							bind:value={($formData as Infer<FormSchema>).username}
+							{...$constraints.username}
+							class="text-foreground opacity-100!" />
 					{/snippet}
 				</Form.Control>
-				{#if userInfoFor === UserInfoFor.INFO_EDIT}
-					<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
-					<Form.FieldErrors />
-				{/if}
+				<Form.Description>최대 20자</Form.Description>
+				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<div class="mb-4 border-2">
+		<div class="my-4 border-2">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Field {form} name="agree_eula" class="p-4">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
@@ -401,26 +310,3 @@
 	title="계정 비활성화 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnDeactivationAlert} />
-
-<Dialog.Root bind:open={openCropper}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
-			<Dialog.Description>
-				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
-				저장 후에 반영됩니다.
-			</Dialog.Description>
-		</Dialog.Header>
-		<Cropper
-			image={sourceImage || ''}
-			maxZoom={10}
-			aspect={1}
-			shape="round"
-			crop_window_margin={30}
-			overlay_options={{ show_third_lines: true }}
-			bind:this={cropper} />
-		<Dialog.Footer>
-			<Button onclick={onSetProfileImage}>확인</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
