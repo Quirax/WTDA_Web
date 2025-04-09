@@ -78,8 +78,10 @@
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
-				// openErrorAlert = true;
-				cancel();
+				if (result.status !== 400) {
+					cancel();
+					// openErrorAlert = true;
+				}
 			} else {
 				invalidate('/user');
 				profileEditMode = false;
@@ -339,48 +341,91 @@
 		{/if}
 
 		{#if profileEditMode}
-			<H3 class="text-xl">문의 가능 시간</H3>
-			<RadioGroup.Root
-				value={!user.profile.contactAvailable
-					? 'undefined'
-					: typeof user.profile.contactAvailable === 'boolean'
-						? 'always'
-						: 'certain-time'}>
-				<div class="flex items-center space-x-2">
-					<RadioGroup.Item value="undefined" id="contact-available-undefined" />
-					<Label for="contact-available-undefined">미설정</Label>
-				</div>
-				<div class="flex items-center space-x-2">
-					<RadioGroup.Item value="always" id="contact-available-always" />
-					<Label for="contact-available-always">상시</Label>
-				</div>
-				<div class="flex items-start space-x-2 max-lg:items-center">
-					<RadioGroup.Item value="certain-time" id="contact-available-certain-time" />
-					<Label for="contact-available-certain-time" class="items-center max-lg:flex">
-						<div>특정 시간:&nbsp;</div>
-						<div class="mt-2 flex items-center">
-							<Select.Root type="single">
-								<Select.Trigger class="w-[5em]">23</Select.Trigger>
-								<Select.Content>
-									{#each Array(24) as _, hour}
-										<Select.Item value={hour.toString()}>{hour}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							<span>시 ~</span>
-							<Select.Root type="single">
-								<Select.Trigger class="w-[5em]">23</Select.Trigger>
-								<Select.Content>
-									{#each Array(24) as _, hour}
-										<Select.Item value={hour.toString()}>{hour}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							<span>시</span>
-						</div>
-					</Label>
-				</div>
-			</RadioGroup.Root>
+			<Form.Field form={profileForm} name="contactAvailable">
+				<Form.Control>
+					{#snippet children({ props })}
+						<H3 class="text-xl">문의 가능 시간</H3>
+						<RadioGroup.Root
+							name={props.name}
+							value={!user.profile.contactAvailable
+								? 'undefined'
+								: typeof user.profile.contactAvailable === 'boolean'
+									? 'always'
+									: 'certain-time'}>
+							<div class="flex items-center space-x-2">
+								<RadioGroup.Item
+									value="undefined"
+									id="contact-available-undefined"
+									onclick={() => ($profileData.contactAvailable = false)} />
+								<Label for="contact-available-undefined">미설정</Label>
+							</div>
+							<div class="flex items-center space-x-2">
+								<RadioGroup.Item
+									value="always"
+									id="contact-available-always"
+									onclick={() => ($profileData.contactAvailable = true)} />
+								<Label for="contact-available-always">상시</Label>
+							</div>
+							<div class="flex items-start space-x-2 max-lg:items-center">
+								<RadioGroup.Item
+									value="certain-time"
+									id="contact-available-certain-time"
+									onclick={() => ($profileData.contactAvailable = { from: 0, to: 23 })} />
+								<Label for="contact-available-certain-time" class="items-center max-lg:flex">
+									<div>특정 시간:&nbsp;</div>
+									<div class="mt-2 flex items-center">
+										<Select.Root
+											type="single"
+											disabled={typeof $profileData.contactAvailable === 'boolean'}>
+											<Select.Trigger class="w-[5em]">
+												{typeof $profileData.contactAvailable === 'boolean'
+													? 0
+													: ($profileData.contactAvailable?.from ?? 0)}
+											</Select.Trigger>
+											<Select.Content>
+												{#each Array(24) as _, hour}
+													<Select.Item
+														value={hour.toString()}
+														onclick={() =>
+															((
+																$profileData.contactAvailable as App.Range<NumberEnumerate<24>>
+															).from = hour as NumberEnumerate<24>)}>
+														{hour}
+													</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+										<span>시 ~</span>
+										<Select.Root
+											type="single"
+											disabled={typeof $profileData.contactAvailable === 'boolean'}>
+											<Select.Trigger class="w-[5em]">
+												{typeof $profileData.contactAvailable === 'boolean'
+													? 23
+													: ($profileData.contactAvailable?.to ?? 23)}
+											</Select.Trigger>
+											<Select.Content>
+												{#each Array(24) as _, hour}
+													<Select.Item
+														value={hour.toString()}
+														onclick={() =>
+															((
+																$profileData.contactAvailable as App.Range<NumberEnumerate<24>>
+															).to = hour as NumberEnumerate<24>)}>
+														{hour}
+													</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+										<span>시</span>
+									</div>
+								</Label>
+							</div>
+						</RadioGroup.Root>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		{:else}
 			<Alert.Root>
 				<Clock class="size-4" />
