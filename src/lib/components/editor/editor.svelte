@@ -2,8 +2,6 @@
 	import { browser } from '$app/environment';
 	import type { QuillOptions } from 'quill';
 
-	import 'quill/dist/quill.snow.css';
-
 	let { value = $bindable() } = $props();
 
 	let holder = $state<HTMLElement>();

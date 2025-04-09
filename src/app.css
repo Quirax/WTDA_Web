@@ -1,3 +1,4 @@
+@import url('quill/dist/quill.snow.css');
 @import 'tailwindcss';
 @config "../tailwind.config.js";
 
@@ -96,88 +97,121 @@
 	}
 }
 
-@layer base {
-	.html *:empty::before {
-		/* ref: https://stackoverflow.com/a/66457550 */
-		content: '';
-		display: inline-block;
-	}
+.ql-container {
+	@apply font-sans text-base;
+}
 
-	/* Headings */
-	.html h1 {
-		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
-	}
-	.html h2 {
-		@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
-	}
-	.html h3 {
-		@apply scroll-m-20 text-2xl font-semibold tracking-tight;
-	}
-	.html h4 {
-		@apply scroll-m-20 text-xl font-semibold tracking-tight;
-	}
-	.html h5 {
-		@apply scroll-m-20 text-lg font-semibold tracking-tight;
-	}
-	.html h6 {
-		@apply scroll-m-20 text-base font-semibold tracking-tight;
-	}
+.ql-editor {
+	@apply text-base;
+}
 
-	/* Fonts */
-	.html .ql-font-serif {
-		@apply font-serif;
-	}
+.ql-editor ol,
+.ql-editor li {
+	padding: 0;
+}
 
-	.html .ql-font-monospace {
-		@apply font-mono;
-	}
+.html *:empty::before,
+.ql-snow .ql-editor *:empty::before {
+	/* ref: https://stackoverflow.com/a/66457550 */
+	content: '';
+	display: inline-block;
+}
 
-	/* Sizes */
-	.html .ql-size-small {
-		@apply text-sm;
-	}
+/* Headings */
+.html h1,
+.ql-snow .ql-editor h1 {
+	@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+.html h2,
+.ql-snow .ql-editor h2 {
+	@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+}
+.html h3,
+.ql-snow .ql-editor h3 {
+	@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+.html h4,
+.ql-snow .ql-editor h4 {
+	@apply scroll-m-20 text-xl font-semibold tracking-tight;
+}
+.html h5,
+.ql-snow .ql-editor h5 {
+	@apply scroll-m-20 text-lg font-semibold tracking-tight;
+}
+.html h6,
+.ql-snow .ql-editor h6 {
+	@apply scroll-m-20 text-base font-semibold tracking-tight;
+}
 
-	.html .ql-size-large {
-		@apply text-lg;
-	}
+/* Fonts */
+.html .ql-font-serif,
+.ql-snow .ql-editor .ql-font-serif {
+	@apply font-serif;
+}
 
-	.html .ql-size-huge {
-		@apply text-xl;
-	}
+.html .ql-font-monospace,
+.ql-snow .ql-editor .ql-font-monospace {
+	@apply font-mono;
+}
 
-	/* Sections */
-	.html blockquote {
-		@apply mt-6 border-l-2 pl-6 italic;
-	}
+/* Sizes */
+.html .ql-size-small,
+.ql-snow .ql-editor .ql-size-small {
+	@apply text-sm;
+}
 
-	.html pre {
-		@apply mt-6 mb-4 overflow-x-auto rounded-lg border bg-zinc-950 p-4 text-[#E1E4E8] dark:bg-zinc-900;
-	}
+.html .ql-size-large,
+.ql-snow .ql-editor .ql-size-large {
+	@apply text-lg;
+}
 
-	/* Lists */
-	.html ol {
-		@apply my-6 ml-6 list-decimal [&>li]:mt-2;
-	}
+.html .ql-size-huge,
+.ql-snow .ql-editor .ql-size-huge {
+	@apply text-xl;
+}
 
-	.html ul {
-		@apply my-6 ml-6 list-disc [&>li]:mt-2;
-	}
+/* Sections */
+.html blockquote,
+.ql-snow .ql-editor blockquote {
+	@apply mt-6 border-l-2 pl-6 italic;
+	border-left-color: inherit;
+}
 
-	/* Align */
-	.html .ql-align-center {
-		@apply text-center;
-	}
+.html pre,
+.ql-snow .ql-editor pre,
+.ql-snow .ql-editor .ql-code-block-container {
+	@apply mt-6 mb-4 overflow-x-auto rounded-lg border bg-zinc-950 p-4 font-mono text-[#E1E4E8] dark:bg-zinc-900;
+}
 
-	.html .ql-align-right {
-		@apply text-right;
-	}
+/* Lists */
+.html ol,
+.ql-snow .ql-editor ol {
+	@apply my-6 ml-6 list-decimal [&>li]:mt-2;
+}
 
-	.html .ql-align-justify {
-		@apply text-justify;
-	}
+.html ul,
+.ql-snow .ql-editor ul {
+	@apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
 
-	/* Elements */
-	.html a {
-		@apply text-primary underline-offset-4 hover:underline;
-	}
+/* Align */
+.html .ql-align-center,
+.ql-snow .ql-editor .ql-align-center {
+	@apply text-center;
+}
+
+.html .ql-align-right,
+.ql-snow .ql-editor .ql-align-right {
+	@apply text-right;
+}
+
+.html .ql-align-justify,
+.ql-snow .ql-editor .ql-align-justify {
+	@apply text-justify;
+}
+
+/* Elements */
+.html a,
+.ql-snow .ql-editor a {
+	@apply text-primary underline-offset-4 hover:underline;
 }
