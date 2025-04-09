@@ -8,8 +8,9 @@ import { profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
+import * as auth from '$lib/server/auth.js';
 
-export const load = (async ({ params, locals }) => {
+export const load = (async ({ params, locals, depends }) => {
 	const id = params.id;
 
 	// 내 프로필로 접근하려는 경우
@@ -105,7 +106,11 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred', form });
 		}
 
-		return { message: 'Updated successfully', form };
+		// Get updated result
+		const sessionToken = event.cookies.get(auth.sessionCookieName) || '';
+		const { user } = await auth.validateSessionToken(sessionToken);
+
+		return { message: 'Updated successfully', form, user };
 	},
 
 	announcementsList: async ({ params, request }) => {

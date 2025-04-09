@@ -49,8 +49,9 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
-	import { invalidate } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 	import tinycolor from 'tinycolor2';
+	import Cropper from '$lib/components/cropper/cropper.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -76,14 +77,15 @@
 		dataType: 'json',
 		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
 		onResult({ result, cancel }) {
-			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+			if (result.type !== 'success' || [200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
 				if (result.status !== 400) {
 					cancel();
 					// openErrorAlert = true;
 				}
 			} else {
-				invalidate('/user');
+				// Distribute updated user info
+				userStore.update(() => result.data?.user);
 				profileEditMode = false;
 			}
 		},
@@ -94,6 +96,60 @@
 		enhance: profileEnhance,
 		constraints: profileConstraints,
 	} = profileForm;
+
+	// Profile Image Cropper
+	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
+	// ref: https://stackoverflow.com/a/11058858
+	let profileImageCropper = $state<{
+		open: boolean;
+		source: string;
+		cropper?: ReturnType<typeof Cropper>;
+	}>({
+		open: false,
+		source: '',
+		cropper: undefined,
+	});
+
+	const onDropProfileImage = ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			if (!e.target?.result) profileImageCropper.source = '';
+			else if (typeof e.target.result === 'string') profileImageCropper.source = e.target.result;
+			else profileImageCropper.source = String.fromCharCode(...new Uint16Array(e.target.result));
+
+			profileImageCropper.open = true;
+		};
+		reader.readAsDataURL(imageFile);
+	};
+
+	// ref: https://superforms.rocks/concepts/tainted
+	const onSetProfileImage = () => {
+		if (!profileImageCropper.cropper) return;
+
+		profileImageCropper.cropper.getImage().then((destImage) => {
+			if (!destImage) return;
+
+			profileData.update(($profileData: Infer<ProfileSchema>) => {
+				$profileData.profileImage = destImage;
+				return $profileData;
+			});
+
+			profileImageCropper.open = false;
+		});
+	};
+
+	const removeProfileImage = () => {
+		profileData.update(($profileData: Infer<ProfileSchema>) => {
+			$profileData.profileImage = '';
+			return $profileData;
+		});
+	};
 
 	// Stat Dialog
 	let openStatDialog = $state(false);
@@ -269,6 +325,7 @@
 									class="size-full" />
 								{#if profileEditMode}
 									<Button
+										onclick={removeProfileImage}
 										variant="link"
 										class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
 										<span>이미지 제거</span>
@@ -279,12 +336,13 @@
 								<User class="size-full" />
 							{/if}
 						</div>
-						{#if profileEditMode && !user.profileImage}
-							<!-- <input
-										name={props.name}
-										value={($formData as Infer<UserSchema>).profileImage}
-										hidden /> -->
-							<Dropzone id={props.id} accept={imageFormat} on:drop={() => {}} multiple={false}>
+						{#if profileEditMode && !$profileData.profileImage}
+							<input name={props.name} value={$profileData.profileImage} hidden />
+							<Dropzone
+								id={props.id}
+								accept={imageFormat}
+								on:drop={onDropProfileImage}
+								multiple={false}>
 								<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
 							</Dropzone>
 							<input name={props.name} value="" hidden />
@@ -932,6 +990,29 @@
 				variant="secondary">
 				취소
 			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={profileImageCropper.open}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Description>
+				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
+				저장 후에 반영됩니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Cropper
+			image={profileImageCropper.source || ''}
+			maxZoom={10}
+			aspect={1}
+			shape="round"
+			crop_window_margin={30}
+			overlay_options={{ show_third_lines: true }}
+			bind:this={profileImageCropper.cropper} />
+		<Dialog.Footer>
+			<Button onclick={onSetProfileImage}>확인</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
