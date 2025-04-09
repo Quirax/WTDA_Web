@@ -515,7 +515,26 @@
 		{#if profileEditMode}
 			<section class="space-y-2 border p-4">
 				<H3 class="text-xl">프로필에서 사용할 강조색</H3>
-				<ColorPicker isDialog={false} isAlpha={false} sliderDirection="horizontal" />
+				<Form.Field form={profileForm} name="accentColor">
+					<Form.Control>
+						{#snippet children({ props })}
+							<ColorPicker
+								isDialog={false}
+								isAlpha={false}
+								sliderDirection="horizontal"
+								hex={user.profile.accentColor || null}
+								onInput={({ hex }) => ($profileData.accentColor = hex === null ? undefined : hex)}
+								nullable={true}
+								texts={{
+									label: {
+										withoutColor: '설정하지 않음',
+									},
+								}} />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
 			</section>
 		{/if}
 
