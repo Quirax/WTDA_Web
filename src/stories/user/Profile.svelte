@@ -319,7 +319,7 @@
 
 		{#if !profileEditMode}
 			<section class="flex">
-				<Button class="w-full flex-1 bg-(--primary-color)">
+				<Button class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
 					<MessageSquare />
 					메시지하기
 				</Button>
@@ -415,7 +415,9 @@
 			<section class="space-y-2">
 				<div class="flex items-center space-x-2">
 					<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
-					<Badge class="bg-(--primary-color)">{openedSlot}/{maxOpenSlot}</Badge>
+					<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
+						{openedSlot}/{maxOpenSlot}
+					</Badge>
 				</div>
 				<div class="space-y-2 space-x-2">
 					{#each Array(openedSlot)}
@@ -552,7 +554,9 @@
 		{#if me && me.id === user.id}
 			{#if profileEditMode}
 				<div class="text-right">
-					<Form.Button variant="default">저장</Form.Button>
+					<Form.Button variant="default" class="bg-(--primary-color) hover:bg-(--primary-color)/90">
+						저장
+					</Form.Button>
 					<Button variant="secondary" onclick={() => (profileEditMode = false)}>취소</Button>
 				</div>
 			{:else}
@@ -628,7 +632,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -658,7 +664,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -688,7 +696,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}

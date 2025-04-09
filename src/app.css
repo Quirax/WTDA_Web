@@ -213,7 +213,8 @@
 /* Elements */
 .html a,
 .ql-snow .ql-editor a {
-	@apply text-primary underline-offset-4 hover:underline;
+	@apply underline-offset-4 hover:underline;
+	color: var(--primary-color, hsl(var(--primary) / 1));
 }
 
 .banner-pattern {
