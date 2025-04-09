@@ -151,6 +151,60 @@
 		});
 	};
 
+	// Header Image Cropper
+	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
+	// ref: https://stackoverflow.com/a/11058858
+	let headerImageCropper = $state<{
+		open: boolean;
+		source: string;
+		cropper?: ReturnType<typeof Cropper>;
+	}>({
+		open: false,
+		source: '',
+		cropper: undefined,
+	});
+
+	const onDropHeaderImage = ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			if (!e.target?.result) headerImageCropper.source = '';
+			else if (typeof e.target.result === 'string') headerImageCropper.source = e.target.result;
+			else headerImageCropper.source = String.fromCharCode(...new Uint16Array(e.target.result));
+
+			headerImageCropper.open = true;
+		};
+		reader.readAsDataURL(imageFile);
+	};
+
+	// ref: https://superforms.rocks/concepts/tainted
+	const onSetHeaderImage = () => {
+		if (!headerImageCropper.cropper) return;
+
+		headerImageCropper.cropper.getImage().then((destImage) => {
+			if (!destImage) return;
+
+			profileData.update(($profileData: Infer<ProfileSchema>) => {
+				$profileData.headerImage = destImage;
+				return $profileData;
+			});
+
+			headerImageCropper.open = false;
+		});
+	};
+
+	const removeHeaderImage = () => {
+		profileData.update(($profileData: Infer<ProfileSchema>) => {
+			$profileData.headerImage = '';
+			return $profileData;
+		});
+	};
+
 	// Stat Dialog
 	let openStatDialog = $state(false);
 
@@ -274,12 +328,13 @@
 <Header title={user.username} />
 
 <section
-	class="relative aspect-9/1 w-full"
+	class="relative aspect-4/1 w-full"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
-	{#if user.profile.headerImage}
-		<img src={user.profile.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
+	{#if $profileData.headerImage}
+		<img src={$profileData.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
 		{#if profileEditMode}
 			<Button
+				onclick={removeHeaderImage}
 				variant="link"
 				class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100 active:opacity-100">
 				<span>이미지 제거</span>
@@ -287,9 +342,8 @@
 		{/if}
 	{:else if profileEditMode}
 		<Dropzone
-			id={'props.id'}
 			accept={imageFormat}
-			on:drop={() => {}}
+			on:drop={onDropHeaderImage}
 			multiple={false}
 			class="dropzone size-full justify-center">
 			<p>여기로 헤더 이미지를 드래그하거나, 클릭하여 헤더 이미지를 선택하세요.</p>
@@ -1013,6 +1067,29 @@
 			bind:this={profileImageCropper.cropper} />
 		<Dialog.Footer>
 			<Button onclick={onSetProfileImage}>확인</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={headerImageCropper.open}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Description>
+				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
+				저장 후에 반영됩니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Cropper
+			image={headerImageCropper.source || ''}
+			maxZoom={10}
+			aspect={4}
+			shape="rect"
+			crop_window_margin={30}
+			overlay_options={{ show_third_lines: true }}
+			bind:this={headerImageCropper.cropper} />
+		<Dialog.Footer>
+			<Button onclick={onSetHeaderImage}>확인</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
