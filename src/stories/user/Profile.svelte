@@ -50,6 +50,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
 	import { invalidate } from '$app/navigation';
+	import tinycolor from 'tinycolor2';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -61,6 +62,13 @@
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
+
+	const patternTinycolor = $derived(tinycolor(user.profile.accentColor || 'hsl(29.52 83% 25%)'));
+	const patternColor = $derived(
+		patternTinycolor.getBrightness() > 127
+			? patternTinycolor.darken(7.7).toHexString()
+			: patternTinycolor.brighten(7.7).toHexString(),
+	);
 
 	// Profile form
 	const profileForm = superForm(profileFormData, {
@@ -229,7 +237,10 @@
 			<p>여기로 헤더 이미지를 드래그하거나, 클릭하여 헤더 이미지를 선택하세요.</p>
 		</Dropzone>
 	{:else}
-		<div class="size-full bg-(--primary-color) bg-[url(/background-pattern-banner.png)]"></div>
+		<div
+			class="banner-pattern size-full bg-(--primary-color)"
+			style={`--pattern-color: ${patternColor};`}>
+		</div>
 	{/if}
 </section>
 

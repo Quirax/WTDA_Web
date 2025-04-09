@@ -215,3 +215,22 @@
 .ql-snow .ql-editor a {
 	@apply text-primary underline-offset-4 hover:underline;
 }
+
+.banner-pattern {
+	position: relative;
+}
+
+.banner-pattern * {
+	z-index: 1;
+}
+
+.banner-pattern::before {
+	position: absolute;
+	left: 0;
+	content: '';
+	width: 100%;
+	height: 100%;
+	background-color: var(--pattern-color, #89531f);
+	mask-image: url('/background-pattern-banner.svg');
+	mask-repeat: repeat;
+}
