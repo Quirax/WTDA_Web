@@ -295,7 +295,7 @@
 	let openAnnouncementEditor = $state(false);
 
 	// Profile Edit Mode
-	let profileEditMode = $state(false);
+	let profileEditMode = $state(true);
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -641,29 +641,37 @@
 		</section>
 
 		{#if profileEditMode}
-			<section class="space-y-2 border p-4">
-				<H3 class="text-xl">링크</H3>
-				{#each user.profile.links || [] as link}
-					<div>
-						<Link class="inline-block size-5 rounded-full bg-(--primary-color) p-0.5 text-white" />
+			<Form.Field form={profileForm} name="links" class="space-y-2 border p-4">
+				<Form.Control>
+					{#snippet children({ props })}
+						<H3 class="text-xl">링크</H3>
+						{#each $profileData.links || [] as _, idx (idx)}
+							<div class="flex items-center space-x-2">
+								<Input placeholder="표시 명칭" bind:value={$profileData.links![idx].text} />
+								<Input placeholder="URL" bind:value={$profileData.links![idx].href} />
+								<Button
+									variant="outline"
+									size="icon"
+									onclick={() =>
+										($profileData.links = $profileData.links!.filter((_, i) => i !== idx))}
+									class="flex-none">
+									<X />
+								</Button>
+							</div>
+						{/each}
 						<Button
-							variant="link"
-							href={link.href}
-							target={link.target}
-							class="text-md text-foreground align-middle">
-							{link.text}
+							variant="outline"
+							class="w-full"
+							onclick={() => {
+								if (!$profileData.links) $profileData.links = [];
+								$profileData.links = [...$profileData.links, { href: '', text: '' }];
+							}}>
+							링크 추가
 						</Button>
-					</div>
-				{/each}
-				<div class="flex items-center space-x-2">
-					<Input placeholder="표시 명칭" />
-					<Input placeholder="URL" />
-					<Button variant="outline" size="icon" onclick={() => {}} class="flex-none">
-						<X />
-					</Button>
-				</div>
-				<Button variant="outline" class="w-full">링크 추가</Button>
-			</section>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		{:else if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
 				<H3 class="hidden">링크</H3>
@@ -673,7 +681,7 @@
 						<Button
 							variant="link"
 							href={link.href}
-							target={link.target}
+							target="_blank"
 							class="text-md text-foreground align-middle">
 							{link.text}
 						</Button>

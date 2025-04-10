@@ -31,8 +31,8 @@ export const profileSchema = z
 		links: z
 			.array(
 				z.object({
-					href: z.string().url().nonempty(),
-					text: z.string().nonempty(),
+					href: z.string(),
+					text: z.string(),
 				}),
 			)
 			.nullish(),
@@ -50,6 +50,29 @@ export const profileSchema = z
 		{
 			message: '시작 시간은 종료 시간보다 이르거나 같아야 합니다.',
 			path: ['contactAvailable'],
+		},
+	)
+	.refine(
+		({ links }) =>
+			!links ||
+			[...links].reduce((acc, cur, i, arr) => {
+				if (cur.href.length === 0 || cur.text.length === 0) {
+					arr.splice(i);
+					return false;
+				}
+
+				try {
+					new URL(cur.href);
+				} catch (e) {
+					arr.splice(i);
+					return false;
+				}
+
+				return acc;
+			}, true),
+		{
+			message: '표시 명칭과 URL을 빠짐없이 입력하시고, 정확한 URL인지 확인해주십시오.',
+			path: ['links'],
 		},
 	);
 
