@@ -295,7 +295,7 @@
 	let openAnnouncementEditor = $state(false);
 
 	// Profile Edit Mode
-	let profileEditMode = $state(true);
+	let profileEditMode = $state(false);
 
 	// TODO: get values from server
 	const maxSlot = 4,
@@ -1057,12 +1057,13 @@
 </Dialog.Root>
 
 <Dialog.Root bind:open={profileImageCropper.open}>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
 			<Dialog.Description>
-				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
-				저장 후에 반영됩니다.
+				프로필 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필
+				이미지는 저장 후에 반영됩니다.
 			</Dialog.Description>
 		</Dialog.Header>
 		<Cropper
@@ -1080,11 +1081,12 @@
 </Dialog.Root>
 
 <Dialog.Root bind:open={headerImageCropper.open}>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Title>헤더 이미지 자르기</Dialog.Title>
 			<Dialog.Description>
-				프로필로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필 이미지는
+				헤더 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 헤더 이미지는
 				저장 후에 반영됩니다.
 			</Dialog.Description>
 		</Dialog.Header>
