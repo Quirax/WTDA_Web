@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 
-export const load = (async ({ params, locals, depends }) => {
+export const load = (async ({ params, locals }) => {
 	const id = params.id;
 
 	// 내 프로필로 접근하려는 경우
