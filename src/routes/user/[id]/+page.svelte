@@ -5,4 +5,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<Profile user={data.user} announcements={data.profileAnnouncements} />
+<Profile
+	user={data.user}
+	profileFormData={data.profileForm}
+	announcements={data.profileAnnouncements} />

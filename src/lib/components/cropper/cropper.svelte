@@ -80,7 +80,7 @@
 		viewHeight = 0;
 	};
 
-	// Set view's size according to aspect ratio using container's size
+	// Set view's size
 	$effect(() => {
 		if (!container) return;
 		if (viewHeight > 0) return;
@@ -89,8 +89,8 @@
 		viewWidth = container.offsetWidth;
 		viewHeight = screen.height - (container.offsetParent as HTMLDivElement)!.offsetHeight;
 
-		if (viewWidth < viewHeight * aspect) viewHeight = viewWidth / aspect;
-		else viewWidth = viewHeight * aspect;
+		if (viewWidth < viewHeight) viewHeight = viewWidth;
+		else viewWidth = viewHeight;
 	});
 
 	// Set and reset event listener
@@ -144,7 +144,7 @@
 		<ZoomIn />
 	</Button>
 </div>
-<div class="flex justify-center w-full">
+<div class="flex w-full justify-center">
 	<Button variant="outline" size="icon" onclick={onClickFlipButton('horizontal')}>
 		<FlipHorizontal2 />
 	</Button>

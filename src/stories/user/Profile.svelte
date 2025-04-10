@@ -45,16 +45,165 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
 	import ColorPicker from 'svelte-awesome-color-picker';
+	import { profileSchema, type ProfileSchema } from '$lib/schema/profile';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Form from '$lib/components/ui/form';
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import tinycolor from 'tinycolor2';
+	import Cropper from '$lib/components/cropper/cropper.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
+		profileFormData: SuperValidated<Infer<ProfileSchema>>;
 	}
 
-	const { user, announcements }: Props = $props();
+	const { user, announcements, profileFormData }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
+
+	const patternTinycolor = $derived(tinycolor(user.profile.accentColor || 'hsl(29.52 83% 25%)'));
+	const patternColor = $derived(
+		patternTinycolor.getBrightness() > 127
+			? patternTinycolor.darken(7.7).toHexString()
+			: patternTinycolor.brighten(7.7).toHexString(),
+	);
+
+	// Profile form
+	const profileForm = superForm(profileFormData, {
+		validators: zodClient(profileSchema),
+		dataType: 'json',
+		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
+		onResult({ result, cancel }) {
+			if (result.type !== 'success' || [200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				if (result.status !== 400) {
+					cancel();
+					// openErrorAlert = true;
+				}
+			} else {
+				// Distribute updated user info
+				userStore.update(() => result.data?.user);
+				profileEditMode = false;
+			}
+		},
+	});
+
+	const {
+		form: profileData,
+		enhance: profileEnhance,
+		constraints: profileConstraints,
+	} = profileForm;
+
+	// Profile Image Cropper
+	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
+	// ref: https://stackoverflow.com/a/11058858
+	let profileImageCropper = $state<{
+		open: boolean;
+		source: string;
+		cropper?: ReturnType<typeof Cropper>;
+	}>({
+		open: false,
+		source: '',
+		cropper: undefined,
+	});
+
+	const onDropProfileImage = ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			if (!e.target?.result) profileImageCropper.source = '';
+			else if (typeof e.target.result === 'string') profileImageCropper.source = e.target.result;
+			else profileImageCropper.source = String.fromCharCode(...new Uint16Array(e.target.result));
+
+			profileImageCropper.open = true;
+		};
+		reader.readAsDataURL(imageFile);
+	};
+
+	// ref: https://superforms.rocks/concepts/tainted
+	const onSetProfileImage = () => {
+		if (!profileImageCropper.cropper) return;
+
+		profileImageCropper.cropper.getImage().then((destImage) => {
+			if (!destImage) return;
+
+			profileData.update(($profileData: Infer<ProfileSchema>) => {
+				$profileData.profileImage = destImage;
+				return $profileData;
+			});
+
+			profileImageCropper.open = false;
+		});
+	};
+
+	const removeProfileImage = () => {
+		profileData.update(($profileData: Infer<ProfileSchema>) => {
+			$profileData.profileImage = '';
+			return $profileData;
+		});
+	};
+
+	// Header Image Cropper
+	// ref: https://svelte.dev/playground/11303854cb6247ae99514acad96190b6?version=5.25.3
+	// ref: https://stackoverflow.com/a/11058858
+	let headerImageCropper = $state<{
+		open: boolean;
+		source: string;
+		cropper?: ReturnType<typeof Cropper>;
+	}>({
+		open: false,
+		source: '',
+		cropper: undefined,
+	});
+
+	const onDropHeaderImage = ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		let reader = new FileReader();
+		reader.onload = (e) => {
+			if (!e.target?.result) headerImageCropper.source = '';
+			else if (typeof e.target.result === 'string') headerImageCropper.source = e.target.result;
+			else headerImageCropper.source = String.fromCharCode(...new Uint16Array(e.target.result));
+
+			headerImageCropper.open = true;
+		};
+		reader.readAsDataURL(imageFile);
+	};
+
+	// ref: https://superforms.rocks/concepts/tainted
+	const onSetHeaderImage = () => {
+		if (!headerImageCropper.cropper) return;
+
+		headerImageCropper.cropper.getImage().then((destImage) => {
+			if (!destImage) return;
+
+			profileData.update(($profileData: Infer<ProfileSchema>) => {
+				$profileData.headerImage = destImage;
+				return $profileData;
+			});
+
+			headerImageCropper.open = false;
+		});
+	};
+
+	const removeHeaderImage = () => {
+		profileData.update(($profileData: Infer<ProfileSchema>) => {
+			$profileData.headerImage = '';
+			return $profileData;
+		});
+	};
 
 	// Stat Dialog
 	let openStatDialog = $state(false);
@@ -179,12 +328,13 @@
 <Header title={user.username} />
 
 <section
-	class="relative aspect-9/1 w-full"
+	class="relative aspect-4/1 w-full"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
-	{#if user.profile.headerImage}
-		<img src={user.profile.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
+	{#if $profileData.headerImage}
+		<img src={$profileData.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
 		{#if profileEditMode}
 			<Button
+				onclick={removeHeaderImage}
 				variant="link"
 				class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100 active:opacity-100">
 				<span>이미지 제거</span>
@@ -192,51 +342,90 @@
 		{/if}
 	{:else if profileEditMode}
 		<Dropzone
-			id={'props.id'}
 			accept={imageFormat}
-			on:drop={() => {}}
+			on:drop={onDropHeaderImage}
 			multiple={false}
 			class="dropzone size-full justify-center">
 			<p>여기로 헤더 이미지를 드래그하거나, 클릭하여 헤더 이미지를 선택하세요.</p>
 		</Dropzone>
 	{:else}
-		<div class="size-full bg-(--primary-color) bg-[url(/background-pattern-banner.png)]"></div>
+		<div
+			class="banner-pattern size-full bg-(--primary-color)"
+			style={`--pattern-color: ${patternColor};`}>
+		</div>
 	{/if}
 </section>
 
 <main
 	class="flex flex-col lg:flex-row"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
-	<section class="bg-background relative box-border w-full flex-none space-y-4 p-6 lg:w-80">
+	<form
+		class="bg-background relative box-border w-full flex-none space-y-4 p-6 lg:w-80"
+		method="POST"
+		use:profileEnhance
+		action="?/update">
 		<section class="flex w-full flex-col items-center space-y-2">
-			<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
-				{#if user.profileImage}
-					<img src={user.profileImage} alt="{user.username} 님의 프로필 이미지" class="size-full" />
-					{#if profileEditMode}
-						<Button
-							variant="link"
-							class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
-							<span>이미지 제거</span>
-						</Button>
-					{/if}
-				{:else}
-					<User class="size-full" />
+			<Form.Field
+				form={profileForm}
+				name="profileImage"
+				class="flex w-full flex-col items-center space-y-2">
+				<Form.Control>
+					{#snippet children({ props })}
+						<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
+							{#if $profileData.profileImage}
+								<img
+									src={$profileData.profileImage}
+									alt="{user.username} 님의 프로필 이미지"
+									class="size-full" />
+								{#if profileEditMode}
+									<Button
+										onclick={removeProfileImage}
+										variant="link"
+										class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
+										<span>이미지 제거</span>
+									</Button>
+									<input name={props.name} value={$profileData.profileImage} hidden />
+								{/if}
+							{:else}
+								<User class="size-full" />
+							{/if}
+						</div>
+						{#if profileEditMode && !$profileData.profileImage}
+							<input name={props.name} value={$profileData.profileImage} hidden />
+							<Dropzone
+								id={props.id}
+								accept={imageFormat}
+								on:drop={onDropProfileImage}
+								multiple={false}>
+								<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
+							</Dropzone>
+							<input name={props.name} value="" hidden />
+						{/if}
+					{/snippet}
+				</Form.Control>
+				{#if profileEditMode}
+					<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
+					<Form.FieldErrors />
 				{/if}
-			</div>
+			</Form.Field>
+
 			{#if profileEditMode}
-				{#if !user.profileImage}
-					<!-- <input
-										name={props.name}
-										value={($formData as Infer<UserSchema>).profileImage}
-										hidden /> -->
-					<Dropzone id={'props.id'} accept={imageFormat} on:drop={() => {}} multiple={false}>
-						<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
-					</Dropzone>
-				{/if}
-				<Input
-					class="text-center text-2xl font-bold md:text-2xl"
-					placeholder="닉네임"
-					value={user.username} />
+				<Form.Field form={profileForm} name="username">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Input
+								{...props}
+								class="text-center text-2xl font-bold md:text-2xl"
+								placeholder="닉네임"
+								bind:value={$profileData.username}
+								{...$profileConstraints.username} />
+						{/snippet}
+					</Form.Control>
+					{#if profileEditMode}
+						<Form.Description>최대 20자</Form.Description>
+						<Form.FieldErrors />
+					{/if}
+				</Form.Field>
 			{:else}
 				<H2 class="border-none text-center text-2xl">{user.username}</H2>
 			{/if}
@@ -244,7 +433,7 @@
 
 		{#if !profileEditMode}
 			<section class="flex">
-				<Button class="w-full flex-1 bg-(--primary-color)">
+				<Button class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
 					<MessageSquare />
 					메시지하기
 				</Button>
@@ -264,48 +453,91 @@
 		{/if}
 
 		{#if profileEditMode}
-			<H3 class="text-xl">문의 가능 시간</H3>
-			<RadioGroup.Root
-				value={!user.profile.contactAvailable
-					? 'undefined'
-					: typeof user.profile.contactAvailable === 'boolean'
-						? 'always'
-						: 'certain-time'}>
-				<div class="flex items-center space-x-2">
-					<RadioGroup.Item value="undefined" id="contact-available-undefined" />
-					<Label for="contact-available-undefined">미설정</Label>
-				</div>
-				<div class="flex items-center space-x-2">
-					<RadioGroup.Item value="always" id="contact-available-always" />
-					<Label for="contact-available-always">상시</Label>
-				</div>
-				<div class="flex items-start space-x-2 max-lg:items-center">
-					<RadioGroup.Item value="certain-time" id="contact-available-certain-time" />
-					<Label for="contact-available-certain-time" class="items-center max-lg:flex">
-						<div>특정 시간:&nbsp;</div>
-						<div class="mt-2 flex items-center">
-							<Select.Root type="single">
-								<Select.Trigger class="w-[5em]">23</Select.Trigger>
-								<Select.Content>
-									{#each Array(24) as _, hour}
-										<Select.Item value={hour.toString()}>{hour}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							<span>시 ~</span>
-							<Select.Root type="single">
-								<Select.Trigger class="w-[5em]">23</Select.Trigger>
-								<Select.Content>
-									{#each Array(24) as _, hour}
-										<Select.Item value={hour.toString()}>{hour}</Select.Item>
-									{/each}
-								</Select.Content>
-							</Select.Root>
-							<span>시</span>
-						</div>
-					</Label>
-				</div>
-			</RadioGroup.Root>
+			<Form.Field form={profileForm} name="contactAvailable">
+				<Form.Control>
+					{#snippet children({ props })}
+						<H3 class="text-xl">문의 가능 시간</H3>
+						<RadioGroup.Root
+							name={props.name}
+							value={!user.profile.contactAvailable
+								? 'undefined'
+								: typeof user.profile.contactAvailable === 'boolean'
+									? 'always'
+									: 'certain-time'}>
+							<div class="flex items-center space-x-2">
+								<RadioGroup.Item
+									value="undefined"
+									id="contact-available-undefined"
+									onclick={() => ($profileData.contactAvailable = false)} />
+								<Label for="contact-available-undefined">미설정</Label>
+							</div>
+							<div class="flex items-center space-x-2">
+								<RadioGroup.Item
+									value="always"
+									id="contact-available-always"
+									onclick={() => ($profileData.contactAvailable = true)} />
+								<Label for="contact-available-always">상시</Label>
+							</div>
+							<div class="flex items-start space-x-2 max-lg:items-center">
+								<RadioGroup.Item
+									value="certain-time"
+									id="contact-available-certain-time"
+									onclick={() => ($profileData.contactAvailable = { from: 0, to: 23 })} />
+								<Label for="contact-available-certain-time" class="items-center max-lg:flex">
+									<div>특정 시간:&nbsp;</div>
+									<div class="mt-2 flex items-center">
+										<Select.Root
+											type="single"
+											disabled={typeof $profileData.contactAvailable === 'boolean'}>
+											<Select.Trigger class="w-[5em]">
+												{typeof $profileData.contactAvailable === 'boolean'
+													? 0
+													: ($profileData.contactAvailable?.from ?? 0)}
+											</Select.Trigger>
+											<Select.Content>
+												{#each Array(24) as _, hour}
+													<Select.Item
+														value={hour.toString()}
+														onclick={() =>
+															((
+																$profileData.contactAvailable as App.Range<NumberEnumerate<24>>
+															).from = hour as NumberEnumerate<24>)}>
+														{hour}
+													</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+										<span>시 ~</span>
+										<Select.Root
+											type="single"
+											disabled={typeof $profileData.contactAvailable === 'boolean'}>
+											<Select.Trigger class="w-[5em]">
+												{typeof $profileData.contactAvailable === 'boolean'
+													? 23
+													: ($profileData.contactAvailable?.to ?? 23)}
+											</Select.Trigger>
+											<Select.Content>
+												{#each Array(24) as _, hour}
+													<Select.Item
+														value={hour.toString()}
+														onclick={() =>
+															((
+																$profileData.contactAvailable as App.Range<NumberEnumerate<24>>
+															).to = hour as NumberEnumerate<24>)}>
+														{hour}
+													</Select.Item>
+												{/each}
+											</Select.Content>
+										</Select.Root>
+										<span>시</span>
+									</div>
+								</Label>
+							</div>
+						</RadioGroup.Root>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		{:else}
 			<Alert.Root>
 				<Clock class="size-4" />
@@ -340,7 +572,9 @@
 			<section class="space-y-2">
 				<div class="flex items-center space-x-2">
 					<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
-					<Badge class="bg-(--primary-color)">{openedSlot}/{maxOpenSlot}</Badge>
+					<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
+						{openedSlot}/{maxOpenSlot}
+					</Badge>
 				</div>
 				<div class="space-y-2 space-x-2">
 					{#each Array(openedSlot)}
@@ -386,9 +620,17 @@
 		<section class="space-y-2">
 			<H3 class="text-center text-xl">소개</H3>
 			{#if profileEditMode}
-				<Editor />
+				<Form.Field form={profileForm} name="introduction">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Editor bind:value={$profileData.introduction} />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
 			{:else}
-				<article class="border p-4">
+				<article class="html border p-4">
 					{#if user.profile.introduction}
 						{@html sanitizeHTML(user.profile.introduction)}
 					{:else}
@@ -399,29 +641,37 @@
 		</section>
 
 		{#if profileEditMode}
-			<section class="space-y-2 border p-4">
-				<H3 class="text-xl">링크</H3>
-				{#each user.profile.links || [] as link}
-					<div>
-						<Link class="inline-block size-5 rounded-full bg-(--primary-color) p-0.5 text-white" />
+			<Form.Field form={profileForm} name="links" class="space-y-2 border p-4">
+				<Form.Control>
+					{#snippet children({ props })}
+						<H3 class="text-xl">링크</H3>
+						{#each $profileData.links || [] as _, idx (idx)}
+							<div class="flex items-center space-x-2">
+								<Input placeholder="표시 명칭" bind:value={$profileData.links![idx].text} />
+								<Input placeholder="URL" bind:value={$profileData.links![idx].href} />
+								<Button
+									variant="outline"
+									size="icon"
+									onclick={() =>
+										($profileData.links = $profileData.links!.filter((_, i) => i !== idx))}
+									class="flex-none">
+									<X />
+								</Button>
+							</div>
+						{/each}
 						<Button
-							variant="link"
-							href={link.href}
-							target={link.target}
-							class="text-md text-foreground align-middle">
-							{link.text}
+							variant="outline"
+							class="w-full"
+							onclick={() => {
+								if (!$profileData.links) $profileData.links = [];
+								$profileData.links = [...$profileData.links, { href: '', text: '' }];
+							}}>
+							링크 추가
 						</Button>
-					</div>
-				{/each}
-				<div class="flex items-center space-x-2">
-					<Input placeholder="표시 명칭" />
-					<Input placeholder="URL" />
-					<Button variant="outline" size="icon" onclick={() => {}} class="flex-none">
-						<X />
-					</Button>
-				</div>
-				<Button variant="outline" class="w-full">링크 추가</Button>
-			</section>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		{:else if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
 				<H3 class="hidden">링크</H3>
@@ -431,7 +681,7 @@
 						<Button
 							variant="link"
 							href={link.href}
-							target={link.target}
+							target="_blank"
 							class="text-md text-foreground align-middle">
 							{link.text}
 						</Button>
@@ -443,14 +693,35 @@
 		{#if profileEditMode}
 			<section class="space-y-2 border p-4">
 				<H3 class="text-xl">프로필에서 사용할 강조색</H3>
-				<ColorPicker isDialog={false} isAlpha={false} sliderDirection="horizontal" />
+				<Form.Field form={profileForm} name="accentColor">
+					<Form.Control>
+						{#snippet children({ props })}
+							<ColorPicker
+								isDialog={false}
+								isAlpha={false}
+								sliderDirection="horizontal"
+								hex={user.profile.accentColor || null}
+								onInput={({ hex }) => ($profileData.accentColor = hex === null ? undefined : hex)}
+								nullable={true}
+								texts={{
+									label: {
+										withoutColor: '설정하지 않음',
+									},
+								}} />
+						{/snippet}
+					</Form.Control>
+					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
+					<Form.FieldErrors />
+				</Form.Field>
 			</section>
 		{/if}
 
 		{#if me && me.id === user.id}
 			{#if profileEditMode}
 				<div class="text-right">
-					<Button variant="default">저장</Button>
+					<Form.Button variant="default" class="bg-(--primary-color) hover:bg-(--primary-color)/90">
+						저장
+					</Form.Button>
 					<Button variant="secondary" onclick={() => (profileEditMode = false)}>취소</Button>
 				</div>
 			{:else}
@@ -464,7 +735,7 @@
 				</Button>
 			{/if}
 		{/if}
-	</section>
+	</form>
 	<section class="w-full space-y-8 p-4">
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
@@ -526,7 +797,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -556,7 +829,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -586,7 +861,9 @@
 							<Card.Title>{article?.title}</Card.Title>
 						</Card.Header>
 						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color)">#{article?.category}</Badge>
+							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+								#{article?.category}
+							</Badge>
 							{#each article?.tags?.slice(0, 3) || [] as tag}
 								<Badge class="m-1" variant="secondary">#{tag}</Badge>
 							{/each}
@@ -775,6 +1052,54 @@
 				variant="secondary">
 				취소
 			</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={profileImageCropper.open}>
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Description>
+				프로필 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필
+				이미지는 저장 후에 반영됩니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Cropper
+			image={profileImageCropper.source || ''}
+			maxZoom={10}
+			aspect={1}
+			shape="round"
+			crop_window_margin={30}
+			overlay_options={{ show_third_lines: true }}
+			bind:this={profileImageCropper.cropper} />
+		<Dialog.Footer>
+			<Button onclick={onSetProfileImage}>확인</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={headerImageCropper.open}>
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>헤더 이미지 자르기</Dialog.Title>
+			<Dialog.Description>
+				헤더 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 헤더 이미지는
+				저장 후에 반영됩니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Cropper
+			image={headerImageCropper.source || ''}
+			maxZoom={10}
+			aspect={4}
+			shape="rect"
+			crop_window_margin={30}
+			overlay_options={{ show_third_lines: true }}
+			bind:this={headerImageCropper.cropper} />
+		<Dialog.Footer>
+			<Button onclick={onSetHeaderImage}>확인</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

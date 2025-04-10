@@ -36,7 +36,7 @@
 
 <section
 	id="search"
-	class="bg-primary text-primary-foreground flex flex-col items-center justify-center space-y-10 bg-[url(/background-pattern-banner.png)] p-20">
+	class="bg-primary text-primary-foreground banner-pattern flex flex-col items-center justify-center space-y-10 p-20">
 	<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
 	<Tabs.Root bind:value={userMode} class="md:w-[400px]">
@@ -47,14 +47,14 @@
 	</Tabs.Root>
 
 	<form
-		class="flex flex-col items-center w-full max-w-sm space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
+		class="flex w-full max-w-sm flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
 		onsubmit={(e) => {
 			e.preventDefault();
 		}}>
 		<Input
 			type="search"
 			placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
-			class="text-xl h-xl border-stone-200 bg-stone-50 text-stone-950 sm:w-full md:w-md" />
+			class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
 		<Button type="submit" variant="secondary">검색</Button>
 	</form>
 </section>
@@ -71,18 +71,18 @@
 
 		<section
 			id="contents-list"
-			class="grid gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 			{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
 				<Card.Root>
 					<img
 						src={article?.thumbnail}
 						alt={article?.title}
-						class="object-cover w-full aspect-video" />
+						class="aspect-video w-full object-cover" />
 					<Card.Header>
 						<Card.Title>{article?.title}</Card.Title>
 						<Card.Description class="text-right">
 							by
-							<Avatar class="inline-block w-6 h-6 align-middle" user={article?.author} />
+							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
 							{article?.author.username}
 						</Card.Description>
 					</Card.Header>
@@ -101,7 +101,7 @@
 {#if userMode === UserMode.requester}
 	<section
 		id="suggestion"
-		class="flex flex-col items-center justify-center p-10 my-10 space-y-8 text-center bg-accent text-accent-foreground">
+		class="bg-accent text-accent-foreground my-10 flex flex-col items-center justify-center space-y-8 p-10 text-center">
 		<H2 class="border-none break-keep">원하는 커미션 타입을 찾지 못하셨나요?</H2>
 		<Button class="p-6 text-xl">먼저 의뢰를 게시하세요!</Button>
 		<div class="space-y-0">
@@ -112,13 +112,13 @@
 {/if}
 
 {#if introductions.length > 0}
-	<section id="introducing" class="relative flex justify-center mt-20 mb-10 px-17">
+	<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
 		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
 			<Carousel.Previous />
 			<Carousel.Content class="w-full">
 				{#each introductions as intro}
 					<Carousel.Item>
-						<div class="p-1 aspect-video">
+						<div class="aspect-video p-1">
 							<Card.Root class="aspect-video">
 								<img class="size-full" src={intro.src} alt={intro.alt} />
 							</Card.Root>

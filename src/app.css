@@ -1,3 +1,4 @@
+@import url('quill/dist/quill.snow.css');
 @import 'tailwindcss';
 @config "../tailwind.config.js";
 
@@ -94,4 +95,143 @@
 	body.dark {
 		background-image: url('/background-pattern-dark.png'); /* Made by [Atle Mo](http://www.atlemo.com/) */
 	}
+}
+
+.ql-container {
+	@apply font-sans text-base;
+}
+
+.ql-editor {
+	@apply text-base;
+}
+
+.ql-editor ol,
+.ql-editor li {
+	padding: 0;
+}
+
+.html *:empty::before,
+.ql-snow .ql-editor *:empty::before {
+	/* ref: https://stackoverflow.com/a/66457550 */
+	content: '';
+	display: inline-block;
+}
+
+/* Headings */
+.html h1,
+.ql-snow .ql-editor h1 {
+	@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+.html h2,
+.ql-snow .ql-editor h2 {
+	@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+}
+.html h3,
+.ql-snow .ql-editor h3 {
+	@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+.html h4,
+.ql-snow .ql-editor h4 {
+	@apply scroll-m-20 text-xl font-semibold tracking-tight;
+}
+.html h5,
+.ql-snow .ql-editor h5 {
+	@apply scroll-m-20 text-lg font-semibold tracking-tight;
+}
+.html h6,
+.ql-snow .ql-editor h6 {
+	@apply scroll-m-20 text-base font-semibold tracking-tight;
+}
+
+/* Fonts */
+.html .ql-font-serif,
+.ql-snow .ql-editor .ql-font-serif {
+	@apply font-serif;
+}
+
+.html .ql-font-monospace,
+.ql-snow .ql-editor .ql-font-monospace {
+	@apply font-mono;
+}
+
+/* Sizes */
+.html .ql-size-small,
+.ql-snow .ql-editor .ql-size-small {
+	@apply text-sm;
+}
+
+.html .ql-size-large,
+.ql-snow .ql-editor .ql-size-large {
+	@apply text-lg;
+}
+
+.html .ql-size-huge,
+.ql-snow .ql-editor .ql-size-huge {
+	@apply text-xl;
+}
+
+/* Sections */
+.html blockquote,
+.ql-snow .ql-editor blockquote {
+	@apply mt-6 border-l-2 pl-6 italic;
+	border-left-color: inherit;
+}
+
+.html pre,
+.ql-snow .ql-editor pre,
+.ql-snow .ql-editor .ql-code-block-container {
+	@apply mt-6 mb-4 overflow-x-auto rounded-lg border bg-zinc-950 p-4 font-mono text-[#E1E4E8] dark:bg-zinc-900;
+}
+
+/* Lists */
+.html ol,
+.ql-snow .ql-editor ol {
+	@apply my-6 ml-6 list-decimal [&>li]:mt-2;
+}
+
+.html ul,
+.ql-snow .ql-editor ul {
+	@apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+
+/* Align */
+.html .ql-align-center,
+.ql-snow .ql-editor .ql-align-center {
+	@apply text-center;
+}
+
+.html .ql-align-right,
+.ql-snow .ql-editor .ql-align-right {
+	@apply text-right;
+}
+
+.html .ql-align-justify,
+.ql-snow .ql-editor .ql-align-justify {
+	@apply text-justify;
+}
+
+/* Elements */
+.html a,
+.ql-snow .ql-editor a {
+	@apply underline-offset-4 hover:underline;
+	color: var(--primary-color, hsl(var(--primary) / 1));
+}
+
+.banner-pattern {
+	position: relative;
+}
+
+.banner-pattern * {
+	z-index: 1;
+}
+
+.banner-pattern::before {
+	position: absolute;
+	left: 0;
+	content: '';
+	width: 100%;
+	height: 100%;
+	background-color: var(--pattern-color, #89531f);
+	mask-image: url('/background-pattern-banner.svg');
+	mask-repeat: repeat;
 }

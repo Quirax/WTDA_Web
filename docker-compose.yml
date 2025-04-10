@@ -1,0 +1,13 @@
+version: '3'
+services:
+  wtda:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 5173:5173
+    volumes:
+      - .:/app/
+      - wtda-node-modules:/app/node_modules
+volumes:
+  wtda-node-modules: {}
