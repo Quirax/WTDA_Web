@@ -1018,7 +1018,8 @@
 										<Button
 											variant="link"
 											class="text-accent-foreground w-full justify-start overflow-hidden text-ellipsis whitespace-nowrap"
-											onclick={() => openAnnouncementDialog(item.id)}>
+											onclick={() => openAnnouncementDialog(item.id)}
+											title={item.title}>
 											{item.title}
 										</Button>
 									</Table.Cell>
