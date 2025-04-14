@@ -77,3 +77,10 @@ export const profileSchema = z
 	);
 
 export type ProfileSchema = typeof profileSchema;
+
+export const announcementSchema = z.object({
+	title: z.string().nonempty('제목은 반드시 있어야 합니다'),
+	content: z.string().default(''),
+});
+
+export type AnnouncementSchema = typeof announcementSchema;

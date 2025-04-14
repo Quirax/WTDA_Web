@@ -16,6 +16,7 @@
 		ChevronRight,
 		TriangleAlert,
 		NotepadTextDashed,
+		Trash2,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -45,21 +46,28 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
 	import ColorPicker from 'svelte-awesome-color-picker';
-	import { profileSchema, type ProfileSchema } from '$lib/schema/profile';
+	import {
+		announcementSchema,
+		profileSchema,
+		type AnnouncementSchema,
+		type ProfileSchema,
+	} from '$lib/schema/profile';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import tinycolor from 'tinycolor2';
 	import Cropper from '$lib/components/cropper/cropper.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
 		profileFormData: SuperValidated<Infer<ProfileSchema>>;
+		announcementFormData: SuperValidated<Infer<AnnouncementSchema>>;
 	}
 
-	const { user, announcements, profileFormData }: Props = $props();
+	const { user, announcements, profileFormData, announcementFormData }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -72,6 +80,8 @@
 	);
 
 	// Profile form
+	let openErrorOnProfileUpdateAlert = $state(false);
+
 	const profileForm = superForm(profileFormData, {
 		validators: zodClient(profileSchema),
 		dataType: 'json',
@@ -81,7 +91,9 @@
 				console.error(result);
 				if (result.status !== 400) {
 					cancel();
-					// openErrorAlert = true;
+
+					console.error(result);
+					openErrorOnProfileUpdateAlert = true;
 				}
 			} else {
 				// Distribute updated user info
@@ -215,6 +227,8 @@
 	};
 
 	// Announcements List
+	let openErrorOnAnnouncementAlert = $state(false);
+
 	let announcementsListDrawerState = $state({
 		open: false,
 		list: Array<{ id: string; title: string; createDate: Date }>(),
@@ -246,6 +260,9 @@
 		} else {
 			announcementsListDrawerState.status = FetchStatus.FAILED;
 			announcementsListDrawerState.total = 0;
+
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
 		}
 	};
 
@@ -288,11 +305,66 @@
 			announcementDialogState.status = FetchStatus.COMPLETED;
 		} else {
 			announcementDialogState.status = FetchStatus.FAILED;
+
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
+		}
+	};
+
+	// Delete Announcement Alert
+	let deleteAnnouncementAlertState = $state({
+		open: false,
+		announcementID: '',
+	});
+
+	const deleteAnnouncement = async () => {
+		if (!deleteAnnouncementAlertState.announcementID) return;
+
+		const formData = new FormData();
+		formData.append('id', deleteAnnouncementAlertState.announcementID);
+
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/deleteAnnouncement', { method: 'post', body: formData })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			getAnnouncementsList();
+			invalidateAll();
+		} else {
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
 		}
 	};
 
 	// Announcement Editor
 	let openAnnouncementEditor = $state(false);
+
+	const announcementForm = superForm(announcementFormData, {
+		validators: zodClient(announcementSchema),
+		dataType: 'json',
+		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
+		onResult({ result, cancel }) {
+			if (result.type !== 'success' || [200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				if (result.status !== 400) {
+					cancel();
+
+					console.error(result);
+					openErrorOnAnnouncementAlert = true;
+				}
+			} else {
+				invalidateAll();
+				openAnnouncementEditor = false;
+			}
+		},
+	});
+
+	const {
+		form: announcementData,
+		enhance: announcementEnhance,
+		constraints: announcementConstraints,
+	} = announcementForm;
 
 	// Profile Edit Mode
 	let profileEditMode = $state(false);
@@ -740,18 +812,16 @@
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
 			<Separator orientation="vertical" class="mx-2 flex-none" />
-			<div class="flex w-full flex-col">
+			<div class="flex w-full flex-col overflow-hidden">
 				{#if announcements}
-					<p class="w-full overflow-hidden text-ellipsis whitespace-nowrap">
-						<Button
-							variant="link"
-							class="text-accent-foreground"
-							onclick={() => openAnnouncementDialog(announcements.id)}>
-							{announcements.title}
-						</Button>
-						<span class="text-muted-foreground text-sm">
-							{formatDatetimeString(announcements.createDate)}
-						</span>
+					<Button
+						variant="link"
+						class="text-accent-foreground w-full justify-start text-left whitespace-pre-wrap"
+						onclick={() => openAnnouncementDialog(announcements.id)}>
+						{announcements.title}
+					</Button>
+					<p class="text-muted-foreground text-right text-sm">
+						{formatDatetimeString(announcements.createDate)}
 					</p>
 				{:else}
 					<p
@@ -882,7 +952,8 @@
 </main>
 
 <Dialog.Root bind:open={openStatDialog}>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>상세 통계</Dialog.Title>
 			<Dialog.Description>
@@ -919,21 +990,25 @@
 </Dialog.Root>
 
 <Drawer.Root bind:open={announcementsListDrawerState.open}>
-	<Drawer.Content>
+	<Drawer.Content class="transition-none">
 		<Drawer.Header>
 			<Drawer.Title>공지사항 변경 이력</Drawer.Title>
 			<Drawer.Description>
 				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
 			</Drawer.Description>
 		</Drawer.Header>
-		<div class="mb-2 p-4 pb-0">
+		<div
+			class="mb-2 max-h-[calc(100vh-210px)] overflow-x-hidden overflow-y-auto p-4 pb-0 transition-none">
 			{#if announcementsListDrawerState.status === FetchStatus.COMPLETED}
 				{#if announcementsListDrawerState.list.length > 0}
-					<Table.Root>
+					<Table.Root class="table-fixed">
 						<Table.Header>
 							<Table.Row>
 								<Table.Head>제목</Table.Head>
 								<Table.Head class="w-[13em]">작성일자</Table.Head>
+								{#if me && me.id === user.id}
+									<Table.Head class="w-20 text-center">삭제</Table.Head>
+								{/if}
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -942,12 +1017,26 @@
 									<Table.Cell>
 										<Button
 											variant="link"
-											class="text-accent-foreground"
-											onclick={() => openAnnouncementDialog(item.id)}>
+											class="text-accent-foreground w-full justify-start overflow-hidden text-ellipsis whitespace-nowrap"
+											onclick={() => openAnnouncementDialog(item.id)}
+											title={item.title}>
 											{item.title}
 										</Button>
 									</Table.Cell>
 									<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
+									{#if me && me.id === user.id}
+										<Table.Cell class="text-center">
+											<Button
+												variant="ghost"
+												size="icon"
+												onclick={() => {
+													deleteAnnouncementAlertState.announcementID = item.id;
+													deleteAnnouncementAlertState.open = true;
+												}}>
+												<Trash2 />
+											</Button>
+										</Table.Cell>
+									{/if}
 								</Table.Row>
 							{/each}
 						</Table.Body>
@@ -1000,9 +1089,12 @@
 </Drawer.Root>
 
 <Dialog.Root bind:open={announcementDialogState.open}>
-	<Dialog.Content class="sm:max-w-[600px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
 		<Dialog.Header>
-			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+			<Dialog.Title
+				style="--height: calc(var(--text-lg--line-height) * var(--text-lg));"
+				class="mt-4">
 				{#if announcementDialogState.status === FetchStatus.COMPLETED}
 					{announcementDialogState.announcement.title}
 				{:else}
@@ -1017,7 +1109,7 @@
 				{/if}
 			</Dialog.Description>
 		</Dialog.Header>
-		<div class="h-100 overflow-y-scroll p-4 pb-0">
+		<div class="html h-100 overflow-y-scroll p-4 pb-0">
 			{#if announcementDialogState.status === FetchStatus.COMPLETED}
 				{@html sanitizeHTML(announcementDialogState.announcement.content)}
 			{:else if announcementDialogState.status === FetchStatus.FAILED}
@@ -1034,25 +1126,45 @@
 </Dialog.Root>
 
 <Dialog.Root bind:open={openAnnouncementEditor}>
-	<Dialog.Content class="sm:max-w-[600px]">
-		<Dialog.Header>
-			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
-				<Input placeholder="공지 제목을 입력하십시오." class="mt-4" />
-			</Dialog.Title>
-		</Dialog.Header>
-		<div class="h-100 pb-0">
-			<Editor />
-		</div>
-		<Dialog.Footer>
-			<Button onclick={() => {}}>저장</Button>
-			<Button
-				onclick={() => {
-					openAnnouncementEditor = false;
-				}}
-				variant="secondary">
-				취소
-			</Button>
-		</Dialog.Footer>
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
+		<form method="POST" use:announcementEnhance class="w-full" action="?/saveAnnouncement">
+			<Dialog.Header>
+				<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+					<Form.Field form={announcementForm} name="title">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Input
+									{...props}
+									bind:value={$announcementData.title}
+									placeholder="공지 제목을 입력하십시오."
+									class="mt-4"
+									{...$announcementConstraints.title} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</Dialog.Title>
+			</Dialog.Header>
+			<Form.Field form={announcementForm} name="content" class="h-100 pb-2">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Editor bind:value={$announcementData.content} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Dialog.Footer>
+				<Form.Button variant="default">저장</Form.Button>
+				<Button
+					onclick={() => {
+						openAnnouncementEditor = false;
+					}}
+					variant="secondary">
+					취소
+				</Button>
+			</Dialog.Footer>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>
 
@@ -1103,6 +1215,21 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog
+	title="정말로 이 공지를 삭제하시겠습니까?"
+	description="삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다."
+	cancel={true}
+	onAction={deleteAnnouncement}
+	bind:open={deleteAnnouncementAlertState.open} />
+<AlertDialog
+	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnProfileUpdateAlert} />
+<AlertDialog
+	title="공지사항 관련 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnAnnouncementAlert} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {
