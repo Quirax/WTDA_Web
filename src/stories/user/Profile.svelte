@@ -16,6 +16,7 @@
 		ChevronRight,
 		TriangleAlert,
 		NotepadTextDashed,
+		Trash2,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -57,6 +58,7 @@
 	import { invalidate, invalidateAll } from '$app/navigation';
 	import tinycolor from 'tinycolor2';
 	import Cropper from '$lib/components/cropper/cropper.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -294,6 +296,31 @@
 			announcementDialogState.status = FetchStatus.COMPLETED;
 		} else {
 			announcementDialogState.status = FetchStatus.FAILED;
+		}
+	};
+
+	// Delete Announcement Alert
+	let deleteAnnouncementAlertState = $state({
+		open: false,
+		announcementID: '',
+	});
+
+	const deleteAnnouncement = async () => {
+		if (!deleteAnnouncementAlertState.announcementID) return;
+
+		const formData = new FormData();
+		formData.append('id', deleteAnnouncementAlertState.announcementID);
+
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/deleteAnnouncement', { method: 'post', body: formData })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			getAnnouncementsList();
+			invalidateAll();
+		} else {
+			// FAILED
 		}
 	};
 
@@ -964,6 +991,9 @@
 							<Table.Row>
 								<Table.Head>제목</Table.Head>
 								<Table.Head class="w-[13em]">작성일자</Table.Head>
+								{#if me && me.id === user.id}
+									<Table.Head class="w-20 text-center">삭제</Table.Head>
+								{/if}
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -978,6 +1008,19 @@
 										</Button>
 									</Table.Cell>
 									<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
+									{#if me && me.id === user.id}
+										<Table.Cell class="text-center">
+											<Button
+												variant="ghost"
+												size="icon"
+												onclick={() => {
+													deleteAnnouncementAlertState.announcementID = item.id;
+													deleteAnnouncementAlertState.open = true;
+												}}>
+												<Trash2 />
+											</Button>
+										</Table.Cell>
+									{/if}
 								</Table.Row>
 							{/each}
 						</Table.Body>
@@ -1156,6 +1199,13 @@
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog
+	title="정말로 이 공지를 삭제하시겠습니까?"
+	description="삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다."
+	cancel={true}
+	onAction={deleteAnnouncement}
+	bind:open={deleteAnnouncementAlertState.open} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

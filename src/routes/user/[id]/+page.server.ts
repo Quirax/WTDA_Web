@@ -2,7 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { announcementsPerPage } from '$lib/config';
 import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
@@ -189,7 +189,31 @@ export const actions: Actions = {
 				id: generateID(),
 			});
 
-			return { message: 'Got announcements List' };
+			return { message: 'Saved the announcement' };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
+
+	deleteAnnouncement: async ({ request, locals }) => {
+		if (!locals.user) return fail(403, { message: 'Access denied' });
+
+		const id = (await request.formData()).get('id') as string | null;
+
+		if (!id) return fail(400, { message: 'No announcement id is specified' });
+
+		try {
+			await db
+				.delete(table.profileAnnouncements)
+				.where(
+					and(
+						eq(table.profileAnnouncements.id, id),
+						eq(table.profileAnnouncements.userId, locals.user.id),
+					),
+				);
+
+			return { message: 'Deleted the announcement' };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
