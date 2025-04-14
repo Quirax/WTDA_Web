@@ -80,6 +80,8 @@
 	);
 
 	// Profile form
+	let openErrorOnProfileUpdateAlert = $state(false);
+
 	const profileForm = superForm(profileFormData, {
 		validators: zodClient(profileSchema),
 		dataType: 'json',
@@ -89,7 +91,9 @@
 				console.error(result);
 				if (result.status !== 400) {
 					cancel();
-					// openErrorAlert = true;
+
+					console.error(result);
+					openErrorOnProfileUpdateAlert = true;
 				}
 			} else {
 				// Distribute updated user info
@@ -223,6 +227,8 @@
 	};
 
 	// Announcements List
+	let openErrorOnAnnouncementAlert = $state(false);
+
 	let announcementsListDrawerState = $state({
 		open: false,
 		list: Array<{ id: string; title: string; createDate: Date }>(),
@@ -254,6 +260,9 @@
 		} else {
 			announcementsListDrawerState.status = FetchStatus.FAILED;
 			announcementsListDrawerState.total = 0;
+
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
 		}
 	};
 
@@ -296,6 +305,9 @@
 			announcementDialogState.status = FetchStatus.COMPLETED;
 		} else {
 			announcementDialogState.status = FetchStatus.FAILED;
+
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
 		}
 	};
 
@@ -320,7 +332,8 @@
 			getAnnouncementsList();
 			invalidateAll();
 		} else {
-			// FAILED
+			console.error(result);
+			openErrorOnAnnouncementAlert = true;
 		}
 	};
 
@@ -336,7 +349,9 @@
 				console.error(result);
 				if (result.status !== 400) {
 					cancel();
-					// openErrorAlert = true;
+
+					console.error(result);
+					openErrorOnAnnouncementAlert = true;
 				}
 			} else {
 				invalidateAll();
@@ -1206,6 +1221,14 @@
 	cancel={true}
 	onAction={deleteAnnouncement}
 	bind:open={deleteAnnouncementAlertState.open} />
+<AlertDialog
+	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnProfileUpdateAlert} />
+<AlertDialog
+	title="공지사항 관련 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnAnnouncementAlert} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {
