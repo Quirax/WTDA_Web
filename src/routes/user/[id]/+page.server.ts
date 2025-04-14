@@ -1,14 +1,15 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { db } from '$lib/server/db';
+import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { announcementsPerPage } from '$lib/config';
-import { profileSchema } from '../../../lib/schema/profile';
+import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
+import { encodeBase32LowerCase } from '@oslojs/encoding';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -60,6 +61,7 @@ export const load = (async ({ params, locals }) => {
 				accentColor: user.profile.accentColor,
 			},
 		}),
+		announcementForm: await superValidate(zod(announcementSchema)),
 	};
 }) satisfies PageServerLoad;
 
@@ -162,6 +164,32 @@ export const actions: Actions = {
 			).at(0);
 
 			return { message: 'Got announcements List', announcement };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
+
+	saveAnnouncement: async (event) => {
+		if (!event.locals.user) return fail(403, { message: 'Access denied' });
+
+		const form = await superValidate(event.request, zod(announcementSchema));
+
+		if (!form.valid) {
+			return fail(400, { message: 'The form is not valid.', form });
+		}
+
+		const { title, content } = form.data;
+
+		try {
+			await db.insert(table.profileAnnouncements).values({
+				title,
+				content,
+				userId: event.locals.user.id,
+				id: generateID(),
+			});
+
+			return { message: 'Got announcements List' };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

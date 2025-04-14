@@ -45,7 +45,12 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
 	import ColorPicker from 'svelte-awesome-color-picker';
-	import { profileSchema, type ProfileSchema } from '$lib/schema/profile';
+	import {
+		announcementSchema,
+		profileSchema,
+		type AnnouncementSchema,
+		type ProfileSchema,
+	} from '$lib/schema/profile';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
@@ -57,9 +62,10 @@
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
 		profileFormData: SuperValidated<Infer<ProfileSchema>>;
+		announcementFormData: SuperValidated<Infer<AnnouncementSchema>>;
 	}
 
-	const { user, announcements, profileFormData }: Props = $props();
+	const { user, announcements, profileFormData, announcementFormData }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -293,6 +299,30 @@
 
 	// Announcement Editor
 	let openAnnouncementEditor = $state(false);
+
+	const announcementForm = superForm(announcementFormData, {
+		validators: zodClient(announcementSchema),
+		dataType: 'json',
+		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
+		onResult({ result, cancel }) {
+			if (result.type !== 'success' || [200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				if (result.status !== 400) {
+					cancel();
+					// openErrorAlert = true;
+				}
+			} else {
+				invalidateAll();
+				openAnnouncementEditor = false;
+			}
+		},
+	});
+
+	const {
+		form: announcementData,
+		enhance: announcementEnhance,
+		constraints: announcementConstraints,
+	} = announcementForm;
 
 	// Profile Edit Mode
 	let profileEditMode = $state(false);
@@ -1017,7 +1047,7 @@
 				{/if}
 			</Dialog.Description>
 		</Dialog.Header>
-		<div class="h-100 overflow-y-scroll p-4 pb-0">
+		<div class="html h-100 overflow-y-scroll p-4 pb-0">
 			{#if announcementDialogState.status === FetchStatus.COMPLETED}
 				{@html sanitizeHTML(announcementDialogState.announcement.content)}
 			{:else if announcementDialogState.status === FetchStatus.FAILED}
@@ -1035,24 +1065,43 @@
 
 <Dialog.Root bind:open={openAnnouncementEditor}>
 	<Dialog.Content class="sm:max-w-[600px]">
-		<Dialog.Header>
-			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
-				<Input placeholder="공지 제목을 입력하십시오." class="mt-4" />
-			</Dialog.Title>
-		</Dialog.Header>
-		<div class="h-100 pb-0">
-			<Editor />
-		</div>
-		<Dialog.Footer>
-			<Button onclick={() => {}}>저장</Button>
-			<Button
-				onclick={() => {
-					openAnnouncementEditor = false;
-				}}
-				variant="secondary">
-				취소
-			</Button>
-		</Dialog.Footer>
+		<form method="POST" use:announcementEnhance class="w-full" action="?/saveAnnouncement">
+			<Dialog.Header>
+				<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+					<Form.Field form={announcementForm} name="title">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Input
+									{...props}
+									bind:value={$announcementData.title}
+									placeholder="공지 제목을 입력하십시오."
+									class="mt-4"
+									{...$announcementConstraints.title} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</Dialog.Title>
+			</Dialog.Header>
+			<Form.Field form={announcementForm} name="content" class="h-100 pb-2">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Editor bind:value={$announcementData.content} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Dialog.Footer>
+				<Form.Button variant="default">저장</Form.Button>
+				<Button
+					onclick={() => {
+						openAnnouncementEditor = false;
+					}}
+					variant="secondary">
+					취소
+				</Button>
+			</Dialog.Footer>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>
 

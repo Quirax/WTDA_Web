@@ -8,4 +8,5 @@
 <Profile
 	user={data.user}
 	profileFormData={data.profileForm}
+	announcementFormData={data.announcementForm}
 	announcements={data.profileAnnouncements} />
