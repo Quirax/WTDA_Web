@@ -770,18 +770,16 @@
 		<section class="bg-accent text-accent-foreground flex border p-2">
 			<h3 class="flex-none font-bold">공지사항</h3>
 			<Separator orientation="vertical" class="mx-2 flex-none" />
-			<div class="flex w-full flex-col">
+			<div class="flex w-full flex-col overflow-hidden">
 				{#if announcements}
-					<p class="w-full overflow-hidden text-ellipsis whitespace-nowrap">
-						<Button
-							variant="link"
-							class="text-accent-foreground"
-							onclick={() => openAnnouncementDialog(announcements.id)}>
-							{announcements.title}
-						</Button>
-						<span class="text-muted-foreground text-sm">
-							{formatDatetimeString(announcements.createDate)}
-						</span>
+					<Button
+						variant="link"
+						class="text-accent-foreground w-full justify-start text-left whitespace-pre-wrap"
+						onclick={() => openAnnouncementDialog(announcements.id)}>
+						{announcements.title}
+					</Button>
+					<p class="text-muted-foreground text-right text-sm">
+						{formatDatetimeString(announcements.createDate)}
 					</p>
 				{:else}
 					<p
@@ -912,7 +910,8 @@
 </main>
 
 <Dialog.Root bind:open={openStatDialog}>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>상세 통계</Dialog.Title>
 			<Dialog.Description>
@@ -949,17 +948,18 @@
 </Dialog.Root>
 
 <Drawer.Root bind:open={announcementsListDrawerState.open}>
-	<Drawer.Content>
+	<Drawer.Content class="transition-none">
 		<Drawer.Header>
 			<Drawer.Title>공지사항 변경 이력</Drawer.Title>
 			<Drawer.Description>
 				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
 			</Drawer.Description>
 		</Drawer.Header>
-		<div class="mb-2 p-4 pb-0">
+		<div
+			class="mb-2 max-h-[calc(100vh-210px)] overflow-x-hidden overflow-y-auto p-4 pb-0 transition-none">
 			{#if announcementsListDrawerState.status === FetchStatus.COMPLETED}
 				{#if announcementsListDrawerState.list.length > 0}
-					<Table.Root>
+					<Table.Root class="table-fixed">
 						<Table.Header>
 							<Table.Row>
 								<Table.Head>제목</Table.Head>
@@ -972,7 +972,7 @@
 									<Table.Cell>
 										<Button
 											variant="link"
-											class="text-accent-foreground"
+											class="text-accent-foreground w-full justify-start overflow-hidden text-ellipsis whitespace-nowrap"
 											onclick={() => openAnnouncementDialog(item.id)}>
 											{item.title}
 										</Button>
@@ -1030,9 +1030,12 @@
 </Drawer.Root>
 
 <Dialog.Root bind:open={announcementDialogState.open}>
-	<Dialog.Content class="sm:max-w-[600px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
 		<Dialog.Header>
-			<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
+			<Dialog.Title
+				style="--height: calc(var(--text-lg--line-height) * var(--text-lg));"
+				class="mt-4">
 				{#if announcementDialogState.status === FetchStatus.COMPLETED}
 					{announcementDialogState.announcement.title}
 				{:else}
@@ -1064,7 +1067,8 @@
 </Dialog.Root>
 
 <Dialog.Root bind:open={openAnnouncementEditor}>
-	<Dialog.Content class="sm:max-w-[600px]">
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
 		<form method="POST" use:announcementEnhance class="w-full" action="?/saveAnnouncement">
 			<Dialog.Header>
 				<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
