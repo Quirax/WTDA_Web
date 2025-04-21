@@ -40,7 +40,7 @@ declare global {
 			thumbnail: string;
 			title: string;
 			author: NonNullable<User>;
-			category: string;
+			category: ArticleCategory;
 			tags: string[] | null;
 		}
 
@@ -72,4 +72,9 @@ export enum FetchStatus {
 	LOADING,
 	FAILED,
 	COMPLETED,
+}
+
+export enum ArticleCategory {
+	TEXT = 'TEXT',
+	DRAWING = 'DRAWING',
 }
