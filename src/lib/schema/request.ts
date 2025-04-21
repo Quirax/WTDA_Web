@@ -5,6 +5,7 @@ export const formSchema = z.object({
 	containsAdultContents: z.boolean().default(false),
 	visibleOnlyToCommissioner: z.boolean().default(false),
 	budget: z.number().nonnegative().nullable(), // null: 조율 가능
+	deadline: z.date().nullable(), // null: 조율 가능
 	//     thumbnail: text('thumbnail'),
 	//     category: articleCategory().notNull(),
 	//     tags: text('tags')

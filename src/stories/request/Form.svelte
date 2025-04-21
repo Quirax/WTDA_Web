@@ -8,10 +8,25 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { formSchema, type FormSchema } from '$lib/schema/request';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group';
+	import * as Popover from '$lib/components/ui/popover';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import { cn } from '$lib/utils';
+	import { CalendarIcon } from 'lucide-svelte';
+	import {
+		DateFormatter,
+		fromDate,
+		getLocalTimeZone,
+		toCalendarDate,
+		today,
+	} from '@internationalized/date';
+	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+
+	const df = new DateFormatter('ko-KR', {
+		dateStyle: 'long',
+	});
 
 	interface Props extends ReturnType<typeof $props> {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -77,7 +92,6 @@
 											</Select.Content>
 										</Select.Root> -->
 
-		<!-- budget -->
 		<Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -122,7 +136,60 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- deadline -->
+		<Form.Field {form} name="deadline" class="mt-4 flex flex-col space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label><Badge variant="destructive">필수</Badge> 작업 기한</Form.Label>
+					<RadioGroup.Root
+						name={props.name}
+						value={$formData.deadline === null ? 'negotiable' : 'certain-date'}>
+						<div class="flex items-start space-x-2 max-lg:items-center">
+							<RadioGroup.Item
+								value="certain-date"
+								id="certain-date"
+								onclick={() => ($formData.deadline = new Date())} />
+							<Label for="certain-date" class="items-center max-lg:flex">
+								<div>특정 날짜 이전까지:&nbsp;</div>
+								<div class="mt-2 flex items-center">
+									<Popover.Root>
+										<Popover.Trigger
+											class={cn(
+												buttonVariants({
+													variant: 'outline',
+													class: 'w-[280px] justify-start text-left font-normal',
+												}),
+												$formData.deadline === null && 'text-muted-foreground',
+											)}
+											disabled={$formData.deadline === null}>
+											<CalendarIcon />
+											{$formData.deadline !== null ? df.format($formData.deadline) : '날짜 선택'}
+										</Popover.Trigger>
+										<Popover.Content class="w-auto p-0">
+											<Calendar
+												type="single"
+												minValue={today(getLocalTimeZone())}
+												locale="ko-KR"
+												bind:value={
+													() => fromDate($formData.deadline ?? new Date(), getLocalTimeZone()),
+													(v) => ($formData.deadline = v.toDate())
+												} />
+										</Popover.Content>
+									</Popover.Root>
+								</div>
+							</Label>
+						</div>
+						<div class="flex items-center space-x-2">
+							<RadioGroup.Item
+								value="negotiable"
+								id="deadline-negotiable"
+								onclick={() => ($formData.deadline = null)} />
+							<Label for="deadline-negotiable">협상 가능</Label>
+						</div>
+					</RadioGroup.Root>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<!-- purpose -->
 
