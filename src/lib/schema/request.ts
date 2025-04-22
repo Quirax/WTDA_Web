@@ -13,7 +13,6 @@ export const formSchema = z.object({
 	//         .notNull()
 	//         .default(sql`'{}'::text[]`),
 	//     content: text('content').notNull().default(''),
-	//         deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
 	//         isForCommercial: boolean().notNull().default(false),
 	//         purpose: text('purpose').notNull(),
 });

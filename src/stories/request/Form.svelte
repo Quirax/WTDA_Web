@@ -15,13 +15,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { cn } from '$lib/utils';
 	import { CalendarIcon } from 'lucide-svelte';
-	import {
-		DateFormatter,
-		fromDate,
-		getLocalTimeZone,
-		toCalendarDate,
-		today,
-	} from '@internationalized/date';
+	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 
 	const df = new DateFormatter('ko-KR', {
@@ -46,6 +40,10 @@
 		},
 	});
 	const { form: formData, enhance, constraints } = form;
+
+	$effect(() => {
+		$inspect($formData);
+	});
 
 	const title = '의뢰 만들기';
 </script>
@@ -109,16 +107,11 @@
 								<div class="mt-2 flex items-center">
 									<Input
 										placeholder="금액"
+										type="currency"
 										{...props}
-										value={$formData.budget?.toLocaleString()}
+										bind:value={$formData.budget}
 										disabled={$formData.budget === null}
-										{...$constraints.budget}
-										onkeyup={({ currentTarget: t }) => {
-											let budget = parseInt(t.value.replace(/,/g, '') || '0');
-											console.log(t.value, t.value.replace(/,/g, ''), budget);
-											$formData.budget = budget;
-											t.value = budget.toLocaleString();
-										}} />
+										{...$constraints.budget} />
 									<span class="flex-none">&nbsp;포인트</span>
 								</div>
 							</Label>
