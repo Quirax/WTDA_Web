@@ -220,7 +220,28 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- isForCommercial -->
+		<Form.Field {form} name="isForCommercial" class="mt-1">
+			<div class="flex flex-row items-center space-y-0 space-x-3">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Checkbox {...props} bind:checked={$formData.isForCommercial} />
+						<div class="space-y-1 leading-none">
+							<Form.Label>상업적 목적으로 사용합니다. (예: 인터넷 방송, 홍보물)</Form.Label>
+						</div>
+						<input name={props.name} value={$formData.isForCommercial} hidden />
+					{/snippet}
+				</Form.Control>
+			</div>
+			<Form.Description>
+				상업적 목적으로 사용하는 경우 반드시 체크해야 합니다.
+				<br />
+				<span class="text-destructive font-bold">
+					비상업적 목적으로 커미션 진행 후 상업적 목적으로 사용하는 경우 커미션주의 저작권을
+					침해하는 것으로, 민&middot;형사상의 책임을 질 수 있습니다.
+				</span>
+			</Form.Description>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<!-- content -->
 		<!-- <Form.Field form={profileForm} name="introduction">
