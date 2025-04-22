@@ -27,6 +27,9 @@
 		ZonedDateTime,
 	} from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import * as m from '$lib/paraglide/messages';
+	import { CategoryText } from '@app';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -77,28 +80,26 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- category -->
-		<!-- <Select.Root
-											type="single"
-											disabled={typeof $profileData.contactAvailable === 'boolean'}>
-											<Select.Trigger class="w-[5em]">
-												{typeof $profileData.contactAvailable === 'boolean'
-													? 23
-													: ($profileData.contactAvailable?.to ?? 23)}
-											</Select.Trigger>
-											<Select.Content>
-												{#each Array(24) as _, hour}
-													<Select.Item
-														value={hour.toString()}
-														onclick={() =>
-															((
-																$profileData.contactAvailable as App.Range<NumberEnumerate<24>>
-															).to = hour as NumberEnumerate<24>)}>
-														{hour}
-													</Select.Item>
-												{/each}
-											</Select.Content>
-										</Select.Root> -->
+		<Form.Field {form} name="category" class="mt-4 flex flex-col space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label><Badge variant="destructive">필수</Badge> 카테고리</Form.Label>
+					<Select.Root type="single" bind:value={$formData.category} name={props.name}>
+						<Select.Trigger class="w-[5em]" {...props}>
+							{CategoryText[$formData.category]() || '카테고리 선택'}
+						</Select.Trigger>
+						<Select.Content>
+							{#each Object.entries(CategoryText) as [k, v]}
+								<Select.Item value={k}>
+									{v()}
+								</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>

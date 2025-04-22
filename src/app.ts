@@ -2,6 +2,7 @@
 // for information about these interfaces
 
 import type { Link } from '$lib/config';
+import * as m from '$lib/paraglide/messages';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
@@ -78,3 +79,8 @@ export enum ArticleCategory {
 	TEXT = 'TEXT',
 	DRAWING = 'DRAWING',
 }
+
+export const CategoryText = {
+	TEXT: m.CATEGORY_TEXT,
+	DRAWING: m.CATEGORY_DRAWING,
+};

@@ -80,7 +80,6 @@
 		"zod": "^3.24.2"
 	},
 	"dependencies": {
-		"@canutin/svelte-currency-input": "^0.13.0",
 		"@inlang/paraglide-sveltekit": "^0.15.5",
 		"@internationalized/date": "3.7.0",
 		"@node-rs/argon2": "^2.0.2",

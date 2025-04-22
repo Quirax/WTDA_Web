@@ -1,3 +1,4 @@
+import { ArticleCategory } from '@app';
 import { z } from 'zod';
 
 export const formSchema = z.object({
@@ -8,6 +9,7 @@ export const formSchema = z.object({
 	deadline: z.date().nullable(), // null: 조율 가능
 	purpose: z.string().nonempty(),
 	isForCommercial: z.boolean().default(false),
+	category: z.nativeEnum(ArticleCategory),
 	//     thumbnail: text('thumbnail'),
 	//     category: articleCategory().notNull(),
 	//     tags: text('tags')
