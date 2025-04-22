@@ -10,12 +10,8 @@ export const formSchema = z.object({
 	purpose: z.string().nonempty(),
 	isForCommercial: z.boolean().default(false),
 	category: z.nativeEnum(ArticleCategory),
+	tags: z.string().array().default([]),
 	//     thumbnail: text('thumbnail'),
-	//     category: articleCategory().notNull(),
-	//     tags: text('tags')
-	//         .array()
-	//         .notNull()
-	//         .default(sql`'{}'::text[]`),
 	//     content: text('content').notNull().default(''),
 });
 

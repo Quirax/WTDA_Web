@@ -14,7 +14,7 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { cn } from '$lib/utils';
-	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarIcon, X } from 'lucide-svelte';
 	import {
 		CalendarDate,
 		CalendarDateTime,
@@ -254,38 +254,35 @@
 					<Form.FieldErrors />
 				</Form.Field> -->
 
-		<!-- tag -->
-		<!-- <Form.Field form={profileForm} name="links" class="space-y-2 border p-4">
-				<Form.Control>
-					{#snippet children({ props })}
-						<H3 class="text-xl">링크</H3>
-						{#each $profileData.links || [] as _, idx (idx)}
-							<div class="flex items-center space-x-2">
-								<Input placeholder="표시 명칭" bind:value={$profileData.links![idx].text} />
-								<Input placeholder="URL" bind:value={$profileData.links![idx].href} />
-								<Button
-									variant="outline"
-									size="icon"
-									onclick={() =>
-										($profileData.links = $profileData.links!.filter((_, i) => i !== idx))}
-									class="flex-none">
-									<X />
-								</Button>
-							</div>
-						{/each}
-						<Button
-							variant="outline"
-							class="w-full"
-							onclick={() => {
-								if (!$profileData.links) $profileData.links = [];
-								$profileData.links = [...$profileData.links, { href: '', text: '' }];
-							}}>
-							링크 추가
-						</Button>
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field> -->
+		<Form.Field {form} name="tags" class="mt-4 space-y-2">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>태그</Form.Label>
+					{#each $formData.tags || [] as _, idx (idx)}
+						<div class="flex items-center space-x-2">
+							<Input placeholder="태그" bind:value={$formData.tags![idx]} />
+							<Button
+								variant="outline"
+								size="icon"
+								onclick={() => ($formData.tags = $formData.tags!.filter((_, i) => i !== idx))}
+								class="flex-none">
+								<X />
+							</Button>
+						</div>
+					{/each}
+					<Button
+						variant="outline"
+						class="w-full"
+						onclick={() => {
+							if (!$formData.tags) $formData.tags = [];
+							$formData.tags = [...$formData.tags, ''];
+						}}>
+						태그 추가
+					</Button>
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<div class="my-4 border-2">
 			<Form.Field {form} name="containsAdultContents" class="p-4">
