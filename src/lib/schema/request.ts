@@ -11,8 +11,8 @@ export const formSchema = z.object({
 	isForCommercial: z.boolean().default(false),
 	category: z.nativeEnum(ArticleCategory),
 	tags: z.string().array().default([]),
+	content: z.string(),
 	//     thumbnail: text('thumbnail'),
-	//     content: text('content').notNull().default(''),
 });
 
 export type FormSchema = typeof formSchema;

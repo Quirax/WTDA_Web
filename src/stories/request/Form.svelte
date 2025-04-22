@@ -30,6 +30,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as m from '$lib/paraglide/messages';
 	import { CategoryText } from '@app';
+	import Editor from '$lib/components/editor/editor.svelte';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -245,14 +246,15 @@
 		</Form.Field>
 
 		<!-- content -->
-		<!-- <Form.Field form={profileForm} name="introduction">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Editor bind:value={$profileData.introduction} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field> -->
+		<Form.Field {form} name="content" class="mt-4 space-y-2">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>세부적인 설명</Form.Label>
+					<Editor bind:value={$formData.content} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<Form.Field {form} name="tags" class="mt-4 space-y-2">
 			<Form.Control>
