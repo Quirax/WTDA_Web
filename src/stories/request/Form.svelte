@@ -31,6 +31,8 @@
 	import * as m from '$lib/paraglide/messages';
 	import { CategoryText } from '@app';
 	import Editor from '$lib/components/editor/editor.svelte';
+	import * as Carousel from '$lib/components/ui/carousel';
+	import * as Card from '$lib/components/ui/card';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -54,6 +56,8 @@
 		},
 	});
 	const { form: formData, enhance, constraints } = form;
+
+	let thumbnails = $state<Array<string>>([]);
 
 	$effect(() => {
 		$inspect($formData);
@@ -245,16 +249,45 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- content -->
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>세부적인 설명</Form.Label>
-					<Editor bind:value={$formData.content} />
+					<Editor
+						bind:value={$formData.content}
+						onchange={(_, delta) =>
+							(thumbnails = delta.ops
+								.map((v) => v.insert)
+								.reduce((acc, cur) => {
+									if (typeof cur === 'object' && typeof cur.image === 'string') {
+										return [...acc, cur.image];
+									} else return acc;
+								}, new Array<string>()))} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
+
+		{#if thumbnails.length > 0}
+			<div class="flex w-full justify-center">
+				<Carousel.Root class="align-center" opts={{ loop: true, align: 'start' }}>
+					<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
+						{#each thumbnails as thumbnail}
+							<Carousel.Item
+								class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+								<div class="size-full p-1">
+									<Card.Root class="size-full">
+										<img class="size-full" src={thumbnail} alt="" />
+									</Card.Root>
+								</div>
+							</Carousel.Item>
+						{/each}
+					</Carousel.Content>
+					<Carousel.Previous />
+					<Carousel.Next />
+				</Carousel.Root>
+			</div>
+		{/if}
 
 		<Form.Field {form} name="tags" class="mt-4 space-y-2">
 			<Form.Control>
@@ -293,7 +326,9 @@
 						{#snippet children({ props })}
 							<Checkbox {...props} bind:checked={$formData.containsAdultContents} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Form.Label>
+									이 의뢰에는 성인 콘텐츠 또는 잔인한 콘텐츠가 포함되어 있습니다.
+								</Form.Label>
 							</div>
 							<input name={props.name} value={$formData.containsAdultContents} hidden />
 						{/snippet}

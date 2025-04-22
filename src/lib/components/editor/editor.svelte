@@ -1,8 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import type { QuillOptions } from 'quill';
+	import type { Delta, QuillOptions } from 'quill';
 
-	let { value = $bindable() } = $props();
+	interface Props {
+		value: string;
+		onchange: (value: string, delta: Delta) => void;
+	}
+
+	let { value = $bindable(), onchange = () => {} }: Props = $props();
 
 	let holder = $state<HTMLElement>();
 
@@ -38,9 +43,12 @@
 
 			const quill = new Quill(holder!, options);
 			quill.clipboard.dangerouslyPasteHTML(value); // ref: https://developer-lte.tistory.com/entry/Quill-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%88%98%EC%A0%95-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-%EC%9E%AC%ED%99%9C%EC%9A%A9
+			onchange(quill.getSemanticHTML(), quill.getContents());
 
 			quill.on('editor-change', () => {
 				value = quill.getSemanticHTML();
+
+				onchange(quill.getSemanticHTML(), quill.getContents());
 			});
 
 			holder!.parentElement!.classList.add('ql-ko');
