@@ -15,7 +15,17 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { cn } from '$lib/utils';
 	import { CalendarIcon } from 'lucide-svelte';
-	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
+	import {
+		CalendarDate,
+		CalendarDateTime,
+		DateFormatter,
+		fromDate,
+		getLocalTimeZone,
+		now,
+		toCalendarDate,
+		today,
+		ZonedDateTime,
+	} from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 
 	const df = new DateFormatter('ko-KR', {
@@ -97,14 +107,13 @@
 					<RadioGroup.Root
 						name={props.name}
 						value={$formData.budget === null ? 'negotiable' : 'certain-budget'}>
-						<div class="flex items-start space-x-2 max-lg:items-center">
+						<div class="flex items-center space-x-2 max-lg:items-center">
 							<RadioGroup.Item
 								value="certain-budget"
 								id="certain-budget"
 								onclick={() => ($formData.budget = 0)} />
 							<Label for="certain-budget" class="items-center max-lg:flex">
-								<div>특정 금액:&nbsp;</div>
-								<div class="mt-2 flex items-center">
+								<div class="flex items-center">
 									<Input
 										placeholder="금액"
 										type="currency"
@@ -136,14 +145,21 @@
 					<RadioGroup.Root
 						name={props.name}
 						value={$formData.deadline === null ? 'negotiable' : 'certain-date'}>
-						<div class="flex items-start space-x-2 max-lg:items-center">
+						<div class="flex items-center space-x-2 max-lg:items-center">
 							<RadioGroup.Item
 								value="certain-date"
 								id="certain-date"
-								onclick={() => ($formData.deadline = new Date())} />
+								onclick={() => {
+									const date = new Date();
+									date.setDate(date.getDate() + 1);
+									date.setUTCHours(0);
+									date.setUTCMinutes(0);
+									date.setUTCSeconds(0);
+									date.setUTCMilliseconds(0);
+									$formData.deadline = date;
+								}} />
 							<Label for="certain-date" class="items-center max-lg:flex">
-								<div>특정 날짜 이전까지:&nbsp;</div>
-								<div class="mt-2 flex items-center">
+								<div class="flex items-center">
 									<Popover.Root>
 										<Popover.Trigger
 											class={cn(
@@ -160,11 +176,14 @@
 										<Popover.Content class="w-auto p-0">
 											<Calendar
 												type="single"
-												minValue={today(getLocalTimeZone())}
+												minValue={today(getLocalTimeZone()).add({ days: 1 })}
 												locale="ko-KR"
 												bind:value={
-													() => fromDate($formData.deadline ?? new Date(), getLocalTimeZone()),
-													(v) => ($formData.deadline = v.toDate())
+													() =>
+														$formData.deadline === null
+															? undefined
+															: fromDate($formData.deadline, getLocalTimeZone()),
+													(v) => ($formData.deadline = v?.toDate() ?? null)
 												} />
 										</Popover.Content>
 									</Popover.Root>
@@ -184,7 +203,22 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- purpose -->
+		<Form.Field {form} name="purpose" class="mt-4 flex flex-col space-y-1">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label><Badge variant="destructive">필수</Badge> 사용 목적</Form.Label>
+					<Input
+						placeholder="사용 목적"
+						{...props}
+						bind:value={$formData.purpose}
+						{...$constraints.purpose} />
+				{/snippet}
+			</Form.Control>
+			<Form.Description>
+				커미션 작품을 어디에 사용할 것인지 적어주세요. (예: 프로필 이미지, 트위터 헤더)
+			</Form.Description>
+			<Form.FieldErrors />
+		</Form.Field>
 
 		<!-- isForCommercial -->
 

@@ -6,6 +6,7 @@ export const formSchema = z.object({
 	visibleOnlyToCommissioner: z.boolean().default(false),
 	budget: z.number().nonnegative().nullable(), // null: 조율 가능
 	deadline: z.date().nullable(), // null: 조율 가능
+	purpose: z.string().nonempty(),
 	//     thumbnail: text('thumbnail'),
 	//     category: articleCategory().notNull(),
 	//     tags: text('tags')
@@ -14,7 +15,6 @@ export const formSchema = z.object({
 	//         .default(sql`'{}'::text[]`),
 	//     content: text('content').notNull().default(''),
 	//         isForCommercial: boolean().notNull().default(false),
-	//         purpose: text('purpose').notNull(),
 });
 
 export type FormSchema = typeof formSchema;
