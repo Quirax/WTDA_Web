@@ -263,31 +263,38 @@
 										return [...acc, cur.image];
 									} else return acc;
 								}, new Array<string>()))} />
+
+					{#if thumbnails.length > 0}
+						<div class="flex w-full justify-center">
+							<Carousel.Root class="align-center" opts={{ loop: true, align: 'start' }}>
+								<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
+									{#each thumbnails as thumbnail}
+										<Carousel.Item
+											class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+											<div class="size-full p-1">
+												<Card.Root class="size-full">
+													<img class="size-full" src={thumbnail} alt="" />
+													<Checkbox
+														class="absolute top-2 right-2 bg-white"
+														bind:checked={
+															() => $formData.thumbnail === thumbnail,
+															(v) => ($formData.thumbnail = v ? thumbnail : null)
+														} />
+												</Card.Root>
+											</div>
+										</Carousel.Item>
+									{/each}
+								</Carousel.Content>
+								<Carousel.Previous />
+								<Carousel.Next />
+							</Carousel.Root>
+						</div>
+					{/if}
 				{/snippet}
 			</Form.Control>
+			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
-
-		{#if thumbnails.length > 0}
-			<div class="flex w-full justify-center">
-				<Carousel.Root class="align-center" opts={{ loop: true, align: 'start' }}>
-					<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
-						{#each thumbnails as thumbnail}
-							<Carousel.Item
-								class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
-								<div class="size-full p-1">
-									<Card.Root class="size-full">
-										<img class="size-full" src={thumbnail} alt="" />
-									</Card.Root>
-								</div>
-							</Carousel.Item>
-						{/each}
-					</Carousel.Content>
-					<Carousel.Previous />
-					<Carousel.Next />
-				</Carousel.Root>
-			</div>
-		{/if}
 
 		<Form.Field {form} name="tags" class="mt-4 space-y-2">
 			<Form.Control>

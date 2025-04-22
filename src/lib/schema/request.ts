@@ -12,7 +12,7 @@ export const formSchema = z.object({
 	category: z.nativeEnum(ArticleCategory),
 	tags: z.string().array().default([]),
 	content: z.string(),
-	//     thumbnail: text('thumbnail'),
+	thumbnail: z.string().nullable(),
 });
 
 export type FormSchema = typeof formSchema;
