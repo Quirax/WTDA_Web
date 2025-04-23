@@ -4,7 +4,7 @@
 
 	interface Props {
 		value: string;
-		onchange: (value: string, delta: Delta) => void;
+		onchange?: (value: string, delta: Delta) => void;
 	}
 
 	let { value = $bindable(), onchange = () => {} }: Props = $props();

@@ -15,6 +15,7 @@
 
 	import './MainPage.css';
 	import Header from './components/Header.svelte';
+	import ArticleList from './components/ArticleList.svelte';
 
 	interface Props {
 		recentCommissionTypes?: App.CommisionType[];
@@ -69,32 +70,10 @@
 			{/if}
 		</H2>
 
-		<section
+		<ArticleList
 			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-			{#each userMode === UserMode.requester ? recentCommissionTypes : recentRequests as article}
-				<Card.Root>
-					<img
-						src={article?.thumbnail}
-						alt={article?.title}
-						class="aspect-video w-full object-cover" />
-					<Card.Header>
-						<Card.Title>{article?.title}</Card.Title>
-						<Card.Description class="text-right">
-							by
-							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
-							{article?.author.username}
-						</Card.Description>
-					</Card.Header>
-					<Card.Content>
-						<Badge class="m-1">#{article?.category}</Badge>
-						{#each article?.tags?.slice(0, 3) || [] as tag}
-							<Badge class="m-1" variant="secondary">#{tag}</Badge>
-						{/each}
-					</Card.Content>
-				</Card.Root>
-			{/each}
-		</section>
+			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests} />
 	</Section>
 {/if}
 

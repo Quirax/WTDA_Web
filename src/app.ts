@@ -39,7 +39,7 @@ declare global {
 		interface Articles {
 			thumbnail: string;
 			title: string;
-			author: NonNullable<User>;
+			author: Omit<NonNullable<User>, 'status'>;
 			category: ArticleCategory;
 			tags: string[] | null;
 		}
