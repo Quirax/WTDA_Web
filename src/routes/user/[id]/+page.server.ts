@@ -2,7 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { announcementsPerPage } from '$lib/config';
 import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
@@ -10,6 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { ArticleType } from '@app';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -232,6 +233,8 @@ export const actions: Actions = {
 			try {
 				const articles = await db
 					.select({
+						id: table.commissionRequest.id,
+						type: sql<'request'>`'REQUEST'`,
 						thumbnail: table.commissionRequest.thumbnail,
 						title: table.commissionRequest.title,
 						author: {

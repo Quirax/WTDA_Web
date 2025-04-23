@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { UserStatus } from '../app';
+	import { ArticleCategory, UserStatus } from '../app';
 
 	import MainPage from '../stories/MainPage.svelte';
 
@@ -11,6 +11,7 @@
 	recentCommissionTypes={Array(10)
 		.fill(undefined)
 		.map((_, i) => ({
+			id: 'asdf',
 			thumbnail: DocsImage,
 			title: `커미션 ${i + 1}`,
 			author: {
@@ -19,13 +20,16 @@
 				profileImage: ProfileImage,
 				email: '',
 				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+				preferences: {},
+				profile: {},
 			},
-			category: '그림',
+			category: ArticleCategory.DRAWING,
 			tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
 		}))}
 	recentRequests={Array(10)
 		.fill(undefined)
 		.map((_, i) => ({
+			id: 'asdf',
 			thumbnail: DocsImage,
 			title: `의뢰 ${i + 1}`,
 			author: {
@@ -34,8 +38,10 @@
 				profileImage: ProfileImage,
 				email: '',
 				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+				preferences: {},
+				profile: {},
 			},
-			category: '그림',
+			category: ArticleCategory.DRAWING,
 			tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
 		}))}
 	introductions={Array(1)

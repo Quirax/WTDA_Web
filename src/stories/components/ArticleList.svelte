@@ -4,7 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Avatar from './Avatar.svelte';
-	import { CategoryText } from '$lib/messages';
+	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -38,6 +38,13 @@
 				</div>
 			{/if}
 			<Card.Header>
+				{#if article?.type}
+					<div>
+						<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+							{ArticleTypeText[article?.type]()}
+						</Badge>
+					</div>
+				{/if}
 				<Card.Title>{article?.title}</Card.Title>
 				{#if !hideAuthor}
 					<Card.Description class="text-right">

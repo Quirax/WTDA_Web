@@ -42,6 +42,8 @@ declare global {
 			author: Omit<NonNullable<User>, 'status'>;
 			category: ArticleCategory;
 			tags: string[] | null;
+			id: string;
+			type?: ArticleType;
 		}
 
 		type CommisionType = Articles & {};
@@ -77,4 +79,8 @@ export enum FetchStatus {
 export enum ArticleCategory {
 	TEXT = 'TEXT',
 	DRAWING = 'DRAWING',
+}
+
+export enum ArticleType {
+	REQUEST = 'REQUEST',
 }
