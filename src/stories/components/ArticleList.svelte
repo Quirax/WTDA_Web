@@ -5,6 +5,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Avatar from './Avatar.svelte';
 	import { CategoryText } from '$lib/messages';
+	import tinycolor from 'tinycolor2';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -13,12 +14,29 @@
 	}
 
 	const { articles, hideAuthor = false, style, accentColor, ...restProps }: Props = $props();
+
+	const patternTinycolor = $derived(tinycolor(accentColor || 'hsl(29.52 83% 25%)'));
+	const patternColor = $derived(
+		patternTinycolor.getBrightness() > 127
+			? patternTinycolor.darken(7.7).toHexString()
+			: patternTinycolor.brighten(7.7).toHexString(),
+	);
 </script>
 
 <section style="--primary-color: {accentColor || 'hsl(var(--primary));'} {style}" {...restProps}>
 	{#each articles as article}
 		<Card.Root>
-			<img src={article?.thumbnail} alt={article?.title} class="aspect-video w-full object-cover" />
+			{#if article?.thumbnail}
+				<img
+					src={article?.thumbnail}
+					alt={article?.title}
+					class="aspect-video w-full object-cover" />
+			{:else}
+				<div
+					class="banner-pattern aspect-video w-full bg-(--primary-color)"
+					style={`--pattern-color: ${patternColor};`}>
+				</div>
+			{/if}
 			<Card.Header>
 				<Card.Title>{article?.title}</Card.Title>
 				{#if !hideAuthor}
