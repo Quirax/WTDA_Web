@@ -396,10 +396,6 @@
 		}
 	});
 
-	$effect(() => {
-		$inspect(articleList);
-	});
-
 	// TODO: get values from server
 	const maxSlot = 4,
 		maxOpenSlot = maxSlot,
