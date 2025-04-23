@@ -41,25 +41,23 @@
 			className,
 		)}
 		type="text"
-		value={new Intl.NumberFormat('ko-KR').format(value)}
+		value={typeof value === 'number' ? new Intl.NumberFormat('ko-KR').format(value) : ''}
 		onkeyup={(event) => {
 			const t = event.currentTarget;
 			const v = t.value;
 
-			if (v !== '') {
-				let original_len = v.length;
-				let caret_pos = t.selectionStart;
+			let original_len = v.length;
+			let caret_pos = t.selectionStart;
 
-				t.value = new Intl.NumberFormat('ko-KR').format(
-					(value = parseInt(v.replace(/\D/g, '').padStart(1, '0'))),
-				);
+			t.value = new Intl.NumberFormat('ko-KR').format(
+				(value = parseInt(v.replace(/\D/g, '').padStart(1, '0'))),
+			);
 
-				let updated_len = t.value.length;
+			let updated_len = t.value.length;
 
-				if (caret_pos) {
-					caret_pos += updated_len - original_len;
-					t.setSelectionRange(caret_pos, caret_pos);
-				}
+			if (caret_pos) {
+				caret_pos += updated_len - original_len;
+				t.setSelectionRange(caret_pos, caret_pos);
 			}
 
 			onkeyup && onkeyup(event);
