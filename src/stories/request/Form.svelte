@@ -18,7 +18,7 @@
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { CategoryText } from '@app';
+	import { CategoryText } from '$lib/messages';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
