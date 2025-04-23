@@ -371,6 +371,35 @@
 	// Profile Edit Mode
 	let profileEditMode = $state(false);
 
+	// Article List
+	let articleListTab = $state<'all' | 'requests'>('all');
+	let articleList = $state<App.Articles[] | undefined | null>();
+
+	$effect(() => {
+		if (articleListTab) {
+			(async () => {
+				const formData = new FormData();
+				formData.append('tab', articleListTab);
+
+				// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+				const result = await fetch('?/articles', { method: 'post', body: formData })
+					.then((r) => r.text())
+					.then((r) => deserialize(r));
+
+				if (result.type === 'success') {
+					articleList = result.data?.list as App.Articles[];
+				} else {
+					articleList = null;
+					console.error(result);
+				}
+			})();
+		}
+	});
+
+	$effect(() => {
+		$inspect(articleList);
+	});
+
 	// TODO: get values from server
 	const maxSlot = 4,
 		maxOpenSlot = maxSlot,
@@ -397,9 +426,6 @@
 			{ value: 580, name: '커미션 3' },
 		],
 	};
-
-	// Article List
-	let articleListTab = $state<'all' | 'requests'>('all');
 </script>
 
 <Header title={user.username} />
@@ -889,6 +915,14 @@
 				class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
 				accentColor={user.profile.accentColor}
 				hideAuthor
+				articles={articleList || []} />
+		</section>
+		<!-- <section class="space-y-4">
+			<H3>대기중인 의뢰</H3>
+			<ArticleList
+				class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+				accentColor={user.profile.accentColor}
+				hideAuthor
 				articles={Array(10)
 					.fill(undefined)
 					.map((_, i) => ({
@@ -898,38 +932,7 @@
 						tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
 						author: user,
 					}))} />
-		</section>
-		<!-- <section class="space-y-4">
-			<H3>대기중인 의뢰</H3>
-			<section class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-				{#each Array(10)
-					.fill(undefined)
-					.map( (_, i) => ({ thumbnail: DocsImage, title: `의뢰 ${i + 1}`, category: '그림', tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'] }), ) as article}
-					<Card.Root>
-						<img
-							src={article?.thumbnail}
-							alt={article?.title}
-							class="aspect-video w-full object-cover" />
-						<Card.Header>
-							<Card.Title>{article?.title}</Card.Title>
-						</Card.Header>
-						<Card.Content>
-							<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
-								#{article?.category}
-							</Badge>
-							{#each article?.tags?.slice(0, 3) || [] as tag}
-								<Badge class="m-1" variant="secondary">#{tag}</Badge>
-							{/each}
-						</Card.Content>
-					</Card.Root>
-				{/each}
-			</section>
-			<div class="text-right">
-				<Button variant="link" class="text-(--primary-color)">
-					더 보기
-					<ChevronRight class="size-4" />
-				</Button>
-			</div>
+
 		</section>
 		<section class="space-y-4">
 			<H3>포트폴리오</H3>

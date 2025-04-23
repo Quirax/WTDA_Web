@@ -4,6 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Avatar from './Avatar.svelte';
+	import { CategoryText } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -30,7 +31,7 @@
 			</Card.Header>
 			<Card.Content>
 				<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
-					#{article?.category}
+					#{CategoryText[article?.category]()}
 				</Badge>
 				{#each article?.tags?.slice(0, 3) || [] as tag}
 					<Badge class="m-1" variant="secondary">#{tag}</Badge>

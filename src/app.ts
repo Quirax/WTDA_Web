@@ -37,7 +37,7 @@ declare global {
 		type ProfileAnnouncements = import('$lib/server/db/schema').ProfileAnnouncements;
 
 		interface Articles {
-			thumbnail: string;
+			thumbnail: string | null;
 			title: string;
 			author: Omit<NonNullable<User>, 'status'>;
 			category: ArticleCategory;

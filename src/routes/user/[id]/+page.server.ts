@@ -219,4 +219,49 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred' });
 		}
 	},
+
+	articles: async ({ params, request }) => {
+		const id = params.id;
+
+		const formData = await request.formData();
+		const tab = formData.get('tab') as string;
+
+		let results: (App.Articles & { modifyDate: Date })[] = [];
+
+		if (tab === 'all' || tab === 'requests') {
+			try {
+				const articles = await db
+					.select({
+						thumbnail: table.commissionRequest.thumbnail,
+						title: table.commissionRequest.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+						},
+						category: table.commissionRequest.category,
+						tags: table.commissionRequest.tags,
+						modifyDate: table.commissionRequest.modifyDate,
+					})
+					.from(table.commissionRequest)
+					.where(eq(table.commissionRequest.author, id))
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+					.limit(10);
+
+				results = [...results, ...articles];
+			} catch (e) {
+				console.error(e);
+				return fail(500, { message: 'An error has occurred' });
+			}
+		}
+
+		results = results
+			.sort((a, b) => b.modifyDate.getTime() - a.modifyDate.getTime())
+			.slice(undefined, 10);
+
+		return { message: 'Got articles List', list: results };
+	},
 };
