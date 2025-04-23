@@ -2,12 +2,12 @@ import { ArticleCategory } from '@app';
 import { z } from 'zod';
 
 export const formSchema = z.object({
-	title: z.string().nonempty(),
+	title: z.string().nonempty('제목을 입력하십시오.'),
 	containsAdultContents: z.boolean().default(false),
 	visibleOnlyToCommissioner: z.boolean().default(false),
-	budget: z.number().nonnegative().nullable(), // null: 조율 가능
+	budget: z.number().nonnegative('금액은 음수가 될 수 없습니다.').nullable(), // null: 조율 가능
 	deadline: z.date().nullable(), // null: 조율 가능
-	purpose: z.string().nonempty(),
+	purpose: z.string().nonempty('사용 목적을 입력하십시오.'),
 	isForCommercial: z.boolean().default(false),
 	category: z.nativeEnum(ArticleCategory),
 	tags: z.string().array().default([]),
