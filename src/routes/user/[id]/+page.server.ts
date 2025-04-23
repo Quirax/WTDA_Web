@@ -2,7 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { announcementsPerPage } from '$lib/config';
 import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
@@ -10,6 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { ArticleType } from '@app';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -218,5 +219,52 @@ export const actions: Actions = {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
 		}
+	},
+
+	articles: async ({ params, request }) => {
+		const id = params.id;
+
+		const formData = await request.formData();
+		const tab = formData.get('tab') as string;
+
+		let results: (App.Articles & { modifyDate: Date })[] = [];
+
+		if (tab === 'all' || tab === 'requests') {
+			try {
+				const articles = await db
+					.select({
+						id: table.commissionRequest.id,
+						type: sql<ArticleType>`'REQUEST'`,
+						thumbnail: table.commissionRequest.thumbnail,
+						title: table.commissionRequest.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+						},
+						category: table.commissionRequest.category,
+						tags: table.commissionRequest.tags,
+						modifyDate: table.commissionRequest.modifyDate,
+					})
+					.from(table.commissionRequest)
+					.where(eq(table.commissionRequest.author, id))
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+					.limit(10);
+
+				results = [...results, ...articles];
+			} catch (e) {
+				console.error(e);
+				return fail(500, { message: 'An error has occurred' });
+			}
+		}
+
+		results = results
+			.sort((a, b) => b.modifyDate.getTime() - a.modifyDate.getTime())
+			.slice(undefined, 10);
+
+		return { message: 'Got articles List', list: results };
 	},
 };

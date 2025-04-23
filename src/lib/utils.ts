@@ -1,7 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
-import { date } from 'drizzle-orm/mysql-core';
 import { MediaQuery } from 'svelte/reactivity';
 import { twMerge } from 'tailwind-merge';
+
+import DOMPurify from 'isomorphic-dompurify';
+import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -13,6 +15,9 @@ export function enumToPgEnum<T extends Record<string, any>>(
 ): [T[keyof T], ...T[keyof T][]] {
 	return Object.values(enumeration).map((value: any) => `${value}`) as any;
 }
+
+export type InferSelectModelPartial<T extends Record<string, ColumnBuilderBase>> =
+	InferModelFromColumns<BuildColumns<'', T, 'pg'>, 'select'>;
 
 const Min2Ms = 60 * 1000;
 
@@ -73,6 +78,4 @@ export function isDesktop() {
 
 	return isDesktop.current;
 }
-
-import DOMPurify from 'isomorphic-dompurify';
 export const sanitizeHTML = DOMPurify?.sanitize || (() => {});

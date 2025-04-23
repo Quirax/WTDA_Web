@@ -37,11 +37,13 @@ declare global {
 		type ProfileAnnouncements = import('$lib/server/db/schema').ProfileAnnouncements;
 
 		interface Articles {
-			thumbnail: string;
+			thumbnail: string | null;
 			title: string;
-			author: NonNullable<User>;
-			category: string;
+			author: Omit<NonNullable<User>, 'status'>;
+			category: ArticleCategory;
 			tags: string[] | null;
+			id: string;
+			type?: ArticleType;
 		}
 
 		type CommisionType = Articles & {};
@@ -72,4 +74,13 @@ export enum FetchStatus {
 	LOADING,
 	FAILED,
 	COMPLETED,
+}
+
+export enum ArticleCategory {
+	TEXT = 'TEXT',
+	DRAWING = 'DRAWING',
+}
+
+export enum ArticleType {
+	REQUEST = 'REQUEST',
 }

@@ -5,8 +5,6 @@
 </script>
 
 <script lang="ts">
-	import '../../app.css';
-
 	import { cn } from '$lib/utils';
 	import { fn } from '@storybook/test';
 	import type { HTMLAttributes } from 'svelte/elements';

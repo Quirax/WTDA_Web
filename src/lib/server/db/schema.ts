@@ -1,9 +1,11 @@
-import { enumToPgEnum } from '../../utils';
-import { pgTable, text, timestamp, pgEnum, json } from 'drizzle-orm/pg-core';
-import { EmailConfirmFor, UserStatus } from '../../../app';
+import { enumToPgEnum, type InferSelectModelPartial } from '../../utils';
+import { pgTable, text, timestamp, pgEnum, json, integer, boolean } from 'drizzle-orm/pg-core';
+import { ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
+import { sql } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
+export const articleCategory = pgEnum('article_category', enumToPgEnum(ArticleCategory));
 
 export const user = pgTable('user', {
 	id: text('id').primaryKey(),
@@ -47,7 +49,36 @@ export const profileAnnouncements = pgTable('profile_announcements', {
 	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
+const article = {
+	id: text('id').primaryKey(),
+	thumbnail: text('thumbnail'),
+	title: text('title').notNull(),
+	author: text('author')
+		.notNull()
+		.references(() => user.id),
+	category: articleCategory().notNull(),
+	tags: text('tags')
+		.array()
+		.notNull()
+		.default(sql`'{}'::text[]`),
+	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	modifyDate: timestamp('modify_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+	content: text('content').notNull().default(''),
+	containsAdultContents: boolean().notNull().default(false),
+};
+
+export const commissionRequest = pgTable('commission_request', {
+	...article,
+	budget: integer('budget'), // null: 조율 가능
+	deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
+	isForCommercial: boolean().notNull().default(false),
+	purpose: text('purpose').notNull(),
+	visibleOnlyToCommissioner: boolean().notNull().default(false),
+});
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type EmailConfirm = typeof emailConfirm.$inferSelect;
 export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;
+export type Article = InferSelectModelPartial<typeof article>;
+export type CommissionRequest = typeof commissionRequest.$inferSelect;
