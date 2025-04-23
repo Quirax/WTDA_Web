@@ -17,6 +17,7 @@
 		TriangleAlert,
 		NotepadTextDashed,
 		Trash2,
+		CirclePlus,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -54,11 +55,12 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import tinycolor from 'tinycolor2';
 	import Cropper from '$lib/components/cropper/cropper.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import ArticleList from '$stories/components/ArticleList.svelte';
+	import * as Tabs from '$lib/components/ui/tabs';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -395,6 +397,9 @@
 			{ value: 580, name: '커미션 3' },
 		],
 	};
+
+	// Article List
+	let articleListTab = $state<'all' | 'requests'>('all');
 </script>
 
 <Header title={user.username} />
@@ -856,7 +861,30 @@
 			</div>
 		</section>
 		<section class="space-y-4">
-			<H3>커미션 타입</H3>
+			<div class="flex justify-between">
+				<Tabs.Root bind:value={articleListTab} class="md:w-[400px]">
+					<Tabs.List class="[&>*]:text-lg [&>*]:font-bold">
+						<Tabs.Trigger value="all">전체</Tabs.Trigger>
+						<!-- <Tabs.Trigger value="commission_types">커미션 타입</Tabs.Trigger> -->
+						<Tabs.Trigger value="requests">의뢰</Tabs.Trigger>
+						<!-- <Tabs.Trigger value="portfolio">포트폴리오</Tabs.Trigger> -->
+					</Tabs.List>
+				</Tabs.Root>
+
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class="m-0 p-0">
+						{#snippet child({ props })}
+							<Button {...props} variant="default" class="px-4"><CirclePlus /> 새로 만들기</Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content class="w-56" align="end">
+						<DropdownMenu.Group>
+							<DropdownMenu.Item onclick={() => goto('/r/create')}>의뢰</DropdownMenu.Item>
+						</DropdownMenu.Group>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
+
 			<ArticleList
 				class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
 				accentColor={user.profile.accentColor}
