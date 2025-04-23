@@ -15,20 +15,9 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { cn } from '$lib/utils';
 	import { CalendarIcon, X } from 'lucide-svelte';
-	import {
-		CalendarDate,
-		CalendarDateTime,
-		DateFormatter,
-		fromDate,
-		getLocalTimeZone,
-		now,
-		toCalendarDate,
-		today,
-		ZonedDateTime,
-	} from '@internationalized/date';
+	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import * as m from '$lib/paraglide/messages';
 	import { CategoryText } from '@app';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as Carousel from '$lib/components/ui/carousel';
@@ -58,10 +47,6 @@
 	const { form: formData, enhance, constraints } = form;
 
 	let thumbnails = $state<Array<string>>([]);
-
-	$effect(() => {
-		$inspect($formData);
-	});
 
 	const title = '의뢰 만들기';
 </script>
