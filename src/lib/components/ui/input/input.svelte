@@ -50,7 +50,9 @@
 				let original_len = v.length;
 				let caret_pos = t.selectionStart;
 
-				t.value = new Intl.NumberFormat('ko-KR').format((value = parseInt(v.replace(/\D/g, ''))));
+				t.value = new Intl.NumberFormat('ko-KR').format(
+					(value = parseInt(v.replace(/\D/g, '').padStart(1, '0'))),
+				);
 
 				let updated_len = t.value.length;
 
