@@ -234,7 +234,7 @@ export const actions: Actions = {
 				const articles = await db
 					.select({
 						id: table.commissionRequest.id,
-						type: sql<'request'>`'REQUEST'`,
+						type: sql<ArticleType>`'REQUEST'`,
 						thumbnail: table.commissionRequest.thumbnail,
 						title: table.commissionRequest.title,
 						author: {
