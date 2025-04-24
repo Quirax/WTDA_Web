@@ -7,6 +7,7 @@
 	import Section from '$stories/components/Section.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { H2, H3 } from '$lib/components/typo';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -27,14 +28,19 @@
 				<span class="italic">세부 내용이 없습니다.</span>
 			{/if}
 		</article>
-		<span>{article.tags}</span>
+		<div class="border-t">
+			{#each article.tags.slice(0, 3) || [] as tag}
+				<Badge class="m-1" variant="default">#{tag}</Badge>
+			{/each}
+		</div>
 	</section>
 	<section class="w-80 flex-none space-y-2 border p-4">
 		<div>
-			{#if article.thumbnail}<img
-					src={article.thumbnail}
-					class="aspect-video w-full"
-					alt="이 의뢰의 썸네일" />{/if}
+			{#if article.thumbnail}
+				<img src={article.thumbnail} class="aspect-video w-full" alt="이 의뢰의 썸네일" />
+			{:else}
+				<div class="banner-pattern bg-primary aspect-video w-full"></div>
+			{/if}
 		</div>
 		<section>
 			<H3 class="hidden">의뢰 기본 정보</H3>
