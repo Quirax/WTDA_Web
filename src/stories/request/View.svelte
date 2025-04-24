@@ -44,10 +44,10 @@
 		</div>
 		<section>
 			<H3 class="hidden">의뢰 기본 정보</H3>
-			<Table.Root>
+			<Table.Root class="table-fixed">
 				<Table.Body>
 					<Table.Row>
-						<Table.Head>작성자</Table.Head>
+						<Table.Head class="w-[8em]">작성자</Table.Head>
 						<Table.Cell>
 							<Button variant="link" class="text-inherit" href="/user/{article.author.id}">
 								<Avatar class="inline-block h-6 w-6 align-middle" user={article.author} />
@@ -61,7 +61,7 @@
 					</Table.Row>
 					<Table.Row>
 						<Table.Head>사용 목적</Table.Head>
-						<Table.Cell>
+						<Table.Cell class="break-all">
 							<div>
 								{article.purpose}
 							</div>
