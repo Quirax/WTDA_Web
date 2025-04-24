@@ -2,6 +2,7 @@
 // for information about these interfaces
 
 import type { Link } from '$lib/config';
+import type { CommissionRequest } from '$lib/server/db/schema';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
@@ -47,7 +48,9 @@ declare global {
 		}
 
 		type CommisionType = Articles & {};
-		type Request = Articles & {};
+		type Request = Omit<CommissionRequest, 'author'> & {
+			author: Omit<NonNullable<User>, 'status'>;
+		};
 
 		interface Locals {
 			user: User;
