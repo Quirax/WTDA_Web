@@ -44,6 +44,10 @@ export const load = (async ({ params }) => {
 		// 커미션주인지 확인
 	}
 
+	if (article.containsAdultContents) {
+		// 성인 콘텐츠를 열람할 수 있는지 확인
+	}
+
 	return {
 		article,
 	};
