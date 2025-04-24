@@ -34,17 +34,20 @@
 <section style="--primary-color: {accentColor || 'hsl(var(--primary));'} {style}" {...restProps}>
 	{#each articles as article}
 		<Card.Root>
-			{#if article?.thumbnail}
-				<img
-					src={article?.thumbnail}
-					alt={article?.title}
-					class="aspect-video w-full object-cover" />
-			{:else}
-				<div
-					class="banner-pattern aspect-video w-full bg-(--primary-color)"
-					style={`--pattern-color: ${patternColor};`}>
-				</div>
-			{/if}
+			{@const href = article.type ? `/${getLinkPrefix(article.type)}/${article?.id}` : ''}
+			<a {href}>
+				{#if article?.thumbnail}
+					<img
+						src={article?.thumbnail}
+						alt={article?.title}
+						class="aspect-video w-full object-cover" />
+				{:else}
+					<div
+						class="banner-pattern aspect-video w-full bg-(--primary-color)"
+						style={`--pattern-color: ${patternColor};`}>
+					</div>
+				{/if}
+			</a>
 			<Card.Header>
 				{#if article?.type}
 					<div>
@@ -58,7 +61,7 @@
 						<Button
 							variant="link"
 							class="text-[length:inherit] leading-[inherit] font-[weight:inherit]! text-inherit"
-							href="/{getLinkPrefix(article.type)}/{article?.id}">
+							{href}>
 							{article?.title}
 						</Button>
 					{:else}
