@@ -40,6 +40,10 @@ export const load = (async ({ params }) => {
 
 	if (!article) throw error(404, { message: 'Cannot find matched request' });
 
+	if (article.visibleOnlyToCommissioner) {
+		// 커미션주인지 확인
+	}
+
 	return {
 		article,
 	};

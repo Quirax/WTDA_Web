@@ -11,9 +11,7 @@
 
 	type $$Props = HTMLAttributes<HTMLDivElement>;
 
-	const { children = fn(), className = undefined, ...restProps } = $props();
-
-	export { className as class };
+	const { children = fn(), class: className = undefined, ...restProps } = $props();
 </script>
 
 <section class={cn(Class, className)} {...restProps}>
