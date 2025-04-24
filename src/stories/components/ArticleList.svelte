@@ -6,6 +6,7 @@
 	import Avatar from './Avatar.svelte';
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
+	import { ArticleType } from '@app';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -21,6 +22,13 @@
 			? patternTinycolor.darken(7.7).toHexString()
 			: patternTinycolor.brighten(7.7).toHexString(),
 	);
+
+	const getLinkPrefix = (type: ArticleType) => {
+		switch (type) {
+			case ArticleType.REQUEST:
+				return 'r';
+		}
+	};
 </script>
 
 <section style="--primary-color: {accentColor || 'hsl(var(--primary));'} {style}" {...restProps}>
@@ -45,12 +53,25 @@
 						</Badge>
 					</div>
 				{/if}
-				<Card.Title>{article?.title}</Card.Title>
+				<Card.Title>
+					{#if article?.type}
+						<Button
+							variant="link"
+							class="text-[length:inherit] leading-[inherit] font-[weight:inherit]! text-inherit"
+							href="/{getLinkPrefix(article.type)}/{article?.id}">
+							{article?.title}
+						</Button>
+					{:else}
+						{article?.title}
+					{/if}
+				</Card.Title>
 				{#if !hideAuthor}
 					<Card.Description class="text-right">
 						by
-						<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
-						{article?.author.username}
+						<Button variant="link" class="text-inherit" href="/user/{article?.author.id}">
+							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
+							{article?.author.username}
+						</Button>
 					</Card.Description>
 				{/if}
 			</Card.Header>
