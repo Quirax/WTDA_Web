@@ -22,7 +22,7 @@
 
 <Header title={article.title} />
 
-<Section class="flex space-x-4">
+<Section class="flex space-x-4 max-md:flex-col">
 	<section class="flex-auto">
 		<H2>{article.title}</H2>
 		<article class="html p-4">
@@ -32,13 +32,13 @@
 				<span class="italic">세부 내용이 없습니다.</span>
 			{/if}
 		</article>
-		<div class="border-t">
+		<div class="border-t pt-2">
 			{#each article.tags.slice(0, 3) || [] as tag}
 				<Badge class="m-1" variant="default">#{tag}</Badge>
 			{/each}
 		</div>
 	</section>
-	<section class="w-80 flex-none space-y-2 border p-4">
+	<section class="flex-none space-y-2 border p-4 max-md:mt-8 md:w-80">
 		<div>
 			{#if article.thumbnail}
 				<img src={article.thumbnail} class="aspect-video w-full" alt="이 의뢰의 썸네일" />
