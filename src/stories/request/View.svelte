@@ -8,12 +8,16 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { H2, H3 } from '$lib/components/typo';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { userStore } from '$lib/context';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
 	}
 
 	const { article }: Props = $props();
+
+	let me = $state<App.User>(null);
+	userStore.subscribe((v) => (me = v));
 </script>
 
 <Header title={article.title} />
@@ -102,5 +106,11 @@
 				</Table.Body>
 			</Table.Root>
 		</section>
+		{#if me && article.author.id === me.id}
+			<section class="text-right">
+				<Button href="">수정하기</Button>
+				<Button variant="destructive" href="">삭제하기</Button>
+			</section>
+		{/if}
 	</section>
 </Section>
