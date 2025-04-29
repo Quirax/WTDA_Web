@@ -9,6 +9,9 @@
 	import { H2, H3 } from '$lib/components/typo';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { userStore } from '$lib/context';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { goto } from '$app/navigation';
+	import Ul from '$lib/components/typo/ul.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -18,6 +21,26 @@
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
+
+	let openErrorAlert = $state(false);
+
+	// 삭제
+	let openBeforeDeletionAlert = $state(false);
+	let openAfterDeletionAlert = $state(false);
+
+	const onDelete = async () => {
+		const result = await fetch('?/delete', {
+			method: 'post',
+			body: new FormData(),
+		}).then((r) => r.json());
+
+		if ([200, 204].indexOf(result.status || 0) === -1) {
+			if (result.status !== 302) openErrorAlert = true;
+			return;
+		}
+
+		openAfterDeletionAlert = true;
+	};
 </script>
 
 <Header title={article.title} />
@@ -109,8 +132,40 @@
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
 				<Button href="">수정하기</Button>
-				<Button variant="destructive" href="">삭제하기</Button>
+				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
+					삭제하기
+				</Button>
 			</section>
 		{/if}
 	</section>
 </Section>
+
+{#snippet deleteDesc()}
+	<Ul>
+		<li>삭제한 게시물은 복구할 수 없습니다.</li>
+		<li>
+			이 의뢰와 관련된 커미션이 진행중인 경우 삭제할 수 없습니다. 커미션을 중단한 후 다시
+			시도하세요.
+		</li>
+	</Ul>
+{/snippet}
+
+<AlertDialog
+	title="정말로 삭제하시겠습니까?"
+	description={deleteDesc}
+	cancel={true}
+	onAction={onDelete}
+	bind:open={openBeforeDeletionAlert} />
+
+<AlertDialog
+	title="삭제 완료"
+	description="게시물을 삭제하였습니다"
+	onAction={() => {
+		goto('/');
+	}}
+	bind:open={openAfterDeletionAlert} />
+
+<AlertDialog
+	title="게시물 관련 처리 도중 오류가 발생하였습니다"
+	description="고객센터에 문의하시기 바랍니다다"
+	bind:open={openErrorAlert} />
