@@ -1,4 +1,4 @@
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -54,3 +54,31 @@ export const load = (async ({ params, locals }) => {
 		}),
 	};
 }) satisfies PageServerLoad;
+
+export const actions: Actions = {
+	default: async (event) => {
+		if (!event.locals.user) throw redirect(302, '/');
+
+		const id = event.params.id;
+
+		const form = await superValidate(event.request, zod(formSchema));
+
+		if (!form.valid) {
+			return fail(400, { message: 'The form is not valid.', form });
+		}
+
+		try {
+			await db
+				.update(table.commissionRequest)
+				.set({
+					...form.data,
+				})
+				.where(eq(table.commissionRequest.id, id));
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred', form });
+		}
+
+		return redirect(302, '/r/' + id);
+	},
+};
