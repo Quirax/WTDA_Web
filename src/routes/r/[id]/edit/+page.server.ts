@@ -1,11 +1,15 @@
-import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { formSchema } from '$lib/schema/request';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, locals }) => {
+	if (!locals.user) throw redirect(302, '/');
+
 	const id = params.id;
 
 	const article = (
@@ -41,47 +45,40 @@ export const load = (async ({ params }) => {
 
 	if (!article) throw error(404, { message: 'Cannot find matched request' });
 
-	if (article.visibleOnlyToCommissioner) {
-		// 커미션주인지 확인
-	}
-
-	if (article.containsAdultContents) {
-		// 성인 콘텐츠를 열람할 수 있는지 확인
-	}
+	if (article.author.id !== locals.user.id)
+		return fail(403, { message: 'Not authorized to edit the article' });
 
 	return {
-		article,
+		form: await superValidate(zod(formSchema), {
+			defaults: article,
+		}),
 	};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	delete: async ({ params, locals }) => {
-		const id = params.id;
+	default: async (event) => {
+		if (!event.locals.user) throw redirect(302, '/');
 
-		if (!locals.user) throw redirect(302, '/');
-		if (!locals.session) throw redirect(302, '/');
+		const id = event.params.id;
 
-		try {
-			const article = (
-				await db
-					.select({
-						author: table.commissionRequest.author,
-					})
-					.from(table.commissionRequest)
-					.where(eq(table.commissionRequest.id, id))
-			).at(0);
+		const form = await superValidate(event.request, zod(formSchema));
 
-			if (article?.author !== locals.user.id)
-				return fail(403, { message: 'Not authorized to delete the article' });
-
-			// TODO: 이 의뢰를 기반으로 한 커미션 계약이 있는 경우, 삭제 불가
-
-			await db.delete(table.commissionRequest).where(eq(table.commissionRequest.id, id));
-		} catch (e: any) {
-			console.error(e);
-			return fail(500, { message: 'An error has occurred' });
+		if (!form.valid) {
+			return fail(400, { message: 'The form is not valid.', form });
 		}
 
-		return { message: 'Deletion of the article completed' };
+		try {
+			await db
+				.update(table.commissionRequest)
+				.set({
+					...form.data,
+				})
+				.where(eq(table.commissionRequest.id, id));
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred', form });
+		}
+
+		return redirect(302, '/r/' + id);
 	},
 };

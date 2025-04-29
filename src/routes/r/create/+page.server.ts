@@ -24,9 +24,11 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
 
+		const id = generateID();
+
 		try {
 			await db.insert(table.commissionRequest).values({
-				id: generateID(),
+				id,
 				...form.data,
 				author: event.locals.user.id,
 			});
@@ -35,6 +37,6 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred', form });
 		}
 
-		return { message: 'Created successfully', form };
+		return redirect(302, '/r/' + id);
 	},
 };

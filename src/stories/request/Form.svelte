@@ -29,9 +29,10 @@
 
 	interface Props extends ReturnType<typeof $props> {
 		data: SuperValidated<Infer<FormSchema>>;
+		editMode?: boolean;
 	}
 
-	const { data }: Props = $props();
+	const { data, editMode = false }: Props = $props();
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
@@ -48,13 +49,13 @@
 
 	let thumbnails = $state<Array<string>>([]);
 
-	const title = '의뢰 만들기';
+	const doString = editMode ? '수정하기' : '만들기';
 </script>
 
-<Header {title} />
+<Header title="의뢰 {doString}" />
 
 <Section>
-	<H2>{title}</H2>
+	<H2>의뢰 {doString}</H2>
 	<form method="POST" use:enhance class="w-full sm:w-2/3">
 		<Form.Field {form} name="title" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
@@ -345,7 +346,7 @@
 			</Form.Field>
 		</div>
 
-		<Form.Button>만들기</Form.Button>
+		<Form.Button>{doString}</Form.Button>
 		<Button variant="secondary">취소하기</Button>
 	</form>
 </Section>
