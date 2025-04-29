@@ -33,22 +33,31 @@
 <header class="bg-background border-b-2">
 	<div class="flex h-16 items-center justify-between px-4">
 		<div class="flex items-center">
-			<a href="/" class="relative size-9 rounded-full" aria-label="Logo">
+			<Button
+				variant="link"
+				size="icon"
+				href="/"
+				class="relative size-9 rounded-full"
+				aria-label="Logo">
 				<LogoAvatar.Root class="bg-white p-1">
 					<LogoAvatar.Image src="/logo.png" alt="뭐하지공방 로고" />
 					<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
 				</LogoAvatar.Root>
-			</a>
+			</Button>
 			<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 				{title}
 			</div>
 		</div>
 		<div class="flex items-center space-x-4">
 			{#if showSearchPanel}
-				<div class="hidden sm:flex">
-					<Input type="search" placeholder="검색..." class="h-9 w-[100px] sm:flex lg:w-[300px]" />
-					<Button class="h-9" aria-label="Search">검색</Button>
-				</div>
+				<form class="hidden sm:flex" method="GET" action="/search">
+					<Input
+						type="search"
+						name="query"
+						placeholder="검색..."
+						class="h-9 w-[100px] sm:flex lg:w-[300px]" />
+					<Button type="submit" class="h-9" aria-label="Search">검색</Button>
+				</form>
 			{/if}{#if showUserPanel}
 				{#if user}
 					<DropdownMenu.Root>

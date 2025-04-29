@@ -16,6 +16,7 @@
 	import './MainPage.css';
 	import Header from './components/Header.svelte';
 	import ArticleList from './components/ArticleList.svelte';
+	import { ArticleType } from '@app';
 
 	interface Props {
 		recentCommissionTypes?: App.CommisionType[];
@@ -49,11 +50,15 @@
 
 	<form
 		class="flex w-full max-w-sm flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
-		onsubmit={(e) => {
-			e.preventDefault();
-		}}>
+		method="GET"
+		action="/search">
+		<input
+			type="hidden"
+			name="type"
+			value={userMode === 'requester' ? ArticleType.COMMISSION : ArticleType.REQUEST} />
 		<Input
 			type="search"
+			name="query"
 			placeholder={userMode === UserMode.requester ? '커미션 타입 찾기' : '의뢰 찾기'}
 			class="h-xl border-stone-200 bg-stone-50 text-xl text-stone-950 sm:w-full md:w-md" />
 		<Button type="submit" variant="secondary">검색</Button>

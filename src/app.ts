@@ -86,4 +86,5 @@ export enum ArticleCategory {
 
 export enum ArticleType {
 	REQUEST = 'REQUEST',
+	COMMISSION = 'COMMISSION',
 }
