@@ -131,7 +131,7 @@
 		</section>
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
-				<Button href="">수정하기</Button>
+				<Button href="/r/{article.id}/edit">수정하기</Button>
 				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
 					삭제하기
 				</Button>
