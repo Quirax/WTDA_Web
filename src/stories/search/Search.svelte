@@ -4,6 +4,12 @@
 	import Section from '$stories/components/Section.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
+	import * as Popover from '$lib/components/ui/popover';
+	import { cn } from '$lib/utils';
+	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	interface Props {
 		query: string | undefined;
@@ -59,8 +65,81 @@
 			</Select.Content>
 		</Select.Root>
 
-		<!-- 금액 범위: 별도 설정, 협의 가능 -->
-		<!-- 일정 범위: 별도 설정, 협의 가능 -->
+		<Popover.Root>
+			<Popover.Trigger
+				class={cn(
+					buttonVariants({
+						variant: 'outline',
+						class: 'w-[10em] justify-start text-left font-normal',
+					}),
+					'text-muted-foreground',
+				)}>
+				<!-- !value -> muted -->
+				금액 범위
+			</Popover.Trigger>
+			<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
+				<div class="flex items-center">
+					<span class="flex-none">최소:&nbsp;</span>
+					<Input placeholder="금액" type="currency" />
+					<!-- bind:value disabled -->
+					<span class="flex-none">&nbsp;포인트</span>
+				</div>
+				<div class="flex items-center">
+					<span class="flex-none">최대:&nbsp;</span>
+					<Input placeholder="금액" type="currency" />
+					<!-- bind:value disabled -->
+					<span class="flex-none">&nbsp;포인트</span>
+				</div>
+				<div class="flex flex-row space-x-2">
+					<Checkbox id="date-negotiable" />
+					<!-- bind:checked -->
+					<div class="leading-none">
+						<label for="date-negotiable">협상 가능한 경우를 포함함</label>
+					</div>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+
+		<Popover.Root>
+			<Popover.Trigger
+				class={cn(
+					buttonVariants({
+						variant: 'outline',
+						class: 'w-[10em] justify-start text-left font-normal',
+					}),
+					'text-muted-foreground',
+				)}>
+				<!-- !value -> muted -->
+				일정 범위
+				<!-- {#if value && value.start}
+        {#if value.end}
+          {df.format(value.start.toDate(getLocalTimeZone()))} - {df.format(
+            value.end.toDate(getLocalTimeZone())
+          )}
+        {:else}
+          {df.format(value.start.toDate(getLocalTimeZone()))}
+        {/if}
+      {:else if startValue}
+        {df.format(startValue.toDate(getLocalTimeZone()))}
+      {:else}
+        Pick a date
+      {/if} -->
+				<!-- df.format(value.toDate(getLocalTimeZone())) -->
+			</Popover.Trigger>
+			<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
+				<div class="border">
+					<RangeCalendar numberOfMonths={2} locale="ko-KR" />
+					<!-- bind:value onStartValueChange -->
+				</div>
+				<div class="flex flex-row space-x-2">
+					<Checkbox id="date-negotiable" />
+					<!-- bind:checked -->
+					<div class="leading-none">
+						<label for="date-negotiable">협상 가능한 경우를 포함함</label>
+					</div>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
 
 		<Select.Root type="single" name="commercial_use">
 			<!-- bind:value -->
