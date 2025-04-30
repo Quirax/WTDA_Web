@@ -49,13 +49,12 @@
 				</Select.Content>
 			</Select.Root>
 
-			<Select.Root type="single" name="type">
+			<Select.Root type="multiple" name="type">
 				<!-- bind:value -->
 				<Select.Trigger class="w-[10em]">
 					{'타입'}<!-- ArticleTypeText[$formData.type]() -->
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value={''}>모두</Select.Item>
 					{#each Object.entries(ArticleTypeText) as [k, v]}
 						<Select.Item value={k}>
 							{v()}
@@ -64,13 +63,12 @@
 				</Select.Content>
 			</Select.Root>
 
-			<Select.Root type="single" name="category">
+			<Select.Root type="multiple" name="category">
 				<!-- bind:value -->
 				<Select.Trigger class="w-[10em]">
 					{'카테고리'}<!-- CategoryText[$formData.category]() -->
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value={''}>모두</Select.Item>
 					{#each Object.entries(CategoryText) as [k, v]}
 						<Select.Item value={k}>
 							{v()}
@@ -105,10 +103,10 @@
 						<span class="flex-none">&nbsp;포인트</span>
 					</div>
 					<div class="flex flex-row space-x-2">
-						<Checkbox id="date-negotiable" />
+						<Checkbox id="budget-negotiable" />
 						<!-- bind:checked -->
 						<div class="leading-none">
-							<label for="date-negotiable">협상 가능한 경우를 포함함</label>
+							<label for="budget-negotiable">협상 가능한 경우를 포함함</label>
 						</div>
 					</div>
 				</Popover.Content>
