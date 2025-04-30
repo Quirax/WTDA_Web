@@ -5,7 +5,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import * as Popover from '$lib/components/ui/popover';
-	import { cn } from '$lib/utils';
+	import { cn, isDesktop } from '$lib/utils';
 	import { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
@@ -14,6 +14,7 @@
 	import { ArticleCategory, UserStatus } from '@app';
 	import DocsImage from '$stories/assets/docs.png';
 	import ProfileImage from '$stories/assets/profile_example.png';
+	import Pagination from '$lib/components/pagination/pagination.svelte';
 
 	interface Props {
 		query: string | undefined;
@@ -172,7 +173,7 @@
 	<section>
 		<ArticleList
 			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			class="my-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 			articles={Array(10)
 				.fill(undefined)
 				.map((_, i) => ({
@@ -192,5 +193,7 @@
 					tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
 				}))}
 			hideMore />
+		<Pagination page={1} count={100} perPage={10} siblingCount={isDesktop() ? 1 : 0} />
+		<!-- bind:page -->
 	</section>
 </Section>
