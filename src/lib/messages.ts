@@ -9,4 +9,5 @@ export const CategoryText = {
 
 export const ArticleTypeText = {
 	REQUEST: m.ARTICLE_TYPE_REQUEST,
+	COMMISSION: m.ARTICLE_TYPE_COMMISSION,
 };
