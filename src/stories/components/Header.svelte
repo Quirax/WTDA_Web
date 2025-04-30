@@ -30,6 +30,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>{title === '뭐하지공방' ? '' : title + ' - '}뭐하지공방</title>
+</svelte:head>
+
 <header class="bg-background border-b-2">
 	<div class="flex h-16 items-center justify-between px-4">
 		<div class="flex items-center">
