@@ -11,5 +11,5 @@ export const load = (async ({ url }) => {
 
 	console.log('query params', params);
 
-	return {};
+	return { query: params.query };
 }) satisfies PageServerLoad;

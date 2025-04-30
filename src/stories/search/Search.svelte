@@ -1,9 +1,15 @@
 <script lang="ts">
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
+
+	interface Props {
+		query: string | undefined;
+	}
+
+	const { query }: Props = $props();
 </script>
 
-<Header title="검색결과" />
+<Header title="'{query}' 검색결과" />
 
 <Section>
 	<nav>
