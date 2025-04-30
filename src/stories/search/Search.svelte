@@ -10,6 +10,10 @@
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import ArticleList from '$stories/components/ArticleList.svelte';
+	import { ArticleCategory, UserStatus } from '@app';
+	import DocsImage from '$stories/assets/docs.png';
+	import ProfileImage from '$stories/assets/profile_example.png';
 
 	interface Props {
 		query: string | undefined;
@@ -165,5 +169,28 @@
 			</Select.Content>
 		</Select.Root>
 	</nav>
-	<section></section>
+	<section>
+		<ArticleList
+			id="contents-list"
+			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			articles={Array(10)
+				.fill(undefined)
+				.map((_, i) => ({
+					id: 'asdf',
+					thumbnail: DocsImage,
+					title: `커미션 ${i + 1}`,
+					author: {
+						id: 'quiraxical',
+						username: 'Quirax Lee',
+						profileImage: ProfileImage,
+						email: '',
+						status: UserStatus.REQUIRED_EMAIL_CONFIRM,
+						preferences: {},
+						profile: {},
+					},
+					category: ArticleCategory.DRAWING,
+					tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
+				}))}
+			hideMore />
+	</section>
 </Section>
