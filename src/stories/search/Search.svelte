@@ -15,27 +15,51 @@
 	import DocsImage from '$stories/assets/docs.png';
 	import ProfileImage from '$stories/assets/profile_example.png';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { formSchema, type FormSchema } from '$lib/schema/search';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Form from '$lib/components/ui/form';
 
 	interface Props {
 		query: string | undefined;
+		params: SuperValidated<Infer<FormSchema>>;
 	}
 
-	const { query }: Props = $props();
+	const { query, params }: Props = $props();
+
+	const form = superForm(params, {
+		validators: zodClient(formSchema),
+		dataType: 'json',
+		onResult({ result, cancel }) {
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				// openErrorAlert = true;
+				cancel();
+			}
+		},
+	});
+	const { form: formData, enhance, constraints } = form;
 </script>
 
 <Header title="'{query}' 검색결과" />
 
 <Section>
 	<H2>'{query}' 검색결과</H2>
-	<form method="GET" class="space-y-2 pt-2 pl-2" action="/search">
-		<div class="flex">
-			<Input
-				type="search"
-				name="query"
-				placeholder="검색하기"
-				class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
-			<Button type="submit">검색</Button>
-		</div>
+	<form method="GET" class="space-y-2 pt-2 pl-2" action="/search" use:enhance>
+		<Form.Field {form} name="query" class="flex">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input
+						{...props}
+						type="search"
+						placeholder="검색하기"
+						bind:value={$formData.query}
+						{...$constraints.query}
+						class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
+					<Button type="submit">검색</Button>
+				{/snippet}
+			</Form.Control>
+		</Form.Field>
 		<div class="my-2 flex flex-wrap space-y-2 space-x-2">
 			<Select.Root type="multiple" name="search_range">
 				<!-- bind:value -->

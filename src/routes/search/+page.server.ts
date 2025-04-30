@@ -2,8 +2,8 @@ import { ArticleType } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
 import { ZodArray, type ZodTypeAny } from 'zod';
-
-const defaultParams: { [key: string]: any } = {};
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const isZodArray = (candidate: any): candidate is ZodArray<ZodTypeAny> => {
 	let check = candidate;
@@ -31,5 +31,10 @@ export const load = (async ({ url }) => {
 
 	console.log('query params', params);
 
-	return { query: params.query };
+	return {
+		query: params.query,
+		params: await superValidate(zod(formSchema), {
+			defaults: params,
+		}),
+	};
 }) satisfies PageServerLoad;
