@@ -11,10 +11,10 @@ export const formSchema = z.object({
 	category: z.nativeEnum(ArticleCategory).array().catch(Object.values(ArticleCategory)),
 	min_budget: z.number().nonnegative('금액은 음수가 될 수 없습니다.').nullish(),
 	max_budget: z.number().nonnegative('금액은 음수가 될 수 없습니다.').nullish(),
-	budget_negotiable: z.boolean().catch(false),
+	budget_negotiable: z.boolean().catch(true),
 	date_start: z.date().nullish(),
 	date_end: z.date().nullish(),
-	date_negotiable: z.boolean().catch(false),
+	date_negotiable: z.boolean().catch(true),
 	commercial_use: z.enum(SearchFlagValues).catch('all'),
 	adult_contents: z.enum(SearchFlagValues).catch('all'),
 });
