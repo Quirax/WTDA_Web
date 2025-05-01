@@ -21,11 +21,10 @@
 	import * as Form from '$lib/components/ui/form';
 
 	interface Props {
-		query: string | undefined;
 		params: Infer<FormSchema>;
 	}
 
-	const { query, params }: Props = $props();
+	const { params }: Props = $props();
 
 	let formData = $state(params);
 
@@ -38,10 +37,10 @@
 	let form = $state<HTMLFormElement>();
 </script>
 
-<Header title="'{query}' 검색결과" />
+<Header title="'{params.query}' 검색결과" />
 
 <Section>
-	<H2>'{query}' 검색결과</H2>
+	<H2>'{params.query}' 검색결과</H2>
 	<form bind:this={form} method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
 		<div class="mr-2 flex">
 			<Input

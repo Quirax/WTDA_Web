@@ -52,7 +52,6 @@ export const load = (async ({ url, untrack, ...rest }) => {
 	console.log('query params', params);
 
 	return {
-		query: params.query,
 		params,
 	};
 }) satisfies PageServerLoad;

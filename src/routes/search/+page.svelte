@@ -5,4 +5,4 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<Search query={data.query} params={data.params} />
+<Search params={data.params} />
