@@ -34,13 +34,15 @@
 	const typeText = $derived(params.type.map((v) => ArticleTypeText[v]()).join(', '));
 
 	const flagText = (value: SearchFlag) => SearchFlagText[value]();
+
+	let form = $state<HTMLFormElement>();
 </script>
 
 <Header title="'{query}' 검색결과" />
 
 <Section>
 	<H2>'{query}' 검색결과</H2>
-	<form method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
+	<form bind:this={form} method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
 		<div class="mr-2 flex">
 			<Input
 				name="query"
@@ -48,7 +50,7 @@
 				placeholder="검색하기"
 				bind:value={formData.query}
 				class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
-			<Button type="submit">검색</Button>
+			<Button onclick={() => form && form.submit()}>검색</Button>
 		</div>
 		<div class="flex flex-wrap space-x-2">
 			<Select.Root type="multiple" name="search_range" bind:value={formData.search_range}>
