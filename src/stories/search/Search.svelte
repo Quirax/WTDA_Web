@@ -39,6 +39,34 @@
 		},
 	});
 	const { form: formData, constraints } = form;
+
+	const searchRangeText = $derived(
+		$formData.search_range
+			.map((v) => {
+				switch (v) {
+					case 'title':
+						return '제목';
+					case 'content':
+						return '내용';
+					case 'tag':
+						return '태그';
+				}
+			})
+			.join(', '),
+	);
+
+	const typeText = $derived($formData.type.map((v) => ArticleTypeText[v]()).join(', '));
+
+	const flagText = (value: 'all' | 'excluded' | 'required') => {
+		switch (value) {
+			case 'all':
+				return '포함';
+			case 'excluded':
+				return '제외';
+			case 'required':
+				return '필수';
+		}
+	};
 </script>
 
 <Header title="'{query}' 검색결과" />
@@ -65,9 +93,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.search_range}>
-							<!-- bind:value -->
-							<Select.Trigger class="w-[10em]">
-								{'검색 범위'}<!-- ArticleTypeText[$formData.type]() -->
+							<Select.Trigger class="w-[16em]">
+								{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
 							</Select.Trigger>
 							<Select.Content>
 								<Select.Item value={'title'}>제목</Select.Item>
@@ -83,9 +110,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.type}>
-							<!-- bind:value -->
-							<Select.Trigger class="w-[10em]">
-								{'타입'}<!-- ArticleTypeText[$formData.type]() -->
+							<Select.Trigger class="w-[12em]">
+								{'타입' + (typeText ? ': ' + typeText : '')}
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(ArticleTypeText) as [k, v]}
@@ -103,9 +129,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.category}>
-							<!-- bind:value -->
 							<Select.Trigger class="w-[10em]">
-								{'카테고리'}<!-- CategoryText[$formData.category]() -->
+								{'카테고리 (' + $formData.category.length + '개)'}
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(CategoryText) as [k, v]}
@@ -199,9 +224,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="single" {...props} bind:value={$formData.commercial_use}>
-							<!-- bind:value -->
-							<Select.Trigger class="w-[10em]">
-								{'상업적 목적'}<!-- ArticleTypeText[$formData.type]() -->
+							<Select.Trigger class="w-[11em]">
+								{'상업적 목적: ' + flagText($formData.commercial_use)}
 							</Select.Trigger>
 							<Select.Content>
 								<Select.Item value={'all'}>모두</Select.Item>
@@ -217,9 +241,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="single" {...props} bind:value={$formData.adult_contents}>
-							<!-- bind:value -->
-							<Select.Trigger class="w-[10em]">
-								{'성인 콘텐츠'}<!-- ArticleTypeText[$formData.type]() -->
+							<Select.Trigger class="w-[11em]">
+								{'성인 콘텐츠: ' + flagText($formData.adult_contents)}
 							</Select.Trigger>
 							<Select.Content>
 								<Select.Item value={'all'}>모두</Select.Item>
