@@ -79,3 +79,5 @@ export function isDesktop() {
 	return isDesktop.current;
 }
 export const sanitizeHTML = DOMPurify?.sanitize || (() => {});
+
+export type Union<T extends readonly string[]> = T[number];

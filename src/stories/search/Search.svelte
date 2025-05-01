@@ -3,7 +3,7 @@
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { ArticleTypeText, CategoryText } from '$lib/messages';
+	import { ArticleTypeText, CategoryText, SearchFlagText, SearchRangeText } from '$lib/messages';
 	import * as Popover from '$lib/components/ui/popover';
 	import { cn, isDesktop } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
@@ -11,7 +11,7 @@
 	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import ArticleList from '$stories/components/ArticleList.svelte';
-	import { ArticleCategory, UserStatus } from '@app';
+	import { ArticleCategory, UserStatus, type SearchFlag } from '@app';
 	import DocsImage from '$stories/assets/docs.png';
 	import ProfileImage from '$stories/assets/profile_example.png';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
@@ -41,32 +41,12 @@
 	const { form: formData, constraints } = form;
 
 	const searchRangeText = $derived(
-		$formData.search_range
-			.map((v) => {
-				switch (v) {
-					case 'title':
-						return '제목';
-					case 'content':
-						return '내용';
-					case 'tag':
-						return '태그';
-				}
-			})
-			.join(', '),
+		$formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
 	);
 
 	const typeText = $derived($formData.type.map((v) => ArticleTypeText[v]()).join(', '));
 
-	const flagText = (value: 'all' | 'excluded' | 'required') => {
-		switch (value) {
-			case 'all':
-				return '포함';
-			case 'excluded':
-				return '제외';
-			case 'required':
-				return '필수';
-		}
-	};
+	const flagText = (value: SearchFlag) => SearchFlagText[value]();
 </script>
 
 <Header title="'{query}' 검색결과" />
@@ -97,9 +77,11 @@
 								{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
 							</Select.Trigger>
 							<Select.Content>
-								<Select.Item value={'title'}>제목</Select.Item>
-								<Select.Item value={'content'}>내용</Select.Item>
-								<Select.Item value={'tag'}>태그</Select.Item>
+								{#each Object.entries(SearchRangeText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
 							</Select.Content>
 						</Select.Root>
 					{/snippet}
@@ -228,9 +210,11 @@
 								{'상업적 목적: ' + flagText($formData.commercial_use)}
 							</Select.Trigger>
 							<Select.Content>
-								<Select.Item value={'all'}>모두</Select.Item>
-								<Select.Item value={'excluded'}>제외</Select.Item>
-								<Select.Item value={'required'}>필수</Select.Item>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
 							</Select.Content>
 						</Select.Root>
 					{/snippet}
@@ -245,9 +229,11 @@
 								{'성인 콘텐츠: ' + flagText($formData.adult_contents)}
 							</Select.Trigger>
 							<Select.Content>
-								<Select.Item value={'all'}>모두</Select.Item>
-								<Select.Item value={'excluded'}>제외</Select.Item>
-								<Select.Item value={'required'}>필수</Select.Item>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
 							</Select.Content>
 						</Select.Root>
 					{/snippet}

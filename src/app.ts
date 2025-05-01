@@ -3,6 +3,7 @@
 
 import type { Link } from '$lib/config';
 import type { CommissionRequest } from '$lib/server/db/schema';
+import type { Union } from '$lib/utils';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
@@ -88,3 +89,9 @@ export enum ArticleType {
 	REQUEST = 'REQUEST',
 	COMMISSION = 'COMMISSION',
 }
+
+export const SearchRangeValues = ['title', 'content', 'tag'] as const;
+export type SearchRange = Union<typeof SearchRangeValues>;
+
+export const SearchFlagValues = ['all', 'excluded', 'required'] as const;
+export type SearchFlag = Union<typeof SearchFlagValues>;
