@@ -19,6 +19,7 @@
 	import { formSchema, type FormSchema } from '$lib/schema/search';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
+	import { afterNavigate, invalidate } from '$app/navigation';
 
 	interface Props {
 		params: Infer<FormSchema>;
@@ -28,9 +29,17 @@
 
 	let formData = $state(params);
 
-	const searchRangeText = $derived(params.search_range.map((v) => SearchRangeText[v]()).join(', '));
+	$effect(() => {
+		if (formData) {
+			invalidate('.');
+		}
+	});
 
-	const typeText = $derived(params.type.map((v) => ArticleTypeText[v]()).join(', '));
+	const searchRangeText = $derived(
+		formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
+	);
+
+	const typeText = $derived(formData.type.map((v) => ArticleTypeText[v]()).join(', '));
 
 	const flagText = (value: SearchFlag) => SearchFlagText[value]();
 
@@ -39,7 +48,7 @@
 
 <Header title="'{params.query}' 검색결과" />
 
-<Section>
+<Section data-sveltekit-preload-data="off" data-sveltekit-preload-code="off">
 	<H2>'{params.query}' 검색결과</H2>
 	<form bind:this={form} method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
 		<div class="mr-2 flex">
@@ -49,7 +58,7 @@
 				placeholder="검색하기"
 				bind:value={formData.query}
 				class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
-			<Button onclick={() => form && form.submit()}>검색</Button>
+			<Button type="submit">검색</Button>
 		</div>
 		<div class="flex flex-wrap space-x-2">
 			<Select.Root type="multiple" name="search_range" bind:value={formData.search_range}>

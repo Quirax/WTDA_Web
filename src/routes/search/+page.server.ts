@@ -33,21 +33,18 @@ const convertType = (value: string | null, shape: ZodTypeAny) => {
 
 export const load = (async ({ url, untrack, ...rest }) => {
 	// query params
-	const params = untrack(
-		() =>
-			Object.fromEntries(
-				Object.keys(formSchema.shape).map((v) => [
-					v,
-					Object(formSchema.shape)[v].parse(
-						isZodArray(Object(formSchema.shape)[v])
-							? url.searchParams.get(v) === null // default 처리를 위해 값이 실제로 없는지 확인
-								? undefined
-								: url.searchParams.getAll(v)
-							: convertType(url.searchParams.get(v), Object(formSchema.shape)[v]),
-					),
-				]),
-			) as Infer<FormSchema>,
-	);
+	const params = Object.fromEntries(
+		Object.keys(formSchema.shape).map((v) => [
+			v,
+			Object(formSchema.shape)[v].parse(
+				isZodArray(Object(formSchema.shape)[v])
+					? url.searchParams.get(v) === null // default 처리를 위해 값이 실제로 없는지 확인
+						? undefined
+						: url.searchParams.getAll(v)
+					: convertType(url.searchParams.get(v), Object(formSchema.shape)[v]),
+			),
+		]),
+	) as Infer<FormSchema>;
 
 	console.log('query params', params);
 
