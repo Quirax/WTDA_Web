@@ -2,7 +2,7 @@ import { ArticleType } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
 import { ZodArray, type ZodTypeAny } from 'zod';
-import { superValidate } from 'sveltekit-superforms';
+import { superValidate, type Infer } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 const isZodArray = (candidate: any): candidate is ZodArray<ZodTypeAny> => {
@@ -27,7 +27,7 @@ export const load = (async ({ url }) => {
 					: url.searchParams.get(v),
 			),
 		]),
-	);
+	) as Infer<FormSchema>;
 
 	console.log('query params', params);
 
