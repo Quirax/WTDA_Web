@@ -49,6 +49,8 @@ export const load = (async ({ url, untrack, ...rest }) => {
 	console.log('query params', params);
 
 	return {
-		params,
+		params: await superValidate(zod(formSchema), {
+			defaults: params,
+		}),
 	};
 }) satisfies PageServerLoad;

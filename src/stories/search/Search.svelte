@@ -22,85 +22,111 @@
 	import { afterNavigate, invalidate } from '$app/navigation';
 
 	interface Props {
-		params: Infer<FormSchema>;
+		params: SuperValidated<Infer<FormSchema>>;
 	}
 
 	const { params }: Props = $props();
 
-	let formData = $state(params);
-
-	$effect(() => {
-		if (formData) {
-			invalidate('.');
-		}
+	const form = superForm(params, {
+		validators: zodClient(formSchema),
+		onResult({ result, cancel }) {
+			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
+				console.error(result);
+				// openErrorAlert = true;
+				cancel();
+			}
+		},
 	});
+	const { form: formData, constraints } = form;
 
 	const searchRangeText = $derived(
-		formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
+		$formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
 	);
 
-	const typeText = $derived(formData.type.map((v) => ArticleTypeText[v]()).join(', '));
+	const typeText = $derived($formData.type.map((v) => ArticleTypeText[v]()).join(', '));
 
 	const flagText = (value: SearchFlag) => SearchFlagText[value]();
-
-	let form = $state<HTMLFormElement>();
 </script>
 
-<Header title="'{params.query}' 검색결과" />
+<Header title="'{$formData.query}' 검색결과" />
 
-<Section data-sveltekit-preload-data="off" data-sveltekit-preload-code="off">
-	<H2>'{params.query}' 검색결과</H2>
-	<form bind:this={form} method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
-		<div class="mr-2 flex">
-			<Input
-				name="query"
-				type="search"
-				placeholder="검색하기"
-				bind:value={formData.query}
-				class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
-			<Button type="submit">검색</Button>
-		</div>
+<!-- ref: https://svelte.dev/docs/kit/link-options#data-sveltekit-preload-data -->
+<Section data-sveltekit-preload-data="off">
+	<H2>'{$formData.query}' 검색결과</H2>
+	<form method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
+		<Form.Field {form} name="query" class="flex">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Input
+						{...props}
+						type="search"
+						placeholder="검색하기"
+						bind:value={$formData.query}
+						{...$constraints.query}
+						class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
+					<Button type="submit">검색</Button>
+				{/snippet}
+			</Form.Control>
+		</Form.Field>
 		<div class="flex flex-wrap space-x-2">
-			<Select.Root type="multiple" name="search_range" bind:value={formData.search_range}>
-				<Select.Trigger class="w-[16em]">
-					{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(SearchRangeText) as [k, v]}
-						<Select.Item value={k}>
-							{v()}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+			<Form.Field {form} name="search_range">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root type="multiple" {...props} bind:value={$formData.search_range}>
+							<Select.Trigger class="w-[16em]">
+								{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(SearchRangeText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
 
-			<Select.Root type="multiple" name="type" bind:value={formData.type}>
-				<Select.Trigger class="w-[12em]">
-					{'타입' + (typeText ? ': ' + typeText : '')}
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(ArticleTypeText) as [k, v]}
-						<Select.Item value={k}>
-							{v()}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+			<Form.Field {form} name="type">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root type="multiple" {...props} bind:value={$formData.type}>
+							<Select.Trigger class="w-[12em]">
+								{'타입' + (typeText ? ': ' + typeText : '')}
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(ArticleTypeText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
 
-			<Select.Root type="multiple" name="category" bind:value={formData.category}>
-				<Select.Trigger class="w-[10em]">
-					{'카테고리 (' + formData.category.length + '개)'}
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(CategoryText) as [k, v]}
-						<Select.Item value={k}>
-							{v()}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+			<Form.Field {form} name="category">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root type="multiple" {...props} bind:value={$formData.category}>
+							<Select.Trigger class="w-[10em]">
+								{'카테고리 (' + $formData.category.length + '개)'}
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(CategoryText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
 
-			<input name="budget_negotiable" bind:value={formData.budget_negotiable} hidden />
+			<input name="budget_negotiable" bind:value={$formData.budget_negotiable} hidden />
 			<Popover.Root>
 				<Popover.Trigger
 					class={cn(
@@ -127,7 +153,7 @@
 						<span class="flex-none">&nbsp;포인트</span>
 					</div>
 					<div class="flex flex-row space-x-2">
-						<Checkbox id="budget_negotiable" bind:checked={formData.budget_negotiable} />
+						<Checkbox id="budget_negotiable" bind:checked={$formData.budget_negotiable} />
 						<div class="leading-none">
 							<label for="budget_negotiable">협상 가능한 경우를 포함함</label>
 						</div>
@@ -135,7 +161,7 @@
 				</Popover.Content>
 			</Popover.Root>
 
-			<input name="date_negotiable" bind:value={formData.date_negotiable} hidden />
+			<input name="date_negotiable" bind:value={$formData.date_negotiable} hidden />
 			<Popover.Root>
 				<Popover.Trigger
 					class={cn(
@@ -168,7 +194,7 @@
 						<!-- bind:value onStartValueChange -->
 					</div>
 					<div class="flex flex-row space-x-2">
-						<Checkbox id="date_negotiable" bind:checked={formData.date_negotiable} />
+						<Checkbox id="date_negotiable" bind:checked={$formData.date_negotiable} />
 						<div class="leading-none">
 							<label for="date_negotiable">협상 가능한 경우를 포함함</label>
 						</div>
@@ -176,30 +202,43 @@
 				</Popover.Content>
 			</Popover.Root>
 
-			<Select.Root type="single" name="commercial_use" bind:value={formData.commercial_use}>
-				<Select.Trigger class="w-[11em]">
-					{'상업적 목적: ' + flagText(formData.commercial_use)}
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(SearchFlagText) as [k, v]}
-						<Select.Item value={k}>
-							{v()}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
-			<Select.Root type="single" name="adult_contents" bind:value={formData.adult_contents}>
-				<Select.Trigger class="w-[11em]">
-					{'성인 콘텐츠: ' + flagText(formData.adult_contents)}
-				</Select.Trigger>
-				<Select.Content>
-					{#each Object.entries(SearchFlagText) as [k, v]}
-						<Select.Item value={k}>
-							{v()}
-						</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+			<Form.Field {form} name="commercial_use">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root type="single" {...props} bind:value={$formData.commercial_use}>
+							<Select.Trigger class="w-[11em]">
+								{'상업적 목적: ' + flagText($formData.commercial_use)}
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
+
+			<Form.Field {form} name="adult_contents">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root type="single" {...props} bind:value={$formData.adult_contents}>
+							<Select.Trigger class="w-[11em]">
+								{'성인 콘텐츠: ' + flagText($formData.adult_contents)}
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
 		</div>
 	</form>
 	<section>
