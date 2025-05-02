@@ -3,6 +3,8 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	$inspect(data.articles);
 </script>
 
-<Search params={data.params} />
+<Search params={data.params!} />

@@ -4,7 +4,7 @@ import { formSchema, type FormSchema } from '$lib/schema/search';
 import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, ZodType, type ZodTypeAny } from 'zod';
 import { superValidate, type Infer } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import {
 	and,
 	arrayContains,
@@ -15,11 +15,13 @@ import {
 	lte,
 	ne,
 	or,
+	sql,
 	type TableConfig,
 } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import type { PgTable, PgTableWithColumns } from 'drizzle-orm/pg-core';
+import { union, unionAll } from 'drizzle-orm/pg-core';
+import { allArticles } from '$lib/server/db/shorthands';
 
 // ref: https://stackoverflow.com/a/65152869
 const isZodType = <T extends ZodTypeAny>(
@@ -121,20 +123,30 @@ export const load = (async ({ url, untrack, ...rest }) => {
 
 	const parsed = formSchema.safeParse(params);
 
+	let articles: (App.Articles & { modifyDate: Date })[] = [];
+
 	if (parsed.success) {
-		// create queries
-		console.log(
-			createCriteria(parsed.data, table.commissionRequest, {
-				budgetColumn: table.commissionRequest.budget,
-				dateColumn: table.commissionRequest.deadline,
-			}),
-		);
+		try {
+			articles =
+				(await allArticles(parsed.data.type, {
+					request: createCriteria(parsed.data, table.commissionRequest, {
+						budgetColumn: table.commissionRequest.budget,
+						dateColumn: table.commissionRequest.deadline,
+					}),
+				})
+					?.limit(10)
+					.offset(10 * 0)) || []; // 1page
+		} catch (e) {
+			console.error(e);
+			return error(500, { message: 'An error has occurred' });
+		}
 	}
 
 	return {
 		params: await superValidate(zod(formSchema), {
-			defaults: params,
+			defaults: parsed.data || params,
 		}),
 		error: JSON.stringify(parsed.error),
+		articles,
 	};
 }) satisfies PageServerLoad;
