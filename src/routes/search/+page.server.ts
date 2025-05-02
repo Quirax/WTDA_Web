@@ -23,6 +23,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { union, unionAll } from 'drizzle-orm/pg-core';
 import { allArticles } from '$lib/server/db/shorthands';
+import { searchResultsPerPage } from '$lib/config';
 
 // ref: https://stackoverflow.com/a/65152869
 const isZodType = <T extends ZodTypeAny>(
@@ -129,18 +130,20 @@ export const load = (async ({ url, untrack, ...rest }) => {
 	const parsed = formSchema.safeParse(params);
 
 	let articles: (App.Articles & { modifyDate: Date })[] = [];
+	let count = 0;
 
 	if (parsed.success) {
 		try {
-			articles =
-				(await allArticles(parsed.data.type, {
-					request: createCriteria(parsed.data, table.commissionRequest, {
-						budgetColumn: table.commissionRequest.budget,
-						dateColumn: table.commissionRequest.deadline,
-					}),
-				})
-					?.limit(10)
-					.offset(10 * 0)) || []; // 1page
+			const all = allArticles(parsed.data.type, {
+				request: createCriteria(parsed.data, table.commissionRequest, {
+					budgetColumn: table.commissionRequest.budget,
+					dateColumn: table.commissionRequest.deadline,
+				}),
+			});
+
+			if (all) count = await db.$count(all);
+
+			articles = (await all?.limit(searchResultsPerPage).offset(searchResultsPerPage * 0)) || []; // 1page
 		} catch (e) {
 			console.error(e);
 			return error(500, { message: 'An error has occurred' });
@@ -153,5 +156,6 @@ export const load = (async ({ url, untrack, ...rest }) => {
 		}),
 		error: JSON.stringify(parsed.error),
 		articles,
+		count,
 	};
 }) satisfies PageServerLoad;

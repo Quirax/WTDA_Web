@@ -4,7 +4,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	$inspect(data.articles);
+	$inspect(data.count);
 </script>
 
-<Search params={data.params!} articles={data.articles} />
+<Search params={data.params!} articles={data.articles} count={data.count} />

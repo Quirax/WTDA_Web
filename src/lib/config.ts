@@ -55,3 +55,4 @@ export const emailExpiresIn = 180; // 3 minutes = 180 seconds
 export const imageFormat = '.apng, .png, .avif, .gif, .jpg, .jpeg, .jpe, .jif, .jfif, .svg, .webp';
 
 export const announcementsPerPage = 5;
+export const searchResultsPerPage = 10;

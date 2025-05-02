@@ -28,13 +28,15 @@
 		today,
 		ZonedDateTime,
 	} from '@internationalized/date';
+	import { searchResultsPerPage } from '$lib/config';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
 		articles: App.Articles[];
+		count: number;
 	}
 
-	const { params, articles }: Props = $props();
+	const { params, articles, count }: Props = $props();
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -383,7 +385,11 @@
 			class="my-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 			{articles}
 			hideMore />
-		<Pagination page={1} count={100} perPage={10} siblingCount={isDesktop() ? 1 : 0} />
+		<Pagination
+			page={1}
+			{count}
+			perPage={searchResultsPerPage}
+			siblingCount={isDesktop() ? 1 : 0} />
 		<!-- bind:page -->
 		<!-- TODO: pagination 처리 -->
 	</section>
