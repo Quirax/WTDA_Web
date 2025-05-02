@@ -7,4 +7,4 @@
 	$inspect(data.articles);
 </script>
 
-<Search params={data.params!} />
+<Search params={data.params!} articles={data.articles} />

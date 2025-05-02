@@ -31,9 +31,10 @@
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
+		articles: App.Articles[];
 	}
 
-	const { params }: Props = $props();
+	const { params, articles }: Props = $props();
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -380,24 +381,7 @@
 		<ArticleList
 			id="contents-list"
 			class="my-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			articles={Array(10)
-				.fill(undefined)
-				.map((_, i) => ({
-					id: 'asdf',
-					thumbnail: DocsImage,
-					title: `커미션 ${i + 1}`,
-					author: {
-						id: 'quiraxical',
-						username: 'Quirax Lee',
-						profileImage: ProfileImage,
-						email: '',
-						status: UserStatus.REQUIRED_EMAIL_CONFIRM,
-						preferences: {},
-						profile: {},
-					},
-					category: ArticleCategory.DRAWING,
-					tags: ['이런 태그', '저런 태그', '요런 태그', '이건 잘림'],
-				}))}
+			{articles}
 			hideMore />
 		<Pagination page={1} count={100} perPage={10} siblingCount={isDesktop() ? 1 : 0} />
 		<!-- bind:page -->
