@@ -31,18 +31,18 @@ const convertType = <T extends ZodTypeAny>(value: string | null, shape: T) => {
 export const load = (async ({ url, untrack, ...rest }) => {
 	try {
 		// query params
-		const params = formSchema.parse(
-			Object.fromEntries(
-				Object.keys(formSchema.shape).map((v) => [
-					v,
-					isZodType(ZodArray, Object(formSchema.shape)[v])
-						? url.searchParams.get(v) === null // default 처리를 위해 값이 실제로 없는지 확인
-							? undefined
-							: url.searchParams.getAll(v)
-						: convertType(url.searchParams.get(v), Object(formSchema.shape)[v]),
-				]),
-			),
+		const params = Object.fromEntries(
+			Object.keys(formSchema._def.schema.shape).map((v) => [
+				v,
+				isZodType(ZodArray, Object(formSchema._def.schema.shape)[v])
+					? url.searchParams.get(v) === null // default 처리를 위해 값이 실제로 없는지 확인
+						? undefined
+						: url.searchParams.getAll(v)
+					: convertType(url.searchParams.get(v), Object(formSchema._def.schema.shape)[v]),
+			]),
 		) as Infer<FormSchema>;
+
+		const parsed = formSchema.safeParse(params);
 
 		console.log('query params', params);
 
@@ -50,10 +50,11 @@ export const load = (async ({ url, untrack, ...rest }) => {
 			params: await superValidate(zod(formSchema), {
 				defaults: params,
 			}),
+			error: JSON.stringify(parsed.error),
 		};
 	} catch (e) {
 		console.error(e);
 
-		return error(500, JSON.stringify(e));
+		return error(500);
 	}
 }) satisfies PageServerLoad;

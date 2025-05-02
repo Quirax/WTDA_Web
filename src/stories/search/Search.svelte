@@ -17,9 +17,8 @@
 	import Pagination from '$lib/components/pagination/pagination.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { formSchema, type FormSchema } from '$lib/schema/search';
-	import { zod, zodClient } from 'sveltekit-superforms/adapters';
+	import { zod } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
-	import { afterNavigate, invalidate } from '$app/navigation';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
@@ -28,7 +27,7 @@
 	const { params }: Props = $props();
 
 	const form = superForm(params, {
-		validators: zodClient(formSchema),
+		validators: zod(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
@@ -37,7 +36,7 @@
 			}
 		},
 	});
-	const { form: formData, constraints } = form;
+	const { form: formData, constraints, errors } = form;
 
 	const searchRangeText = $derived(
 		$formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
@@ -64,7 +63,17 @@
 						bind:value={$formData.query}
 						{...$constraints.query}
 						class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
-					<Button type="submit">검색</Button>
+					<Button
+						type="submit"
+						onclick={async (e) => {
+							const validated = await form.validateForm();
+							if (!validated.valid) {
+								e.preventDefault();
+								$errors = validated.errors;
+							}
+						}}>
+						검색
+					</Button>
 				{/snippet}
 			</Form.Control>
 		</Form.Field>
@@ -137,6 +146,8 @@
 							class: 'mb-2 w-[10em] justify-start text-left font-normal',
 						}),
 						'text-muted-foreground',
+						(($errors.min_budget?.length || 0) > 0 || ($errors.max_budget?.length || 0) > 0) &&
+							'border-destructive bg-destructive/10 border-2',
 					)}>
 					<!-- !value -> muted -->
 					금액 범위
