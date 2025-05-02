@@ -1,5 +1,14 @@
 import { enumToPgEnum, type InferSelectModelPartial } from '../../utils';
-import { pgTable, text, timestamp, pgEnum, json, integer, boolean } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	text,
+	timestamp,
+	pgEnum,
+	json,
+	integer,
+	boolean,
+	index,
+} from 'drizzle-orm/pg-core';
 import { ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
 import { sql } from 'drizzle-orm';
 
@@ -67,14 +76,21 @@ const article = {
 	containsAdultContents: boolean().notNull().default(false),
 };
 
-export const commissionRequest = pgTable('commission_request', {
-	...article,
-	budget: integer('budget'), // null: 조율 가능
-	deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
-	isForCommercial: boolean().notNull().default(false),
-	purpose: text('purpose').notNull(),
-	visibleOnlyToCommissioner: boolean().notNull().default(false),
-});
+export const commissionRequest = pgTable(
+	'commission_request',
+	{
+		...article,
+		budget: integer('budget'), // null: 조율 가능
+		deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
+		isForCommercial: boolean().notNull().default(false),
+		purpose: text('purpose').notNull(),
+		visibleOnlyToCommissioner: boolean().notNull().default(false),
+	},
+	(table) => [
+		index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
+		index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
+	],
+);
 // TODO: add index for some fields
 // ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
 // ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
