@@ -1,7 +1,7 @@
 import { ArticleType } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
-import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodType, type ZodTypeAny } from 'zod';
+import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, ZodType, type ZodTypeAny } from 'zod';
 import { superValidate, type Infer } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error } from '@sveltejs/kit';
@@ -29,16 +29,25 @@ const convertType = <T extends ZodTypeAny>(value: string | null, shape: T) => {
 	return value;
 };
 
+const getSchema = <T extends ZodTypeAny>(schema: T) => {
+	let check = schema;
+	do {
+		if (check instanceof ZodObject) return check.shape;
+		check = check?._def?.schema;
+	} while (check);
+	return undefined;
+};
+
 export const load = (async ({ url, untrack, ...rest }) => {
 	// query params
 	const params = Object.fromEntries(
-		Object.keys(formSchema._def.schema.shape).map((v) => [
+		Object.keys(getSchema(formSchema)).map((v) => [
 			v,
-			isZodType(ZodArray, Object(formSchema._def.schema.shape)[v])
+			isZodType(ZodArray, Object(getSchema(formSchema))[v])
 				? url.searchParams.get(v) === null // default 처리를 위해 값이 실제로 없는지 확인
 					? undefined
 					: url.searchParams.getAll(v)
-				: convertType(url.searchParams.get(v), Object(formSchema._def.schema.shape)[v]),
+				: convertType(url.searchParams.get(v), Object(getSchema(formSchema))[v]),
 		]),
 	) as Infer<FormSchema>;
 

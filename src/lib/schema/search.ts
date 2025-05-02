@@ -32,6 +32,20 @@ export const formSchema = z
 			path: ['max_budget'],
 		});
 		return false;
+	})
+	.superRefine(({ date_start, date_end }, { addIssue }) => {
+		if (!date_start || !date_end || date_start <= date_end) return true;
+		addIssue({
+			code: z.ZodIssueCode.custom,
+			message: '시작 날짜는 끝 날짜보다 클 수 없습니다',
+			path: ['date_start'],
+		});
+		addIssue({
+			code: z.ZodIssueCode.custom,
+			message: '시작 날짜는 끝 날짜보다 클 수 없습니다',
+			path: ['date_end'],
+		});
+		return false;
 	});
 
 export type FormSchema = typeof formSchema;
