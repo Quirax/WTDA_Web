@@ -54,7 +54,7 @@
 <Section data-sveltekit-preload-data="off">
 	<H2>'{$formData.query}' 검색결과</H2>
 	<form method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
-		<Form.Field {form} name="query" class="flex">
+		<Form.Field {form} name="query" class="mr-2 flex">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Input
@@ -127,6 +127,8 @@
 			</Form.Field>
 
 			<input name="budget_negotiable" bind:value={$formData.budget_negotiable} hidden />
+			<input name="min_budget" bind:value={$formData.min_budget} hidden />
+			<input name="max_budget" bind:value={$formData.max_budget} hidden />
 			<Popover.Root>
 				<Popover.Trigger
 					class={cn(
@@ -140,24 +142,50 @@
 					금액 범위
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
-					<div class="flex items-center">
-						<span class="flex-none">최소:&nbsp;</span>
-						<Input placeholder="금액" type="currency" />
-						<!-- bind:value disabled -->
-						<span class="flex-none">&nbsp;포인트</span>
-					</div>
-					<div class="flex items-center">
-						<span class="flex-none">최대:&nbsp;</span>
-						<Input placeholder="금액" type="currency" />
-						<!-- bind:value disabled -->
-						<span class="flex-none">&nbsp;포인트</span>
-					</div>
-					<div class="flex flex-row space-x-2">
-						<Checkbox id="budget_negotiable" bind:checked={$formData.budget_negotiable} />
-						<div class="leading-none">
-							<label for="budget_negotiable">협상 가능한 경우를 포함함</label>
-						</div>
-					</div>
+					<Form.Field {form} name="min_budget">
+						<Form.Control>
+							{#snippet children({ props })}
+								<div class="flex items-center">
+									<span class="flex-none">최소:&nbsp;</span>
+									<Input
+										{...props}
+										placeholder="금액"
+										type="currency"
+										bind:value={$formData.min_budget}
+										{...$constraints.min_budget} />
+									<span class="flex-none">&nbsp;포인트</span>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="max_budget">
+						<Form.Control>
+							{#snippet children({ props })}
+								<div class="flex items-center">
+									<span class="flex-none">최대:&nbsp;</span>
+									<Input
+										{...props}
+										placeholder="금액"
+										type="currency"
+										bind:value={$formData.max_budget}
+										{...$constraints.max_budget} />
+									<span class="flex-none">&nbsp;포인트</span>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="budget_negotiable" class="flex flex-row space-x-2">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Checkbox {...props} bind:checked={$formData.budget_negotiable} />
+								<div class="leading-none">
+									<Form.Label>협상 가능한 경우를 포함함</Form.Label>
+								</div>
+							{/snippet}
+						</Form.Control>
+					</Form.Field>
 				</Popover.Content>
 			</Popover.Root>
 
