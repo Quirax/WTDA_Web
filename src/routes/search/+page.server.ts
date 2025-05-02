@@ -11,6 +11,7 @@ import {
 	eq,
 	gte,
 	ilike,
+	isNotNull,
 	isNull,
 	lte,
 	ne,
@@ -87,16 +88,20 @@ const createCriteria = (
 		const budget = [];
 		if (params.min_budget) budget.push(gte(budgetColumn, params.min_budget));
 		if (params.max_budget) budget.push(lte(budgetColumn, params.max_budget));
-		if (params.budget_negotiable) criteria.push(or(and(...budget), isNull(budgetColumn)));
-		else criteria.push(and(...budget));
+		if (budget.length > 0) {
+			if (params.budget_negotiable) criteria.push(or(and(...budget), isNull(budgetColumn)));
+			else criteria.push(and(...budget));
+		} else if (!params.budget_negotiable) criteria.push(isNotNull(budgetColumn));
 	}
 
 	if (dateColumn) {
 		const date = [];
 		if (params.date_start) date.push(gte(dateColumn, params.date_start));
 		if (params.date_end) date.push(lte(dateColumn, params.date_end));
-		if (params.date_negotiable) criteria.push(or(and(...date), isNull(dateColumn)));
-		else criteria.push(and(...date));
+		if (date.length > 0) {
+			if (params.date_negotiable) criteria.push(or(and(...date), isNull(dateColumn)));
+			else criteria.push(and(...date));
+		} else if (!params.date_negotiable) criteria.push(isNotNull(dateColumn));
 	}
 
 	if (params.commercial_use === 'excluded') criteria.push(ne(t.isForCommercial, true));

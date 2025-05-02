@@ -385,5 +385,6 @@
 			hideMore />
 		<Pagination page={1} count={100} perPage={10} siblingCount={isDesktop() ? 1 : 0} />
 		<!-- bind:page -->
+		<!-- TODO: pagination 처리 -->
 	</section>
 </Section>
