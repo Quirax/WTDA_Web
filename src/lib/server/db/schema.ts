@@ -75,6 +75,9 @@ export const commissionRequest = pgTable('commission_request', {
 	purpose: text('purpose').notNull(),
 	visibleOnlyToCommissioner: boolean().notNull().default(false),
 });
+// TODO: add index for some fields
+// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
+// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
 
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;

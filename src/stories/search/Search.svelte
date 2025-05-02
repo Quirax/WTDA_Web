@@ -127,6 +127,8 @@
 			</Form.Control>
 		</Form.Field>
 		<div class="flex flex-wrap space-x-2">
+			<!-- TODO: 검색할 사용자 선택 기능 추가 -->
+
 			<Form.Field {form} name="search_range">
 				<Form.Control>
 					{#snippet children({ props })}
