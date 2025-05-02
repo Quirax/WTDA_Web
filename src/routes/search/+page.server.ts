@@ -23,7 +23,7 @@ const convertType = <T extends ZodTypeAny>(value: string | null, shape: T) => {
 	if (value === null) return null;
 
 	if (isZodType(ZodBoolean, shape)) return value === 'true';
-	if (isZodType(ZodNumber, shape)) return parseFloat(value);
+	if (isZodType(ZodNumber, shape)) return value === '' ? null : parseFloat(value);
 
 	return value;
 };

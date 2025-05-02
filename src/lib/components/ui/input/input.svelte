@@ -7,7 +7,11 @@
 
 	type Props = WithElementRef<
 		Omit<HTMLInputAttributes, 'type'> &
-			({ type: 'file'; files?: FileList } | { type?: InputType | 'currency'; files?: undefined })
+			(
+				| { type: 'file'; files?: FileList; nullable?: undefined }
+				| { type?: InputType; files?: undefined; nullable?: undefined }
+				| { type: 'currency'; nullable?: boolean; files?: undefined }
+			)
 	>;
 
 	let {
@@ -33,7 +37,7 @@
 		{...restProps} />
 {:else if type === 'currency'}
 	<!-- ref: https://codepen.io/559wade/pen/LRzEjj -->
-	{@const { onkeyup, 'on:keyup': _onkeyup, ...otherProps } = restProps}
+	{@const { onkeyup, 'on:keyup': _onkeyup, nullable = false, ...otherProps } = restProps}
 	<input
 		bind:this={ref}
 		class={cn(
@@ -49,9 +53,13 @@
 			let original_len = v.length;
 			let caret_pos = t.selectionStart;
 
-			t.value = new Intl.NumberFormat('ko-KR').format(
-				(value = parseInt(v.replace(/\D/g, '').padStart(1, '0'))),
-			);
+			if (nullable && v === '') {
+				value = null;
+			} else {
+				t.value = new Intl.NumberFormat('ko-KR').format(
+					(value = parseInt(v.replace(/\D/g, '').padStart(1, '0'))),
+				);
+			}
 
 			let updated_len = t.value.length;
 

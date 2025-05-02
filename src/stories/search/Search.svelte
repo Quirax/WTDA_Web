@@ -44,6 +44,16 @@
 
 	const typeText = $derived($formData.type.map((v) => ArticleTypeText[v]()).join(', '));
 
+	const budgetRangeText = () => {
+		const rangeTexts: string[] = Array(0);
+
+		if ($formData.min_budget !== null || $formData.max_budget !== null) rangeTexts.push('설정됨');
+		if ($formData.budget_negotiable) rangeTexts.push('협상 가능');
+
+		if (rangeTexts.length === 0) return '';
+		else return ` (${rangeTexts.join(', ')})`;
+	};
+
 	const flagText = (value: SearchFlag) => SearchFlagText[value]();
 </script>
 
@@ -143,14 +153,17 @@
 					class={cn(
 						buttonVariants({
 							variant: 'outline',
-							class: 'mb-2 w-[10em] justify-start text-left font-normal',
+							class: 'mb-2 w-[16em] justify-start text-left font-normal',
 						}),
-						'text-muted-foreground',
+						$formData.min_budget === null &&
+							$formData.max_budget === null &&
+							!$formData.budget_negotiable &&
+							'text-muted-foreground',
 						(($errors.min_budget?.length || 0) > 0 || ($errors.max_budget?.length || 0) > 0) &&
 							'border-destructive bg-destructive/10 border-2',
 					)}>
 					<!-- !value -> muted -->
-					금액 범위
+					{`금액 범위${budgetRangeText()}`}
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
 					<Form.Field {form} name="min_budget">
@@ -162,6 +175,7 @@
 										{...props}
 										placeholder="금액"
 										type="currency"
+										nullable
 										bind:value={$formData.min_budget}
 										{...$constraints.min_budget} />
 									<span class="flex-none">&nbsp;포인트</span>
@@ -179,6 +193,7 @@
 										{...props}
 										placeholder="금액"
 										type="currency"
+										nullable
 										bind:value={$formData.max_budget}
 										{...$constraints.max_budget} />
 									<span class="flex-none">&nbsp;포인트</span>
