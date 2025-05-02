@@ -19,12 +19,25 @@
 	import { formSchema, type FormSchema } from '$lib/schema/search';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
+	import { CalendarIcon } from 'lucide-svelte';
+	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import {
+		DateFormatter,
+		fromDate,
+		getLocalTimeZone,
+		today,
+		ZonedDateTime,
+	} from '@internationalized/date';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
 	}
 
 	const { params }: Props = $props();
+
+	const df = new DateFormatter('ko-KR', {
+		dateStyle: 'long',
+	});
 
 	const form = superForm(params, {
 		validators: zod(formSchema),
@@ -55,6 +68,32 @@
 	};
 
 	const flagText = (value: SearchFlag) => SearchFlagText[value]();
+
+	let startDate = $state<ZonedDateTime | undefined>(
+		!$formData.date_start ? undefined : fromDate($formData.date_start, getLocalTimeZone()),
+	);
+	$effect(() => {
+		if (startDate) $formData.date_start = startDate.toDate();
+		else $formData.date_start = null;
+	});
+
+	let endDate = $state<ZonedDateTime | undefined>(
+		!$formData.date_end ? undefined : fromDate($formData.date_end, getLocalTimeZone()),
+	);
+	$effect(() => {
+		if (endDate) $formData.date_end = endDate.toDate();
+		else $formData.date_end = null;
+	});
+
+	const dateRangeText = () => {
+		const rangeTexts: string[] = Array(0);
+
+		if (startDate || endDate) rangeTexts.push('설정됨');
+		if ($formData.date_negotiable) rangeTexts.push('협상 가능');
+
+		if (rangeTexts.length === 0) return '';
+		else return ` (${rangeTexts.join(', ')})`;
+	};
 </script>
 
 <Header title="'{$formData.query}' 검색결과" />
@@ -145,9 +184,9 @@
 				</Form.Control>
 			</Form.Field>
 
-			<input name="budget_negotiable" bind:value={$formData.budget_negotiable} hidden />
-			<input name="min_budget" bind:value={$formData.min_budget} hidden />
-			<input name="max_budget" bind:value={$formData.max_budget} hidden />
+			<input name="budget_negotiable" value={$formData.budget_negotiable} hidden />
+			<input name="min_budget" value={$formData.min_budget} hidden />
+			<input name="max_budget" value={$formData.max_budget} hidden />
 			<Popover.Root>
 				<Popover.Trigger
 					class={cn(
@@ -162,7 +201,6 @@
 						(($errors.min_budget?.length || 0) > 0 || ($errors.max_budget?.length || 0) > 0) &&
 							'border-destructive bg-destructive/10 border-2',
 					)}>
-					<!-- !value -> muted -->
 					{`금액 범위${budgetRangeText()}`}
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
@@ -215,44 +253,85 @@
 				</Popover.Content>
 			</Popover.Root>
 
-			<input name="date_negotiable" bind:value={$formData.date_negotiable} hidden />
+			<input name="date_negotiable" value={$formData.date_negotiable} hidden />
+			<input name="date_start" value={$formData.date_start} hidden />
+			<input name="date_end" value={$formData.date_end} hidden />
 			<Popover.Root>
 				<Popover.Trigger
 					class={cn(
 						buttonVariants({
 							variant: 'outline',
-							class: 'mb-2 w-[10em] justify-start text-left font-normal',
+							class: 'mb-2 w-[16em] justify-start text-left font-normal',
 						}),
-						'text-muted-foreground',
+						!startDate && !endDate && !$formData.date_negotiable && 'text-muted-foreground',
+						(($errors.date_start?.length || 0) > 0 || ($errors.date_end?.length || 0) > 0) &&
+							'border-destructive bg-destructive/10 border-2',
 					)}>
-					<!-- !value -> muted -->
-					일정 범위
-					<!-- {#if value && value.start}
-        {#if value.end}
-          {df.format(value.start.toDate(getLocalTimeZone()))} - {df.format(
-            value.end.toDate(getLocalTimeZone())
-          )}
-        {:else}
-          {df.format(value.start.toDate(getLocalTimeZone()))}
-        {/if}
-      {:else if startValue}
-        {df.format(startValue.toDate(getLocalTimeZone()))}
-      {:else}
-        Pick a date
-      {/if} -->
-					<!-- df.format(value.toDate(getLocalTimeZone())) -->
+					{`일정 범위${dateRangeText()}`}
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
-					<div class="border">
-						<RangeCalendar numberOfMonths={2} locale="ko-KR" />
-						<!-- bind:value onStartValueChange -->
-					</div>
-					<div class="flex flex-row space-x-2">
-						<Checkbox id="date_negotiable" bind:checked={$formData.date_negotiable} />
-						<div class="leading-none">
-							<label for="date_negotiable">협상 가능한 경우를 포함함</label>
-						</div>
-					</div>
+					<Form.Field {form} name="date_start">
+						<Form.Control>
+							{#snippet children({ props })}
+								<div class="flex items-center">
+									<Popover.Root>
+										<Popover.Trigger
+											class={cn(
+												buttonVariants({
+													variant: 'outline',
+													class: 'w-[13em] justify-start text-left font-normal',
+												}),
+												!$formData.date_start && 'text-muted-foreground',
+											)}>
+											<CalendarIcon />
+											{$formData.date_start ? df.format($formData.date_start) : '날짜 선택'}
+										</Popover.Trigger>
+										<Popover.Content class="w-auto p-0">
+											<Calendar type="single" locale="ko-KR" bind:value={startDate} />
+										</Popover.Content>
+									</Popover.Root>
+									<span class="flex-none">&nbsp;부터</span>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="date_end">
+						<Form.Control>
+							{#snippet children({ props })}
+								<div class="flex items-center">
+									<Popover.Root>
+										<Popover.Trigger
+											class={cn(
+												buttonVariants({
+													variant: 'outline',
+													class: 'w-[13em] justify-start text-left font-normal',
+												}),
+												!$formData.date_end && 'text-muted-foreground',
+											)}>
+											<CalendarIcon />
+											{$formData.date_end ? df.format($formData.date_end) : '날짜 선택'}
+										</Popover.Trigger>
+										<Popover.Content class="w-auto p-0">
+											<Calendar type="single" locale="ko-KR" bind:value={endDate} />
+										</Popover.Content>
+									</Popover.Root>
+									<span class="flex-none">&nbsp;까지</span>
+								</div>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Form.Field {form} name="date_negotiable" class="flex flex-row space-x-2">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Checkbox {...props} bind:checked={$formData.date_negotiable} />
+								<div class="leading-none">
+									<Form.Label>협상 가능한 경우를 포함함</Form.Label>
+								</div>
+							{/snippet}
+						</Form.Control>
+					</Form.Field>
 				</Popover.Content>
 			</Popover.Root>
 
