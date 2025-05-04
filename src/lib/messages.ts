@@ -16,6 +16,7 @@ export const SearchRangeText = {
 	title: m.SEARCH_RANGE_TITLE,
 	content: m.SEARCH_RANGE_CONTENT,
 	tag: m.SEARCH_RANGE_TAG,
+	username: m.SEARCH_RANGE_USERNAME,
 };
 
 export const SearchFlagText = {

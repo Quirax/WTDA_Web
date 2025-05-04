@@ -90,7 +90,7 @@ export enum ArticleType {
 	COMMISSION = 'COMMISSION',
 }
 
-export const SearchRangeValues = ['title', 'content', 'tag'] as const;
+export const SearchRangeValues = ['title', 'content', 'tag', 'username'] as const;
 export type SearchRange = Union<typeof SearchRangeValues>;
 
 export const SearchFlagValues = ['all', 'excluded', 'required'] as const;

@@ -79,6 +79,8 @@ const createCriteria = (
 				return ilike(t.content, `%${params.query.replace(/%/g, '%%')}%`);
 			case 'tag':
 				return arrayContains(t.tags, [params.query]);
+			case 'username':
+				return ilike(table.user.username, `%${params.query.replace(/%/g, '%%')}%`);
 		}
 	});
 	if (searchRange.length > 0) criteria.push(or(...searchRange));

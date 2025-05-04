@@ -147,14 +147,14 @@
 			</Form.Control>
 		</Form.Field>
 		<div class="flex flex-wrap space-x-2">
-			<!-- TODO: 검색할 사용자 선택 기능 추가 -->
-
 			<Form.Field {form} name="search_range">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.search_range}>
-							<Select.Trigger class="w-[16em]">
-								{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
+							<Select.Trigger>
+								<div class="mr-2">
+									{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchRangeText) as [k, v]}
@@ -409,6 +409,5 @@
 			{count}
 			perPage={searchResultsPerPage}
 			siblingCount={isDesktop() ? 1 : 0} />
-		<!-- TODO: pagination 처리 -->
 	</section>
 </Section>
