@@ -158,6 +158,7 @@ export const load = (async ({ url, untrack, ...rest }) => {
 	}
 
 	return {
+		query: params.query,
 		params: await superValidate(zod(formSchema), {
 			defaults: parsed.data || params,
 		}),

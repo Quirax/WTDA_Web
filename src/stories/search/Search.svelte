@@ -36,9 +36,10 @@
 		articles: App.Articles[];
 		count: number;
 		page: number;
+		query: string;
 	}
 
-	const { params, articles, count, page: currentPage }: Props = $props();
+	const { params, articles, count, page: currentPage, query }: Props = $props();
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -111,11 +112,11 @@
 	});
 </script>
 
-<Header title="'{$formData.query}' 검색결과" />
+<Header title="'{query}' 검색결과" />
 
 <!-- ref: https://svelte.dev/docs/kit/link-options#data-sveltekit-preload-data -->
 <Section data-sveltekit-preload-data="off">
-	<H2>'{$formData.query}' 검색결과</H2>
+	<H2>'{query}' 검색결과</H2>
 	<form
 		bind:this={formElement}
 		method="GET"
