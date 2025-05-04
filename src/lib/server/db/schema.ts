@@ -1,5 +1,14 @@
 import { enumToPgEnum, type InferSelectModelPartial } from '../../utils';
-import { pgTable, text, timestamp, pgEnum, json, integer, boolean } from 'drizzle-orm/pg-core';
+import {
+	pgTable,
+	text,
+	timestamp,
+	pgEnum,
+	json,
+	integer,
+	boolean,
+	index,
+} from 'drizzle-orm/pg-core';
 import { ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
 import { sql } from 'drizzle-orm';
 
@@ -7,18 +16,22 @@ export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
 export const articleCategory = pgEnum('article_category', enumToPgEnum(ArticleCategory));
 
-export const user = pgTable('user', {
-	id: text('id').primaryKey(),
-	// age: integer('age'),
-	username: text('username').notNull().unique(), // 닉네임
-	passwordHash: text('password_hash').notNull(), // 비밀번호
-	profileImage: text('profile_image'), // 프로필 이미지
-	// fallbackInitial: text('fallback_initial').notNull(), // 이니셜
-	email: text('email').notNull().unique(), // 이메일
-	status: statusEnum().notNull().default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
-	preferences: json('preferences').$type<Partial<App.Preferences>>().notNull().default({}),
-	profile: json('profile').$type<Partial<App.Profile>>().notNull().default({}),
-});
+export const user = pgTable(
+	'user',
+	{
+		id: text('id').primaryKey(),
+		// age: integer('age'),
+		username: text('username').notNull().unique(), // 닉네임
+		passwordHash: text('password_hash').notNull(), // 비밀번호
+		profileImage: text('profile_image'), // 프로필 이미지
+		// fallbackInitial: text('fallback_initial').notNull(), // 이니셜
+		email: text('email').notNull().unique(), // 이메일
+		status: statusEnum().notNull().default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
+		preferences: json('preferences').$type<Partial<App.Preferences>>().notNull().default({}),
+		profile: json('profile').$type<Partial<App.Profile>>().notNull().default({}),
+	},
+	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
+);
 
 export const session = pgTable('session', {
 	id: text('id').primaryKey(),
@@ -67,14 +80,23 @@ const article = {
 	containsAdultContents: boolean().notNull().default(false),
 };
 
-export const commissionRequest = pgTable('commission_request', {
-	...article,
-	budget: integer('budget'), // null: 조율 가능
-	deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
-	isForCommercial: boolean().notNull().default(false),
-	purpose: text('purpose').notNull(),
-	visibleOnlyToCommissioner: boolean().notNull().default(false),
-});
+export const commissionRequest = pgTable(
+	'commission_request',
+	{
+		...article,
+		budget: integer('budget'), // null: 조율 가능
+		deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
+		isForCommercial: boolean().notNull().default(false),
+		purpose: text('purpose').notNull(),
+		visibleOnlyToCommissioner: boolean().notNull().default(false),
+	},
+	// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
+	// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
+	(table) => [
+		index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
+		index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
+	],
+);
 
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;

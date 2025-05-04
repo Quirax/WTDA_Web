@@ -3,5 +3,13 @@
 	"hello_world": "Hello, {name} from ko!",
 	"CATEGORY_TEXT": "글",
 	"CATEGORY_DRAWING": "그림",
-	"ARTICLE_TYPE_REQUEST": "의뢰"
+	"ARTICLE_TYPE_REQUEST": "의뢰",
+	"ARTICLE_TYPE_COMMISSION": "​​커미션",
+	"SEARCH_RANGE_TITLE": "제목",
+	"SEARCH_RANGE_CONTENT": "내용",
+	"SEARCH_RANGE_TAG": "태그",
+	"SEARCH_RANGE_USERNAME": "작성자 닉네임",
+	"SEARCH_FLAG_ALL": "포함",
+	"SEARCH_FLAG_EXCLUDED": "제외",
+	"SEARCH_FLAG_REQUIRED": "필수"
 }

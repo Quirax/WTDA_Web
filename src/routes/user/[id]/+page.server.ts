@@ -11,6 +11,7 @@ import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { ArticleType } from '@app';
+import { allArticles } from '$lib/server/db/shorthands';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -229,36 +230,23 @@ export const actions: Actions = {
 
 		let results: (App.Articles & { modifyDate: Date })[] = [];
 
-		if (tab === 'all' || tab === 'requests') {
-			try {
-				const articles = await db
-					.select({
-						id: table.commissionRequest.id,
-						type: sql<ArticleType>`'REQUEST'`,
-						thumbnail: table.commissionRequest.thumbnail,
-						title: table.commissionRequest.title,
-						author: {
-							id: table.user.id,
-							username: table.user.username,
-							profileImage: table.user.profileImage,
-							email: table.user.email,
-							preferences: table.user.preferences,
-							profile: table.user.profile,
-						},
-						category: table.commissionRequest.category,
-						tags: table.commissionRequest.tags,
-						modifyDate: table.commissionRequest.modifyDate,
-					})
-					.from(table.commissionRequest)
-					.where(eq(table.commissionRequest.author, id))
-					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
-					.limit(10);
-
-				results = [...results, ...articles];
-			} catch (e) {
-				console.error(e);
-				return fail(500, { message: 'An error has occurred' });
+		try {
+			if (tab === 'all') {
+				results =
+					(await allArticles([ArticleType.REQUEST, ArticleType.COMMISSION], {
+						request: eq(table.commissionRequest.author, id),
+						commission: eq(table.commissionRequest.author, id),
+					})?.limit(10)) || [];
+			} else if (tab === 'requests') {
+				results =
+					(await allArticles([ArticleType.REQUEST], {
+						request: eq(table.commissionRequest.author, id),
+						commission: eq(table.commissionRequest.author, id),
+					})?.limit(10)) || [];
 			}
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
 		}
 
 		results = results

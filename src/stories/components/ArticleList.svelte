@@ -12,9 +12,17 @@
 		articles: App.Articles[];
 		hideAuthor?: boolean;
 		accentColor?: string;
+		hideMore?: boolean;
 	}
 
-	const { articles, hideAuthor = false, style, accentColor, ...restProps }: Props = $props();
+	const {
+		articles,
+		hideAuthor = false,
+		style,
+		accentColor,
+		hideMore = false,
+		...restProps
+	}: Props = $props();
 
 	const patternTinycolor = $derived(tinycolor(accentColor || 'hsl(29.52 83% 25%)'));
 	const patternColor = $derived(
@@ -89,9 +97,12 @@
 		</Card.Root>
 	{/each}
 </section>
-<div class="text-right">
-	<Button variant="link" class="text-(--primary-color)">
-		더 보기
-		<ChevronRight class="size-4" />
-	</Button>
-</div>
+
+{#if !hideMore}
+	<div class="text-right">
+		<Button variant="link" class="text-(--primary-color)">
+			더 보기
+			<ChevronRight class="size-4" />
+		</Button>
+	</div>
+{/if}

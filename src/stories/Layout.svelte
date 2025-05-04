@@ -5,13 +5,20 @@
 
 	import './Layout.css';
 	import Footer from './components/Footer.svelte';
-	import { ParaglideJS } from '@inlang/paraglide-sveltekit';
-	import { i18n } from '$lib/i18n';
+	import { locales, localizeHref } from '$lib/paraglide/runtime';
+	import { page } from '$app/state';
 
 	let { children = fn() } = $props();
 </script>
 
-<ParaglideJS {i18n}>
-	{@render children()}
-	<Footer />
-</ParaglideJS>
+{@render children()}
+<Footer />
+
++
+<div style="display:none">
+	+ {#each locales as locale}
+		+ <a href={localizeHref(page.url.pathname, { locale })}>{locale}</a>
+		+
+	{/each}
+	+
+</div>
