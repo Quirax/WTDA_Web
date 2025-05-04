@@ -8,6 +8,7 @@ import { error, fail } from '@sveltejs/kit';
 import {
 	and,
 	arrayContains,
+	desc,
 	eq,
 	gte,
 	ilike,
@@ -115,6 +116,8 @@ const createCriteria = (
 };
 
 export const load = (async ({ url, untrack, ...rest }) => {
+	const page = parseInt(url.searchParams.get('page') || '1');
+
 	// query params
 	const params = Object.fromEntries(
 		Object.keys(getSchema(formSchema)).map((v) => [
@@ -143,7 +146,11 @@ export const load = (async ({ url, untrack, ...rest }) => {
 
 			if (all) count = await db.$count(all);
 
-			articles = (await all?.limit(searchResultsPerPage).offset(searchResultsPerPage * 0)) || []; // 1page
+			articles =
+				(await all
+					?.orderBy(desc(table.commissionRequest.createDate))
+					.limit(searchResultsPerPage)
+					.offset(searchResultsPerPage * (page - 1))) || [];
 		} catch (e) {
 			console.error(e);
 			return error(500, { message: 'An error has occurred' });
@@ -157,5 +164,6 @@ export const load = (async ({ url, untrack, ...rest }) => {
 		error: JSON.stringify(parsed.error),
 		articles,
 		count,
+		page,
 	};
 }) satisfies PageServerLoad;

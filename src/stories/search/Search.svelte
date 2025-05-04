@@ -29,14 +29,16 @@
 		ZonedDateTime,
 	} from '@internationalized/date';
 	import { searchResultsPerPage } from '$lib/config';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
 		articles: App.Articles[];
 		count: number;
+		page: number;
 	}
 
-	const { params, articles, count }: Props = $props();
+	const { params, articles, count, page: currentPage }: Props = $props();
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -53,6 +55,7 @@
 		},
 	});
 	const { form: formData, constraints, errors } = form;
+	let formElement = $state<HTMLFormElement>();
 
 	const searchRangeText = $derived(
 		$formData.search_range.map((v) => SearchRangeText[v]()).join(', '),
@@ -97,6 +100,15 @@
 		if (rangeTexts.length === 0) return '';
 		else return ` (${rangeTexts.join(', ')})`;
 	};
+
+	let page = $state(currentPage);
+	$effect(() => {
+		if (!untrack(() => formElement)) return;
+
+		if (page !== currentPage) {
+			form.submit(formElement);
+		}
+	});
 </script>
 
 <Header title="'{$formData.query}' 검색결과" />
@@ -104,7 +116,11 @@
 <!-- ref: https://svelte.dev/docs/kit/link-options#data-sveltekit-preload-data -->
 <Section data-sveltekit-preload-data="off">
 	<H2>'{$formData.query}' 검색결과</H2>
-	<form method="GET" class="my-2 space-y-2 border pt-2 pl-2" action="/search">
+	<form
+		bind:this={formElement}
+		method="GET"
+		class="my-2 space-y-2 border pt-2 pl-2"
+		action="/search">
 		<Form.Field {form} name="query" class="mr-2 flex">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -378,6 +394,8 @@
 				</Form.Control>
 			</Form.Field>
 		</div>
+
+		<input name="page" bind:value={page} hidden />
 	</form>
 	<section>
 		<ArticleList
@@ -386,11 +404,10 @@
 			{articles}
 			hideMore />
 		<Pagination
-			page={1}
+			bind:page
 			{count}
 			perPage={searchResultsPerPage}
 			siblingCount={isDesktop() ? 1 : 0} />
-		<!-- bind:page -->
 		<!-- TODO: pagination 처리 -->
 	</section>
 </Section>

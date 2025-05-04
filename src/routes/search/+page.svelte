@@ -7,4 +7,4 @@
 	$inspect(data.count);
 </script>
 
-<Search params={data.params!} articles={data.articles} count={data.count} />
+<Search params={data.params!} articles={data.articles} count={data.count} page={data.page} />
