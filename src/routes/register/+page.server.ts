@@ -4,7 +4,6 @@ import { formSchema } from '$lib/schema/userInfo';
 import { zod, zodClient } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { hash } from '@node-rs/argon2';
 import { EmailConfirmFor, UserStatus } from '../../app';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
