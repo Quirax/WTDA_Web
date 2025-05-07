@@ -379,9 +379,46 @@
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Select.Root type="single" {...props} bind:value={$formData.adult_contents}>
-							<Select.Trigger class="w-[11em]">
-								{'성인 콘텐츠: ' + flagText($formData.adult_contents)}
+						<Select.Root
+							type="single"
+							{...props}
+							bind:value={
+								() => $formData.adult_contents,
+								(v) => {
+									$formData.adult_contents = v;
+									if (v === 'excluded') $formData.grotesque_contents = 'excluded';
+								}
+							}>
+							<Select.Trigger>
+								<div class="mr-2">{'성인 콘텐츠: ' + flagText($formData.adult_contents)}</div>
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
+
+			<Form.Field {form} name="grotesque_contents">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Select.Root
+							type="single"
+							{...props}
+							disabled={$formData.adult_contents === 'excluded'}
+							bind:value={
+								() => $formData.grotesque_contents,
+								(v) =>
+									($formData.grotesque_contents =
+										$formData.adult_contents === 'excluded' ? 'excluded' : v)
+							}>
+							<Select.Trigger>
+								<div class="mr-2">{'잔인한 콘텐츠: ' + flagText($formData.grotesque_contents)}</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchFlagText) as [k, v]}

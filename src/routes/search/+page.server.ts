@@ -114,7 +114,28 @@ const createCriteria = (
 	if (params.adult_contents === 'excluded')
 		criteria.push(eq(t.containsAdultContents, AdultContents.NORMAL));
 	else if (params.adult_contents === 'required')
-		criteria.push(ne(t.containsAdultContents, AdultContents.NORMAL));
+		switch (params.grotesque_contents) {
+			case 'all':
+				criteria.push(ne(t.containsAdultContents, AdultContents.NORMAL));
+				break;
+			case 'excluded':
+				criteria.push(eq(t.containsAdultContents, AdultContents.ADULT_RESTRICTED));
+				break;
+			case 'required':
+				criteria.push(eq(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+		}
+	else
+		switch (params.grotesque_contents) {
+			case 'all':
+				break;
+			case 'excluded':
+				criteria.push(ne(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+			case 'required':
+				criteria.push(eq(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+		}
 
 	return and(...criteria);
 };

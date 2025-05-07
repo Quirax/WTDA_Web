@@ -17,7 +17,8 @@ export const formSchema = z
 		date_end: z.date().nullable(),
 		date_negotiable: z.boolean().catch(true),
 		commercial_use: z.enum(SearchFlagValues).catch('all'),
-		adult_contents: z.enum(SearchFlagValues).catch('all'),
+		adult_contents: z.enum(SearchFlagValues).catch('excluded'),
+		grotesque_contents: z.enum(SearchFlagValues).catch('excluded'),
 	})
 	.superRefine(({ min_budget, max_budget }, { addIssue }) => {
 		if (!min_budget || !max_budget || min_budget <= max_budget) return true;

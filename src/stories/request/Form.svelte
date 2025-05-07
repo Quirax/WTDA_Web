@@ -369,6 +369,6 @@
 		</div>
 
 		<Form.Button>{doString}</Form.Button>
-		<Button variant="secondary">취소하기</Button>
+		<Button variant="secondary" onclick={() => history.back()}>취소하기</Button>
 	</form>
 </Section>
