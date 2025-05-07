@@ -64,7 +64,7 @@
 						</Badge>
 					</div>
 				{/if}
-				<Card.Title>
+				<Card.Title class="overflow-hidden">
 					{#if article?.type}
 						<Button
 							variant="link"
@@ -77,8 +77,8 @@
 					{/if}
 				</Card.Title>
 				{#if !hideAuthor}
-					<Card.Description class="text-right">
-						by
+					<Card.Description class="flex items-center justify-end space-x-2">
+						<span>by</span>
 						<Button variant="link" class="text-inherit" href="/user/{article?.author.id}">
 							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
 							{article?.author.username}
@@ -89,8 +89,7 @@
 			<Card.Content>
 				<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
 					#{CategoryText[article?.category]()}
-				</Badge>
-				{#each article?.tags?.slice(0, 3) || [] as tag}
+				</Badge>{#each article?.tags?.slice(0, 3) || [] as tag}
 					<Badge class="m-1" variant="secondary">#{tag}</Badge>
 				{/each}
 			</Card.Content>
