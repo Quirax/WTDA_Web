@@ -177,8 +177,8 @@ export const load = (async ({ url, untrack, locals, ...rest }) => {
 
 			articles =
 				(await all
-					?.orderBy(desc(table.commissionRequest.createDate))
-					.limit(searchResultsPerPage)
+					// ?.orderBy(desc(table.commissionRequest.createDate))
+					?.limit(searchResultsPerPage)
 					.offset(searchResultsPerPage * (page - 1))) || [];
 		} catch (e) {
 			console.error(e);
