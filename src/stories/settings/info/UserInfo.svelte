@@ -175,9 +175,54 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<div class="my-4 border-2">
+		{#if userInfoFor !== UserInfoFor.REGISTRATION}
+			<div class="my-4 space-y-4 border-2 p-4">
+				<Form.Field {form} name="display_adult_contents">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => ($formData as Infer<UserSchema>).display_adult_contents || false, (v) => {
+									($formData as Infer<UserSchema>).display_adult_contents = v
+									if(!v) ($formData as Infer<UserSchema>).display_grotesque_contents = false
+								}} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+								<div class="space-y-1 leading-none">
+									<Form.Label>성인 콘텐츠를 표시합니다</Form.Label>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_adult_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="display_grotesque_contents" class="ml-8">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => ($formData as Infer<UserSchema>).display_grotesque_contents || false, (v) => {
+									($formData as Infer<UserSchema>).display_grotesque_contents = ($formData as Infer<UserSchema>).display_adult_contents && v
+								}} disabled={userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
+								<div class="space-y-1 leading-none">
+									<Form.Label>유혈 등 잔인한 콘텐츠를 표시합니다</Form.Label>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_grotesque_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+		{/if}
+		<div class="my-4 space-y-4 border-2 p-4">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="agree_eula" class="p-4">
+				<Form.Field {form} name="agree_eula">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -199,7 +244,7 @@
 					</div>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="agree_privacypolicy" class="p-4">
+				<Form.Field {form} name="agree_privacypolicy">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -222,7 +267,7 @@
 					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
-			<Form.Field {form} name="agree_marketing" class="p-4">
+			<Form.Field {form} name="agree_marketing">
 				<div class="flex flex-row items-center space-y-0 space-x-3">
 					<Form.Control>
 						{#snippet children({ props })}

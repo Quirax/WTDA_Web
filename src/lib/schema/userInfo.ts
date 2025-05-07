@@ -15,6 +15,8 @@ const userObject = z.object({
 	password: z.string().optional(),
 	passwordConfirm: z.string().optional(),
 	agree_marketing: z.boolean().default(false),
+	display_adult_contents: z.boolean().default(false),
+	display_grotesque_contents: z.boolean().default(false),
 });
 
 const passwordConfirm = {

@@ -3,7 +3,7 @@ import { superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from '$lib/schema/userInfo';
-import { _userInfoEditCookie } from '../+page.server';
+import { _getPreferences, _userInfoEditCookie } from '../+page.server';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -22,26 +22,9 @@ export const load = (async (event) => {
 		path: '/',
 	});
 
-	const results = (
-		await db
-			.select({
-				user: {
-					preferences: table.user.preferences,
-				},
-			})
-			.from(table.user)
-			.where(eq(table.user.id, event.locals.user.id))
-	).at(0);
-
-	if (!results) throw redirect(302, '/');
-
 	return {
 		form: await superValidate(zod(userSchema), {
-			defaults: {
-				agree_marketing:
-					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
-					false,
-			},
+			defaults: await _getPreferences(event.locals.user.id),
 		}),
 	};
 }) satisfies PageServerLoad;
@@ -56,16 +39,17 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
 
-		const { password, agree_marketing } = form.data;
+		const { password, agree_marketing, display_adult_contents, display_grotesque_contents } =
+			form.data;
 
 		let set: Partial<{
-			preferences: {
-				agree_marketing: typeof agree_marketing;
-			};
+			preferences: App.Preferences;
 		}> &
 			Partial<{ passwordHash: string }> = {
 			preferences: {
 				agree_marketing,
+				display_adult_contents,
+				display_grotesque_contents,
 			},
 		};
 

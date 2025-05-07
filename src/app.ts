@@ -23,6 +23,8 @@ declare global {
 
 		interface Preferences {
 			agree_marketing: boolean;
+			display_adult_contents?: boolean;
+			display_grotesque_contents?: boolean;
 		}
 
 		interface Profile {
