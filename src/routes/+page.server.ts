@@ -1,9 +1,9 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { ArticleType, UserStatus } from '../app';
+import { AdultContents, ArticleType, UserStatus } from '../app';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { eq, desc, sql, ne, and } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user?.status === UserStatus.REQUIRED_EMAIL_CONFIRM)
@@ -11,6 +11,15 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user?.status === UserStatus.DEACTIVATED)
 		// Force logout deactivated user
 		throw redirect(302, '/logout');
+
+	const where = [];
+
+	if (!locals.user || !locals.user.preferences.display_adult_contents)
+		where.push(eq(table.commissionRequest.containsAdultContents, AdultContents.NORMAL));
+	else if (!locals.user.preferences.display_grotesque_contents)
+		where.push(
+			ne(table.commissionRequest.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED),
+		);
 
 	try {
 		const requests = await db
@@ -32,6 +41,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 				modifyDate: table.commissionRequest.modifyDate,
 			})
 			.from(table.commissionRequest)
+			.where(and(...where))
 			.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
 			.orderBy(desc(table.commissionRequest.modifyDate))
 			.limit(10);

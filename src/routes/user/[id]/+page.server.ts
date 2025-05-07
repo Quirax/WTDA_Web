@@ -222,7 +222,7 @@ export const actions: Actions = {
 		}
 	},
 
-	articles: async ({ params, request }) => {
+	articles: async ({ params, request, locals }) => {
 		const id = params.id;
 
 		const formData = await request.formData();
@@ -233,16 +233,24 @@ export const actions: Actions = {
 		try {
 			if (tab === 'all') {
 				results =
-					(await allArticles([ArticleType.REQUEST, ArticleType.COMMISSION], {
-						request: eq(table.commissionRequest.author, id),
-						commission: eq(table.commissionRequest.author, id),
-					})?.limit(10)) || [];
+					(await allArticles(
+						[ArticleType.REQUEST, ArticleType.COMMISSION],
+						{
+							request: eq(table.commissionRequest.author, id),
+							commission: eq(table.commissionRequest.author, id),
+						},
+						locals.user,
+					)?.limit(10)) || [];
 			} else if (tab === 'requests') {
 				results =
-					(await allArticles([ArticleType.REQUEST], {
-						request: eq(table.commissionRequest.author, id),
-						commission: eq(table.commissionRequest.author, id),
-					})?.limit(10)) || [];
+					(await allArticles(
+						[ArticleType.REQUEST],
+						{
+							request: eq(table.commissionRequest.author, id),
+							commission: eq(table.commissionRequest.author, id),
+						},
+						locals.user,
+					)?.limit(10)) || [];
 			}
 		} catch (e) {
 			console.error(e);

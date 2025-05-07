@@ -140,7 +140,7 @@ const createCriteria = (
 	return and(...criteria);
 };
 
-export const load = (async ({ url, untrack, ...rest }) => {
+export const load = (async ({ url, untrack, locals, ...rest }) => {
 	const page = parseInt(url.searchParams.get('page') || '1');
 
 	// query params
@@ -162,12 +162,16 @@ export const load = (async ({ url, untrack, ...rest }) => {
 
 	if (parsed.success) {
 		try {
-			const all = allArticles(parsed.data.type, {
-				request: createCriteria(parsed.data, table.commissionRequest, {
-					budgetColumn: table.commissionRequest.budget,
-					dateColumn: table.commissionRequest.deadline,
-				}),
-			});
+			const all = allArticles(
+				parsed.data.type,
+				{
+					request: createCriteria(parsed.data, table.commissionRequest, {
+						budgetColumn: table.commissionRequest.budget,
+						dateColumn: table.commissionRequest.deadline,
+					}),
+				},
+				locals.user,
+			);
 
 			if (all) count = await db.$count(all);
 

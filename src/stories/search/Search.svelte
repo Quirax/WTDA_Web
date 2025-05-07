@@ -30,6 +30,7 @@
 	} from '@internationalized/date';
 	import { searchResultsPerPage } from '$lib/config';
 	import { untrack } from 'svelte';
+	import { userStore } from '$lib/context';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
@@ -40,6 +41,9 @@
 	}
 
 	const { params, articles, count, page: currentPage, query }: Props = $props();
+
+	let me = $state<App.User>(null);
+	userStore.subscribe((v) => (me = v));
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -376,16 +380,19 @@
 				</Form.Control>
 			</Form.Field>
 
+			<!-- TODO : notAllowed인 경우 안내 툴팁 표시 -->
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
+						{@const notAllowed = !me || !me.preferences.display_adult_contents}
 						<Select.Root
 							type="single"
 							{...props}
+							disabled={notAllowed}
 							bind:value={
-								() => $formData.adult_contents,
+								() => (notAllowed ? 'excluded' : $formData.adult_contents),
 								(v) => {
-									$formData.adult_contents = v;
+									$formData.adult_contents = notAllowed ? 'excluded' : v;
 									if (v === 'excluded') $formData.grotesque_contents = 'excluded';
 								}
 							}>
@@ -404,18 +411,21 @@
 				</Form.Control>
 			</Form.Field>
 
+			<!-- TODO : notAllowed인 경우 안내 툴팁 표시 -->
 			<Form.Field {form} name="grotesque_contents">
 				<Form.Control>
 					{#snippet children({ props })}
+						{@const notAllowed =
+							!me ||
+							!me.preferences.display_grotesque_contents ||
+							$formData.adult_contents === 'excluded'}
 						<Select.Root
 							type="single"
 							{...props}
-							disabled={$formData.adult_contents === 'excluded'}
+							disabled={notAllowed}
 							bind:value={
-								() => $formData.grotesque_contents,
-								(v) =>
-									($formData.grotesque_contents =
-										$formData.adult_contents === 'excluded' ? 'excluded' : v)
+								() => (notAllowed ? 'excluded' : $formData.grotesque_contents),
+								(v) => ($formData.grotesque_contents = notAllowed ? 'excluded' : v)
 							}>
 							<Select.Trigger>
 								<div class="mr-2">{'잔인한 콘텐츠: ' + flagText($formData.grotesque_contents)}</div>

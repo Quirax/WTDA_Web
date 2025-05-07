@@ -1,8 +1,19 @@
-import { ArticleType } from '@app';
+import { AdultContents, ArticleType } from '@app';
 import { db } from '.';
 import * as table from './schema';
-import { eq, SQL, sql } from 'drizzle-orm';
+import { and, eq, ne, SQL, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
+
+const generateCommonWhere = (t: typeof table.commissionRequest, currentUser?: App.User) => {
+	const commonWhere = [];
+
+	if (!currentUser || !currentUser.preferences.display_adult_contents)
+		commonWhere.push(eq(t.containsAdultContents, AdultContents.NORMAL));
+	else if (!currentUser.preferences.display_grotesque_contents)
+		commonWhere.push(ne(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+
+	return commonWhere;
+};
 
 export const allArticles = (
 	types: ArticleType[],
@@ -10,6 +21,7 @@ export const allArticles = (
 		request?: SQL;
 		commission?: SQL;
 	} = {},
+	currentUser?: App.User,
 ) => {
 	let subqueries = types
 		.map((type) => {
@@ -34,7 +46,7 @@ export const allArticles = (
 							modifyDate: table.commissionRequest.modifyDate,
 						})
 						.from(table.commissionRequest)
-						.where(where.request)
+						.where(and(...generateCommonWhere(table.commissionRequest, currentUser), where.request))
 						.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id));
 				case ArticleType.COMMISSION:
 					return undefined;
