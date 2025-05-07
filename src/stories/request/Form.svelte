@@ -22,6 +22,7 @@
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
+	import { AdultContents } from '@app';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -312,25 +313,46 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<div class="my-4 border-2">
-			<Form.Field {form} name="containsAdultContents" class="p-4">
-				<div class="flex flex-row items-center space-y-0 space-x-3">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Checkbox {...props} bind:checked={$formData.containsAdultContents} />
+		<div class="my-4 space-y-4 border-2 p-4">
+			<Form.Field {form} name="containsAdultContents" class="space-y-4">
+				<Form.Control>
+					{#snippet children({ props })}
+						<input name={props.name} value={$formData.containsAdultContents} hidden />
+						<div class="flex flex-row items-center space-y-0 space-x-3">
+							<Checkbox
+								{...props}
+								bind:checked={
+									() => $formData.containsAdultContents !== AdultContents.NORMAL,
+									(v) =>
+										($formData.containsAdultContents = v
+											? AdultContents.ADULT_RESTRICTED
+											: AdultContents.NORMAL)
+								} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>
-									이 의뢰에는 성인 콘텐츠 또는 잔인한 콘텐츠가 포함되어 있습니다.
-								</Form.Label>
+								<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
 							</div>
-							<input name={props.name} value={$formData.containsAdultContents} hidden />
-						{/snippet}
-					</Form.Control>
-				</div>
+						</div>
+						<div class="ml-8 flex flex-row items-center space-y-0 space-x-3">
+							<Checkbox
+								{...props}
+								disabled={$formData.containsAdultContents === AdultContents.NORMAL}
+								bind:checked={
+									() => $formData.containsAdultContents === AdultContents.GROTESQUE_RESTRICTED,
+									(v) =>
+										($formData.containsAdultContents = v
+											? AdultContents.GROTESQUE_RESTRICTED
+											: AdultContents.ADULT_RESTRICTED)
+								} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.</Form.Label>
+							</div>
+						</div>
+					{/snippet}
+				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {form} name="visibleOnlyToCommissioner" class="p-4">
+			<Form.Field {form} name="visibleOnlyToCommissioner">
 				<div class="flex flex-row items-center space-y-0 space-x-3">
 					<Form.Control>
 						{#snippet children({ props })}

@@ -95,3 +95,9 @@ export type SearchRange = Union<typeof SearchRangeValues>;
 
 export const SearchFlagValues = ['all', 'excluded', 'required'] as const;
 export type SearchFlag = Union<typeof SearchFlagValues>;
+
+export enum AdultContents {
+	NORMAL = 'NORMAL',
+	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
+	GROTESQUE_RESTRICTED = 'GROTESQUE_RESTRICTED',
+}

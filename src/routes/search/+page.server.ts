@@ -1,4 +1,4 @@
-import { ArticleType } from '@app';
+import { AdultContents, ArticleType } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
 import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, ZodType, type ZodTypeAny } from 'zod';
@@ -111,8 +111,10 @@ const createCriteria = (
 	if (params.commercial_use === 'excluded') criteria.push(ne(t.isForCommercial, true));
 	else if (params.commercial_use === 'required') criteria.push(eq(t.isForCommercial, true));
 
-	if (params.adult_contents === 'excluded') criteria.push(ne(t.containsAdultContents, true));
-	else if (params.adult_contents === 'required') criteria.push(eq(t.containsAdultContents, true));
+	if (params.adult_contents === 'excluded')
+		criteria.push(eq(t.containsAdultContents, AdultContents.NORMAL));
+	else if (params.adult_contents === 'required')
+		criteria.push(ne(t.containsAdultContents, AdultContents.NORMAL));
 
 	return and(...criteria);
 };

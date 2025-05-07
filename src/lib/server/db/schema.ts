@@ -9,12 +9,13 @@ import {
 	boolean,
 	index,
 } from 'drizzle-orm/pg-core';
-import { ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
+import { AdultContents, ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
 import { sql } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
 export const articleCategory = pgEnum('article_category', enumToPgEnum(ArticleCategory));
+export const adultContents = pgEnum('adult_contents', enumToPgEnum(AdultContents));
 
 export const user = pgTable(
 	'user',
@@ -77,7 +78,7 @@ const article = {
 	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	modifyDate: timestamp('modify_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	content: text('content').notNull().default(''),
-	containsAdultContents: boolean().notNull().default(false),
+	containsAdultContents: adultContents().notNull().default(AdultContents.NORMAL),
 };
 
 export const commissionRequest = pgTable(

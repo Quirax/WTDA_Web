@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
+import { AdultContents } from '@app';
 
 export const load = (async ({ params }) => {
 	const id = params.id;
@@ -45,7 +46,7 @@ export const load = (async ({ params }) => {
 		// 커미션주인지 확인
 	}
 
-	if (article.containsAdultContents) {
+	if (article.containsAdultContents !== AdultContents.NORMAL) {
 		// 성인 콘텐츠를 열람할 수 있는지 확인
 	}
 
