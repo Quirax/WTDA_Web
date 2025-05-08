@@ -43,6 +43,7 @@ export const articlesPerType = (
 						category: table.commissionRequest.category,
 						tags: table.commissionRequest.tags,
 						modifyDate: table.commissionRequest.modifyDate,
+						containsAdultContents: table.commissionRequest.containsAdultContents,
 					})
 					.from(table.commissionRequest)
 					.where(and(...generateCommonWhere(table.commissionRequest, currentUser), where.request))

@@ -48,6 +48,7 @@ declare global {
 			tags: string[] | null;
 			id: string;
 			type?: ArticleType;
+			containsAdultContents?: AdultContents;
 		}
 
 		type CommisionType = Articles & {};

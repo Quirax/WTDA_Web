@@ -6,7 +6,8 @@
 	import Avatar from './Avatar.svelte';
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
-	import { ArticleType } from '@app';
+	import { AdultContents, ArticleType } from '@app';
+	import { cn } from '$lib/utils';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -48,7 +49,12 @@
 					<img
 						src={article?.thumbnail}
 						alt={article?.title}
-						class="aspect-video w-full object-cover" />
+						class={cn(
+							'aspect-video w-full object-cover',
+							article?.containsAdultContents &&
+								article?.containsAdultContents !== AdultContents.NORMAL &&
+								'blur-sm',
+						)} />
 				{:else}
 					<div
 						class="banner-pattern aspect-video w-full bg-(--primary-color)"
@@ -58,10 +64,17 @@
 			</a>
 			<Card.Header>
 				{#if article?.type}
-					<div>
-						<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+					<div class="my-2 space-x-1">
+						<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
 							{ArticleTypeText[article?.type]()}
 						</Badge>
+						{#if article?.containsAdultContents}
+							{#if article.containsAdultContents === AdultContents.ADULT_RESTRICTED}
+								<Badge class="bg-destructive hover:bg-destructive/90">성인 콘텐츠</Badge>
+							{:else if article.containsAdultContents === AdultContents.GROTESQUE_RESTRICTED}
+								<Badge class="bg-destructive hover:bg-destructive/90">잔인한 콘텐츠</Badge>
+							{/if}
+						{/if}
 					</div>
 				{/if}
 				<Card.Title class="overflow-hidden">
@@ -71,6 +84,7 @@
 							class="text-[length:inherit] leading-[inherit] font-[weight:inherit]! text-inherit"
 							{href}>
 							{article?.title}
+							<!-- TODO: tooltip으로 전체 제목 표시 -->
 						</Button>
 					{:else}
 						{article?.title}
@@ -86,11 +100,11 @@
 					</Card.Description>
 				{/if}
 			</Card.Header>
-			<Card.Content>
-				<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+			<Card.Content class="my-2 space-y-1 space-x-1">
+				<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
 					#{CategoryText[article?.category]()}
 				</Badge>{#each article?.tags?.slice(0, 3) || [] as tag}
-					<Badge class="m-1" variant="secondary">#{tag}</Badge>
+					<Badge variant="secondary">#{tag}</Badge>
 				{/each}
 			</Card.Content>
 		</Card.Root>
