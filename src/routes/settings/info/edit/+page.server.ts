@@ -103,4 +103,37 @@ export const actions: Actions = {
 
 		return { message: 'Deletion of account completed' };
 	},
+
+	authenticate: async ({ locals, request }) => {
+		if (!locals.user) return fail(403);
+
+		const birthday = (await request.formData()).get('birthday');
+
+		if (!birthday) return fail(400, { message: 'Birthday is required' });
+
+		const birthday_ts = new Date(parseInt(birthday as string));
+
+		birthday_ts.setHours(0);
+		birthday_ts.setMinutes(0);
+		birthday_ts.setSeconds(0);
+		birthday_ts.setMilliseconds(0);
+
+		const auth = {
+			status: UserStatus.AUTHENTICATED,
+			birthday: birthday_ts,
+			authExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+		};
+
+		try {
+			await db.update(table.user).set(auth).where(eq(table.user.id, locals.user.id));
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return {
+			message: 'Authentication is completed',
+			auth,
+		};
+	},
 };

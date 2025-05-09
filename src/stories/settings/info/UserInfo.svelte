@@ -35,6 +35,7 @@
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
+	import { deserialize } from '$app/forms';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -46,7 +47,9 @@
 		};
 	}
 
-	const { data, for: userInfoFor, auth }: Props = $props();
+	const { data, for: userInfoFor, auth: prevAuth }: Props = $props();
+
+	let auth = $state(prevAuth);
 
 	let title = $state('');
 	let openErrorAlert = $state(false);
@@ -99,13 +102,29 @@
 	let openAuthenticationDialog = $state(false);
 	let openAuthenticationCompletedAlert = $state(false);
 	let openErrorOnAuthenticateAlert = $state(false);
-	let birthday = $state(new Date());
+	let birthday = $state(prevAuth?.birthday ?? new Date());
 
 	const onAuthenticate = async () => {
-		console.log(birthday);
-
 		openAuthenticationDialog = false;
-		openAuthenticationCompletedAlert = true;
+
+		const formData = new FormData();
+
+		formData.append('birthday', birthday.getTime().toString());
+
+		const result = await fetch('?/authenticate', {
+			method: 'post',
+			body: formData,
+		})
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			auth = result.data!.auth as typeof auth;
+			openAuthenticationCompletedAlert = true;
+		} else {
+			console.error(result);
+			openErrorOnAuthenticateAlert = true;
+		}
 	};
 </script>
 
@@ -198,8 +217,11 @@
 		{#if userInfoFor !== UserInfoFor.REGISTRATION}
 			<div class="my-4 space-y-4 border-2 p-4">
 				<div class="flex flex-row items-center space-y-0 space-x-3">
-					<Button onclick={() => (openAuthenticationDialog = true)}>본인인증</Button>
-					<!-- disabled={userInfoFor === UserInfoFor.INFO_VIEW} -->
+					<Button
+						onclick={() => (openAuthenticationDialog = true)}
+						disabled={userInfoFor === UserInfoFor.INFO_VIEW}>
+						본인인증
+					</Button>
 					<span class="text-sm">
 						본인인증
 						{#if auth?.status === UserStatus.NOT_AUTHENTICATED || !auth?.authExpiresAt || auth?.authExpiresAt < new Date()}
