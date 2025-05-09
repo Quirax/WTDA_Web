@@ -238,52 +238,52 @@
 					</span>
 				</div>
 				<Form.Field {form} name="display_adult_contents">
-					<Tooltip
-						text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 표시할 수 없습니다."
-						disabled={isAuthenticated && !isNotAdult}>
-						<div class="flex flex-row items-center space-y-0 space-x-3">
-							<Form.Control>
-								{#snippet children({ props })}
-									<!-- prettier-ignore -->
-									<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_adult_contents) || false, (v) => {
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_adult_contents) || false, (v) => {
 									($formData as Infer<UserSchema>).display_adult_contents = isAuthenticated && v
 									if(!v) ($formData as Infer<UserSchema>).display_grotesque_contents = false
 								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW} />
-									<div class="space-y-1 leading-none">
+								<div class="space-y-1 leading-none">
+									<Tooltip
+										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 표시할 수 없습니다."
+										disabled={isAuthenticated && !isNotAdult}>
 										<Form.Label>성인 콘텐츠를 표시합니다</Form.Label>
-									</div>
-									<input
-										name={props.name}
-										value={($formData as Infer<UserSchema>).display_adult_contents}
-										hidden />
-								{/snippet}
-							</Form.Control>
-						</div>
-					</Tooltip>
+									</Tooltip>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_adult_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
 					<Form.FieldErrors />
 				</Form.Field>
 				<Form.Field {form} name="display_grotesque_contents" class="ml-8">
-					<Tooltip
-						text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 표시할 수 없습니다."
-						disabled={isAuthenticated && !isNotAdult}>
-						<div class="flex flex-row items-center space-y-0 space-x-3">
-							<Form.Control>
-								{#snippet children({ props })}
-									<!-- prettier-ignore -->
-									<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_grotesque_contents) || false, (v) => {
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_grotesque_contents) || false, (v) => {
 									($formData as Infer<UserSchema>).display_grotesque_contents = isAuthenticated && ($formData as Infer<UserSchema>).display_adult_contents && v
 								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
-									<div class="space-y-1 leading-none">
+								<div class="space-y-1 leading-none">
+									<Tooltip
+										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 표시할 수 없습니다."
+										disabled={isAuthenticated && !isNotAdult}>
 										<Form.Label>유혈 등 잔인한 콘텐츠를 표시합니다</Form.Label>
-									</div>
-									<input
-										name={props.name}
-										value={($formData as Infer<UserSchema>).display_grotesque_contents}
-										hidden />
-								{/snippet}
-							</Form.Control>
-						</div>
-					</Tooltip>
+									</Tooltip>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_grotesque_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
 					<Form.FieldErrors />
 				</Form.Field>
 			</div>
