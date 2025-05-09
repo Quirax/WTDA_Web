@@ -40,6 +40,8 @@ export async function validateSessionToken(token: string) {
 				status: table.user.status,
 				preferences: table.user.preferences,
 				profile: table.user.profile,
+				birthday: table.user.birthday,
+				authExpiresAt: table.user.authExpiresAt,
 			},
 			session: table.session,
 		})

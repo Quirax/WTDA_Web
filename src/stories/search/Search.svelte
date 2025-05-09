@@ -45,6 +45,15 @@
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
+	const isAuthenticated = $derived(
+		me?.status === UserStatus.AUTHENTICATED &&
+			!!me?.authExpiresAt &&
+			me?.authExpiresAt >= new Date(),
+	);
+	const isNotAdult = $derived(
+		!me?.birthday || me.birthday.getFullYear() + 19 > new Date().getFullYear(),
+	);
+
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
 	});
@@ -384,7 +393,8 @@
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
-						{@const notAllowed = !me || !me.preferences.display_adult_contents}
+						{@const notAllowed =
+							!me || !isAuthenticated || isNotAdult || !me.preferences.display_adult_contents}
 						<Select.Root
 							type="single"
 							{...props}
@@ -417,6 +427,8 @@
 					{#snippet children({ props })}
 						{@const notAllowed =
 							!me ||
+							!isAuthenticated ||
+							isNotAdult ||
 							!me.preferences.display_grotesque_contents ||
 							$formData.adult_contents === 'excluded'}
 						<Select.Root

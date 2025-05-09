@@ -318,6 +318,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<input name={props.name} value={$formData.containsAdultContents} hidden />
+						<!-- TODO: 본인인증 안 된 경우 성인 콘텐츠 작성 불가 -->
 						<div class="flex flex-row items-center space-y-0 space-x-3">
 							<Checkbox
 								{...props}
@@ -333,6 +334,7 @@
 							</div>
 						</div>
 						<div class="ml-8 flex flex-row items-center space-y-0 space-x-3">
+							<!-- TODO: 본인인증 안 된 경우 잔인한 콘텐츠 작성 불가 -->
 							<Checkbox
 								{...props}
 								disabled={$formData.containsAdultContents === AdultContents.NORMAL}

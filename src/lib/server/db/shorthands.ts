@@ -1,4 +1,4 @@
-import { AdultContents, ArticleType } from '@app';
+import { AdultContents, ArticleType, UserStatus } from '@app';
 import { db } from '.';
 import * as table from './schema';
 import { and, desc, eq, ne, SQL, sql } from 'drizzle-orm';
@@ -7,7 +7,19 @@ import { unionAll } from 'drizzle-orm/pg-core';
 const generateCommonWhere = (t: typeof table.commissionRequest, currentUser?: App.User) => {
 	const commonWhere = [];
 
-	if (!currentUser || !currentUser.preferences.display_adult_contents)
+	const isAuthenticated =
+		currentUser?.status === UserStatus.AUTHENTICATED &&
+		!!currentUser?.authExpiresAt &&
+		currentUser?.authExpiresAt >= new Date();
+	const isNotAdult =
+		!currentUser?.birthday || currentUser.birthday.getFullYear() + 19 > new Date().getFullYear();
+
+	if (
+		!currentUser ||
+		!isAuthenticated ||
+		isNotAdult ||
+		!currentUser.preferences.display_adult_contents
+	)
 		commonWhere.push(eq(t.containsAdultContents, AdultContents.NORMAL));
 	else if (!currentUser.preferences.display_grotesque_contents)
 		commonWhere.push(ne(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
@@ -39,6 +51,8 @@ export const articlesPerType = (
 							email: table.user.email,
 							preferences: table.user.preferences,
 							profile: table.user.profile,
+							birthday: table.user.birthday,
+							authExpiresAt: table.user.authExpiresAt,
 						},
 						category: table.commissionRequest.category,
 						tags: table.commissionRequest.tags,
