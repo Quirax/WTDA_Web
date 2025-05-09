@@ -8,6 +8,7 @@ import {
 	integer,
 	boolean,
 	index,
+	date,
 } from 'drizzle-orm/pg-core';
 import { AdultContents, ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
 import { sql } from 'drizzle-orm';
@@ -21,15 +22,15 @@ export const user = pgTable(
 	'user',
 	{
 		id: text('id').primaryKey(),
-		// age: integer('age'),
 		username: text('username').notNull().unique(), // 닉네임
 		passwordHash: text('password_hash').notNull(), // 비밀번호
 		profileImage: text('profile_image'), // 프로필 이미지
-		// fallbackInitial: text('fallback_initial').notNull(), // 이니셜
 		email: text('email').notNull().unique(), // 이메일
 		status: statusEnum().notNull().default(UserStatus.REQUIRED_EMAIL_CONFIRM), // 사용자 상태
 		preferences: json('preferences').$type<Partial<App.Preferences>>().notNull().default({}),
 		profile: json('profile').$type<Partial<App.Profile>>().notNull().default({}),
+		birthday: timestamp('birthday', { withTimezone: true, mode: 'date' }),
+		authExpiresAt: timestamp('auth_expires_at', { withTimezone: true, mode: 'date' }),
 	},
 	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
 );
