@@ -215,6 +215,10 @@
 			</Form.Field>
 		{/if}
 		{#if userInfoFor !== UserInfoFor.REGISTRATION}
+			{@const isAuthenticated =
+				auth?.status === UserStatus.AUTHENTICATED &&
+				!!auth?.authExpiresAt &&
+				auth?.authExpiresAt >= new Date()}
 			<div class="my-4 space-y-4 border-2 p-4">
 				<div class="flex flex-row items-center space-y-0 space-x-3">
 					<Button
@@ -223,12 +227,7 @@
 						본인인증
 					</Button>
 					<span class="text-sm">
-						본인인증
-						{#if auth?.status === UserStatus.NOT_AUTHENTICATED || !auth?.authExpiresAt || auth?.authExpiresAt < new Date()}
-							해제
-						{:else}
-							완료
-						{/if}
+						본인인증 {isAuthenticated ? '완료' : '해제'}
 						{#if auth?.authExpiresAt}
 							({auth.authExpiresAt.getFullYear()}. {auth.authExpiresAt.getMonth() + 1}. {auth.authExpiresAt.getDate()}.
 							만료)
@@ -240,10 +239,11 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
-								<Checkbox {...props} bind:checked={() => ($formData as Infer<UserSchema>).display_adult_contents || false, (v) => {
-									($formData as Infer<UserSchema>).display_adult_contents = v
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && ($formData as Infer<UserSchema>).display_adult_contents) || false, (v) => {
+									($formData as Infer<UserSchema>).display_adult_contents = isAuthenticated && v
 									if(!v) ($formData as Infer<UserSchema>).display_grotesque_contents = false
-								}} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+								}} disabled={!isAuthenticated || userInfoFor === UserInfoFor.INFO_VIEW} />
+								<!-- TODO: !isAuthenticated 시 안내 툴팁 -->
 								<div class="space-y-1 leading-none">
 									<Form.Label>성인 콘텐츠를 표시합니다</Form.Label>
 								</div>
@@ -261,9 +261,10 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<!-- prettier-ignore -->
-								<Checkbox {...props} bind:checked={() => ($formData as Infer<UserSchema>).display_grotesque_contents || false, (v) => {
-									($formData as Infer<UserSchema>).display_grotesque_contents = ($formData as Infer<UserSchema>).display_adult_contents && v
-								}} disabled={userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && ($formData as Infer<UserSchema>).display_grotesque_contents) || false, (v) => {
+									($formData as Infer<UserSchema>).display_grotesque_contents = isAuthenticated && ($formData as Infer<UserSchema>).display_adult_contents && v
+								}} disabled={!isAuthenticated || userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
+								<!-- TODO: !isAuthenticated 시 안내 툴팁 -->
 								<div class="space-y-1 leading-none">
 									<Form.Label>유혈 등 잔인한 콘텐츠를 표시합니다</Form.Label>
 								</div>
