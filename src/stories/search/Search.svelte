@@ -389,7 +389,6 @@
 				</Form.Control>
 			</Form.Field>
 
-			<!-- TODO : notAllowed인 경우 안내 툴팁 표시 -->
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -421,7 +420,6 @@
 				</Form.Control>
 			</Form.Field>
 
-			<!-- TODO : notAllowed인 경우 안내 툴팁 표시 -->
 			<Form.Field {form} name="grotesque_contents">
 				<Form.Control>
 					{#snippet children({ props })}
@@ -455,12 +453,19 @@
 			</Form.Field>
 		</div>
 
+		<div class="text-muted-foreground text-sm">
+			본인인증이 진행되지 않았거나 미성년자인 경우, 표시 설정이 되지 않은 경우, 성인 콘텐츠 및
+			잔인한 콘텐츠를 검색할 수 없습니다. <Button variant="link" href="/settings/info">
+				사용자 설정
+			</Button>에서 확인하시기 바랍니다.
+		</div>
+
 		<input name="page" bind:value={page} hidden />
 	</form>
 	<section>
 		<ArticleList
 			id="contents-list"
-			class="my-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 			{articles}
 			hideMore />
 		<Pagination
