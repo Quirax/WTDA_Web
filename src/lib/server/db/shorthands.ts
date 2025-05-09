@@ -3,23 +3,12 @@ import { db } from '.';
 import * as table from './schema';
 import { and, desc, eq, ne, SQL, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
+import { isAdult } from '$lib/utils';
 
 const generateCommonWhere = (t: typeof table.commissionRequest, currentUser?: App.User) => {
 	const commonWhere = [];
 
-	const isAuthenticated =
-		currentUser?.status === UserStatus.AUTHENTICATED &&
-		!!currentUser?.authExpiresAt &&
-		currentUser?.authExpiresAt >= new Date();
-	const isNotAdult =
-		!currentUser?.birthday || currentUser.birthday.getFullYear() + 19 > new Date().getFullYear();
-
-	if (
-		!currentUser ||
-		!isAuthenticated ||
-		isNotAdult ||
-		!currentUser.preferences.display_adult_contents
-	)
+	if (!currentUser || !isAdult(currentUser) || !currentUser.preferences.display_adult_contents)
 		commonWhere.push(eq(t.containsAdultContents, AdultContents.NORMAL));
 	else if (!currentUser.preferences.display_grotesque_contents)
 		commonWhere.push(ne(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));

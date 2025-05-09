@@ -5,7 +5,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { ArticleTypeText, CategoryText, SearchFlagText, SearchRangeText } from '$lib/messages';
 	import * as Popover from '$lib/components/ui/popover';
-	import { cn, isDesktop } from '$lib/utils';
+	import { cn, isAdult as adultCheck, isDesktop } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
@@ -45,14 +45,7 @@
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
-	const isAuthenticated = $derived(
-		me?.status === UserStatus.AUTHENTICATED &&
-			!!me?.authExpiresAt &&
-			me?.authExpiresAt >= new Date(),
-	);
-	const isNotAdult = $derived(
-		!me?.birthday || me.birthday.getFullYear() + 19 > new Date().getFullYear(),
-	);
+	const isAdult = $derived(adultCheck(me));
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -392,8 +385,7 @@
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
-						{@const notAllowed =
-							!me || !isAuthenticated || isNotAdult || !me.preferences.display_adult_contents}
+						{@const notAllowed = !me || !isAdult || !me.preferences.display_adult_contents}
 						<Select.Root
 							type="single"
 							{...props}
@@ -425,8 +417,7 @@
 					{#snippet children({ props })}
 						{@const notAllowed =
 							!me ||
-							!isAuthenticated ||
-							isNotAdult ||
+							!isAdult ||
 							!me.preferences.display_grotesque_contents ||
 							$formData.adult_contents === 'excluded'}
 						<Select.Root
