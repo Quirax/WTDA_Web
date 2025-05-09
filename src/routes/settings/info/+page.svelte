@@ -5,4 +5,4 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<UserInfo data={data.form} for={UserInfoFor.INFO_VIEW} />
+<UserInfo data={data.form} for={UserInfoFor.INFO_VIEW} auth={data.auth} />

@@ -22,10 +22,13 @@ export const load = (async (event) => {
 		path: '/',
 	});
 
+	const preferences = await _getPreferences(event.locals.user.id);
+
 	return {
 		form: await superValidate(zod(userSchema), {
-			defaults: await _getPreferences(event.locals.user.id),
+			defaults: preferences.form,
 		}),
+		auth: preferences.auth,
 	};
 }) satisfies PageServerLoad;
 

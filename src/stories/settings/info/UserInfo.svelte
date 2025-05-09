@@ -10,7 +10,6 @@
 
 <script lang="ts">
 	import { formSchema, userSchema, type FormSchema, type UserSchema } from '$lib/schema/userInfo';
-
 	import Section from '../../components/Section.svelte';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import * as Form from '$lib/components/ui/form';
@@ -18,7 +17,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
-
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import User from 'lucide-svelte/icons/user';
@@ -32,13 +30,23 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import P from '$lib/components/typo/p.svelte';
 	import { goto } from '$app/navigation';
+	import { UserStatus } from '@app';
+	import { H3 } from '$lib/components/typo';
+	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import { fromDate, getLocalTimeZone, today } from '@internationalized/date';
+	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
 		for: UserInfoFor;
+		auth?: {
+			status: UserStatus;
+			birthday: Date | null;
+			authExpiresAt: Date | null;
+		};
 	}
 
-	const { data, for: userInfoFor }: Props = $props();
+	const { data, for: userInfoFor, auth }: Props = $props();
 
 	let title = $state('');
 	let openErrorAlert = $state(false);
@@ -86,6 +94,18 @@
 		}
 
 		openAfterDeactivationAlert = true;
+	};
+
+	let openAuthenticationDialog = $state(false);
+	let openAuthenticationCompletedAlert = $state(false);
+	let openErrorOnAuthenticateAlert = $state(false);
+	let birthday = $state(new Date());
+
+	const onAuthenticate = async () => {
+		console.log(birthday);
+
+		openAuthenticationDialog = false;
+		openAuthenticationCompletedAlert = true;
 	};
 </script>
 
@@ -177,6 +197,22 @@
 		{/if}
 		{#if userInfoFor !== UserInfoFor.REGISTRATION}
 			<div class="my-4 space-y-4 border-2 p-4">
+				<div class="flex flex-row items-center space-y-0 space-x-3">
+					<Button onclick={() => (openAuthenticationDialog = true)}>본인인증</Button>
+					<!-- disabled={userInfoFor === UserInfoFor.INFO_VIEW} -->
+					<span class="text-sm">
+						본인인증
+						{#if auth?.status === UserStatus.NOT_AUTHENTICATED || !auth?.authExpiresAt || auth?.authExpiresAt < new Date()}
+							해제
+						{:else}
+							완료
+						{/if}
+						{#if auth?.authExpiresAt}
+							({auth.authExpiresAt.getFullYear()}. {auth.authExpiresAt.getMonth() + 1}. {auth.authExpiresAt.getDate()}.
+							만료)
+						{/if}
+					</span>
+				</div>
 				<Form.Field {form} name="display_adult_contents">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
@@ -355,3 +391,44 @@
 	title="계정 비활성화 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnDeactivationAlert} />
+<AlertDialog
+	title="본인 인증을 완료하였습니다."
+	description="관련 법령에 따라 본인 인증은 1년 뒤 만료되나, 만료되더라도 다른 사람으로 재인증할 수 없습니다. 잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다."
+	bind:open={openAuthenticationCompletedAlert} />
+<AlertDialog
+	title="본인 인증 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnAuthenticateAlert} />
+
+<Dialog.Root bind:open={openAuthenticationDialog}>
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>임시 본인 인증: 생년월일 입력</Dialog.Title>
+			<Dialog.Description>
+				뭐하지공방이 본인 인증 서비스에 가입하기 전까지 생년월일을 기입하는 것으로 대신합니다.
+				<br />
+				<span class="text-destructive font-bold">한 번 생년월일을 저장하면 변경할 수 없으며,</span>
+				잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="flex justify-center">
+			<CalendarWithSelects
+				type="single"
+				maxValue={today(getLocalTimeZone())}
+				locale="ko-KR"
+				unselectable="off"
+				disabled={!!auth?.birthday}
+				bind:value={
+					() => fromDate(auth?.birthday ?? birthday, getLocalTimeZone()),
+					(v) => (birthday = v?.toDate() ?? new Date())
+				} />
+		</div>
+		<section class="text-right">
+			<Button onclick={onAuthenticate}>인증하기</Button>
+			<Button variant="secondary" onclick={() => (openAuthenticationDialog = false)}>
+				취소하기
+			</Button>
+		</section>
+	</Dialog.Content>
+</Dialog.Root>
