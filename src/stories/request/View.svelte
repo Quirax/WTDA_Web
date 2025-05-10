@@ -13,6 +13,7 @@
 	import { goto } from '$app/navigation';
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { AdultContents } from '@app';
+	import { page } from '$app/state';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
