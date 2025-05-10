@@ -23,6 +23,8 @@ export const load = (async ({ params, locals }) => {
 					email: table.user.email,
 					preferences: table.user.preferences,
 					profile: table.user.profile,
+					birthday: table.user.birthday,
+					authExpiresAt: table.user.authExpiresAt,
 				},
 				category: table.commissionRequest.category,
 				tags: table.commissionRequest.tags,
