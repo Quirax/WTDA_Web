@@ -4,8 +4,10 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
+import { AdultContents, ErrorCode } from '@app';
+import { isAdult } from '$lib/utils';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, locals }) => {
 	const id = params.id;
 
 	const article = (
@@ -21,6 +23,8 @@ export const load = (async ({ params }) => {
 					email: table.user.email,
 					preferences: table.user.preferences,
 					profile: table.user.profile,
+					birthday: table.user.birthday,
+					authExpiresAt: table.user.authExpiresAt,
 				},
 				category: table.commissionRequest.category,
 				tags: table.commissionRequest.tags,
@@ -42,11 +46,16 @@ export const load = (async ({ params }) => {
 	if (!article) throw error(404, { message: 'Cannot find matched request' });
 
 	if (article.visibleOnlyToCommissioner) {
-		// 커미션주인지 확인
+		// TODO: 커미션주인지 확인
 	}
 
-	if (article.containsAdultContents) {
-		// 성인 콘텐츠를 열람할 수 있는지 확인
+	if (article.containsAdultContents !== AdultContents.NORMAL) {
+		if (!isAdult(locals.user)) {
+			throw error(451, {
+				code: ErrorCode.ADULT_RESTRICTED,
+				message: "It's unavailable for legal reasons",
+			});
+		}
 	}
 
 	return {

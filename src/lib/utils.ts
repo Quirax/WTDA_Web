@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge';
 
 import DOMPurify from 'isomorphic-dompurify';
 import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
+import { UserStatus } from '@app';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -81,3 +82,13 @@ export function isDesktop() {
 export const sanitizeHTML = DOMPurify?.sanitize || (() => {});
 
 export type Union<T extends readonly string[]> = T[number];
+
+export const isAdult = (user: App.User) => {
+	const isAuthenticated =
+		user?.status === UserStatus.AUTHENTICATED &&
+		!!user?.authExpiresAt &&
+		user?.authExpiresAt >= new Date();
+	const isNotAdult = !user?.birthday || user.birthday.getFullYear() + 19 > new Date().getFullYear();
+
+	return isAuthenticated && !isNotAdult;
+};

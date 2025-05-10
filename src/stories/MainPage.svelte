@@ -77,7 +77,7 @@
 
 		<ArticleList
 			id="contents-list"
-			class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests} />
 	</Section>
 {/if}

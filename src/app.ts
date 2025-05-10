@@ -16,6 +16,10 @@ declare global {
 	>;
 
 	namespace App {
+		interface Error {
+			code?: ErrorCode;
+		}
+
 		interface Range<T> {
 			from: T;
 			to: T;
@@ -23,6 +27,8 @@ declare global {
 
 		interface Preferences {
 			agree_marketing: boolean;
+			display_adult_contents?: boolean;
+			display_grotesque_contents?: boolean;
 		}
 
 		interface Profile {
@@ -46,6 +52,7 @@ declare global {
 			tags: string[] | null;
 			id: string;
 			type?: ArticleType;
+			containsAdultContents?: AdultContents;
 		}
 
 		type CommisionType = Articles & {};
@@ -95,3 +102,13 @@ export type SearchRange = Union<typeof SearchRangeValues>;
 
 export const SearchFlagValues = ['all', 'excluded', 'required'] as const;
 export type SearchFlag = Union<typeof SearchFlagValues>;
+
+export enum AdultContents {
+	NORMAL = 'NORMAL',
+	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
+	GROTESQUE_RESTRICTED = 'GROTESQUE_RESTRICTED',
+}
+
+export enum ErrorCode {
+	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
+}

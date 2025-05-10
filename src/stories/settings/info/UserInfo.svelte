@@ -10,7 +10,6 @@
 
 <script lang="ts">
 	import { formSchema, userSchema, type FormSchema, type UserSchema } from '$lib/schema/userInfo';
-
 	import Section from '../../components/Section.svelte';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import * as Form from '$lib/components/ui/form';
@@ -18,7 +17,6 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
-
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import User from 'lucide-svelte/icons/user';
@@ -32,13 +30,27 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import P from '$lib/components/typo/p.svelte';
 	import { goto } from '$app/navigation';
+	import { UserStatus } from '@app';
+	import { H3 } from '$lib/components/typo';
+	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+	import { fromDate, getLocalTimeZone, today } from '@internationalized/date';
+	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
+	import { deserialize } from '$app/forms';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
 		for: UserInfoFor;
+		auth?: {
+			status: UserStatus;
+			birthday: Date | null;
+			authExpiresAt: Date | null;
+		};
 	}
 
-	const { data, for: userInfoFor }: Props = $props();
+	const { data, for: userInfoFor, auth: prevAuth }: Props = $props();
+
+	let auth = $state(prevAuth);
 
 	let title = $state('');
 	let openErrorAlert = $state(false);
@@ -86,6 +98,34 @@
 		}
 
 		openAfterDeactivationAlert = true;
+	};
+
+	let openAuthenticationDialog = $state(false);
+	let openAuthenticationCompletedAlert = $state(false);
+	let openErrorOnAuthenticateAlert = $state(false);
+	let birthday = $state(prevAuth?.birthday ?? new Date());
+
+	const onAuthenticate = async () => {
+		openAuthenticationDialog = false;
+
+		const formData = new FormData();
+
+		formData.append('birthday', birthday.getTime().toString());
+
+		const result = await fetch('?/authenticate', {
+			method: 'post',
+			body: formData,
+		})
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			auth = result.data!.auth as typeof auth;
+			openAuthenticationCompletedAlert = true;
+		} else {
+			console.error(result);
+			openErrorOnAuthenticateAlert = true;
+		}
 	};
 </script>
 
@@ -175,9 +215,82 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
-		<div class="my-4 border-2">
+		{#if userInfoFor !== UserInfoFor.REGISTRATION}
+			{@const isAuthenticated =
+				auth?.status === UserStatus.AUTHENTICATED &&
+				!!auth?.authExpiresAt &&
+				auth?.authExpiresAt >= new Date()}
+			{@const isNotAdult =
+				!auth?.birthday || auth.birthday.getFullYear() + 19 > new Date().getFullYear()}
+			<div class="my-4 space-y-4 border-2 p-4">
+				<div class="flex flex-row items-center space-y-0 space-x-3">
+					<Button
+						onclick={() => (openAuthenticationDialog = true)}
+						disabled={userInfoFor === UserInfoFor.INFO_VIEW}>
+						본인인증
+					</Button>
+					<span class="text-sm">
+						본인인증 {isAuthenticated ? '완료' : '해제'}
+						{#if auth?.authExpiresAt}
+							({auth.authExpiresAt.getFullYear()}. {auth.authExpiresAt.getMonth() + 1}. {auth.authExpiresAt.getDate()}.
+							만료)
+						{/if}
+					</span>
+				</div>
+				<Form.Field {form} name="display_adult_contents">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_adult_contents) || false, (v) => {
+									($formData as Infer<UserSchema>).display_adult_contents = isAuthenticated && v
+									if(!v) ($formData as Infer<UserSchema>).display_grotesque_contents = false
+								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW} />
+								<div class="space-y-1 leading-none">
+									<Tooltip
+										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 표시할 수 없습니다."
+										disabled={isAuthenticated && !isNotAdult}>
+										<Form.Label>성인 콘텐츠를 표시합니다</Form.Label>
+									</Tooltip>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_adult_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="display_grotesque_contents" class="ml-8">
+					<div class="flex flex-row items-center space-y-0 space-x-3">
+						<Form.Control>
+							{#snippet children({ props })}
+								<!-- prettier-ignore -->
+								<Checkbox {...props} bind:checked={() => (isAuthenticated && !isNotAdult && ($formData as Infer<UserSchema>).display_grotesque_contents) || false, (v) => {
+									($formData as Infer<UserSchema>).display_grotesque_contents = isAuthenticated && ($formData as Infer<UserSchema>).display_adult_contents && v
+								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
+								<div class="space-y-1 leading-none">
+									<Tooltip
+										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 표시할 수 없습니다."
+										disabled={isAuthenticated && !isNotAdult}>
+										<Form.Label>유혈 등 잔인한 콘텐츠를 표시합니다</Form.Label>
+									</Tooltip>
+								</div>
+								<input
+									name={props.name}
+									value={($formData as Infer<UserSchema>).display_grotesque_contents}
+									hidden />
+							{/snippet}
+						</Form.Control>
+					</div>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
+		{/if}
+		<div class="my-4 space-y-4 border-2 p-4">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
-				<Form.Field {form} name="agree_eula" class="p-4">
+				<Form.Field {form} name="agree_eula">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -199,7 +312,7 @@
 					</div>
 					<Form.FieldErrors />
 				</Form.Field>
-				<Form.Field {form} name="agree_privacypolicy" class="p-4">
+				<Form.Field {form} name="agree_privacypolicy">
 					<div class="flex flex-row items-center space-y-0 space-x-3">
 						<Form.Control>
 							{#snippet children({ props })}
@@ -222,7 +335,7 @@
 					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
-			<Form.Field {form} name="agree_marketing" class="p-4">
+			<Form.Field {form} name="agree_marketing">
 				<div class="flex flex-row items-center space-y-0 space-x-3">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -310,3 +423,44 @@
 	title="계정 비활성화 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnDeactivationAlert} />
+<AlertDialog
+	title="본인 인증을 완료하였습니다."
+	description="관련 법령에 따라 본인 인증은 1년 뒤 만료되나, 만료되더라도 다른 사람으로 재인증할 수 없습니다. 잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다."
+	bind:open={openAuthenticationCompletedAlert} />
+<AlertDialog
+	title="본인 인증 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnAuthenticateAlert} />
+
+<Dialog.Root bind:open={openAuthenticationDialog}>
+	<Dialog.Content
+		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>임시 본인 인증: 생년월일 입력</Dialog.Title>
+			<Dialog.Description>
+				뭐하지공방이 본인 인증 서비스에 가입하기 전까지 생년월일을 기입하는 것으로 대신합니다.
+				<br />
+				<span class="text-destructive font-bold">한 번 생년월일을 저장하면 변경할 수 없으며,</span>
+				잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다.
+			</Dialog.Description>
+		</Dialog.Header>
+		<div class="flex justify-center">
+			<CalendarWithSelects
+				type="single"
+				maxValue={today(getLocalTimeZone())}
+				locale="ko-KR"
+				unselectable="off"
+				disabled={!!auth?.birthday}
+				bind:value={
+					() => fromDate(auth?.birthday ?? birthday, getLocalTimeZone()),
+					(v) => (birthday = v?.toDate() ?? new Date())
+				} />
+		</div>
+		<section class="text-right">
+			<Button onclick={onAuthenticate}>인증하기</Button>
+			<Button variant="secondary" onclick={() => (openAuthenticationDialog = false)}>
+				취소하기
+			</Button>
+		</section>
+	</Dialog.Content>
+</Dialog.Root>

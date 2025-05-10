@@ -5,7 +5,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { ArticleTypeText, CategoryText, SearchFlagText, SearchRangeText } from '$lib/messages';
 	import * as Popover from '$lib/components/ui/popover';
-	import { cn, isDesktop } from '$lib/utils';
+	import { cn, isAdult as adultCheck, isDesktop } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
@@ -30,6 +30,7 @@
 	} from '@internationalized/date';
 	import { searchResultsPerPage } from '$lib/config';
 	import { untrack } from 'svelte';
+	import { userStore } from '$lib/context';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
@@ -40,6 +41,11 @@
 	}
 
 	const { params, articles, count, page: currentPage, query }: Props = $props();
+
+	let me = $state<App.User>(null);
+	userStore.subscribe((v) => (me = v));
+
+	const isAdult = $derived(adultCheck(me));
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -379,9 +385,51 @@
 			<Form.Field {form} name="adult_contents">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Select.Root type="single" {...props} bind:value={$formData.adult_contents}>
-							<Select.Trigger class="w-[11em]">
-								{'성인 콘텐츠: ' + flagText($formData.adult_contents)}
+						{@const notAllowed = !me || !isAdult || !me.preferences.display_adult_contents}
+						<Select.Root
+							type="single"
+							{...props}
+							disabled={notAllowed}
+							bind:value={
+								() => (notAllowed ? 'excluded' : $formData.adult_contents),
+								(v) => {
+									$formData.adult_contents = notAllowed ? 'excluded' : v;
+									if (v === 'excluded') $formData.grotesque_contents = 'excluded';
+								}
+							}>
+							<Select.Trigger>
+								<div class="mr-2">{'성인 콘텐츠: ' + flagText($formData.adult_contents)}</div>
+							</Select.Trigger>
+							<Select.Content>
+								{#each Object.entries(SearchFlagText) as [k, v]}
+									<Select.Item value={k}>
+										{v()}
+									</Select.Item>
+								{/each}
+							</Select.Content>
+						</Select.Root>
+					{/snippet}
+				</Form.Control>
+			</Form.Field>
+
+			<Form.Field {form} name="grotesque_contents">
+				<Form.Control>
+					{#snippet children({ props })}
+						{@const notAllowed =
+							!me ||
+							!isAdult ||
+							!me.preferences.display_grotesque_contents ||
+							$formData.adult_contents === 'excluded'}
+						<Select.Root
+							type="single"
+							{...props}
+							disabled={notAllowed}
+							bind:value={
+								() => (notAllowed ? 'excluded' : $formData.grotesque_contents),
+								(v) => ($formData.grotesque_contents = notAllowed ? 'excluded' : v)
+							}>
+							<Select.Trigger>
+								<div class="mr-2">{'잔인한 콘텐츠: ' + flagText($formData.grotesque_contents)}</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchFlagText) as [k, v]}
@@ -396,12 +444,19 @@
 			</Form.Field>
 		</div>
 
+		<div class="text-muted-foreground text-sm">
+			본인인증이 진행되지 않았거나 미성년자인 경우, 표시 설정이 되지 않은 경우, 성인 콘텐츠 및
+			잔인한 콘텐츠를 검색할 수 없습니다. <Button variant="link" href="/settings/info">
+				사용자 설정
+			</Button>에서 확인하시기 바랍니다.
+		</div>
+
 		<input name="page" bind:value={page} hidden />
 	</form>
 	<section>
 		<ArticleList
 			id="contents-list"
-			class="my-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+			class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
 			{articles}
 			hideMore />
 		<Pagination

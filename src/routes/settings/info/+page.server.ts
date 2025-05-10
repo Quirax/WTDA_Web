@@ -7,30 +7,47 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const load = (async ({ locals }) => {
-	if (!locals.user) throw redirect(302, '/');
-
+export const _getPreferences = async (userId: string) => {
 	const results = (
 		await db
 			.select({
-				user: {
-					preferences: table.user.preferences,
-				},
+				preferences: table.user.preferences,
+				status: table.user.status,
+				birthday: table.user.birthday,
+				authExpiresAt: table.user.authExpiresAt,
 			})
 			.from(table.user)
-			.where(eq(table.user.id, locals.user.id))
+			.where(eq(table.user.id, userId))
 	).at(0);
 
 	if (!results) throw redirect(302, '/');
 
+	const preferences = results.preferences as Partial<App.Preferences>;
+
+	return {
+		form: {
+			agree_marketing: preferences.agree_marketing || false,
+			display_adult_contents: preferences.display_adult_contents || false,
+			display_grotesque_contents: preferences.display_grotesque_contents || false,
+		},
+		auth: {
+			status: results.status,
+			birthday: results.birthday,
+			authExpiresAt: results.authExpiresAt,
+		},
+	};
+};
+
+export const load = (async ({ locals }) => {
+	if (!locals.user) throw redirect(302, '/');
+
+	const preferences = await _getPreferences(locals.user.id);
+
 	return {
 		form: await superValidate(zod(userSchema), {
-			defaults: {
-				agree_marketing:
-					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
-					false,
-			},
+			defaults: preferences.form,
 		}),
+		auth: preferences.auth,
 	};
 }) satisfies PageServerLoad;
 

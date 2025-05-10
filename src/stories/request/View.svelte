@@ -12,6 +12,8 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { goto } from '$app/navigation';
 	import Ul from '$lib/components/typo/ul.svelte';
+	import { AdultContents } from '@app';
+	import { page } from '$app/state';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -42,6 +44,15 @@
 		openAfterDeletionAlert = true;
 	};
 </script>
+
+<svelte:head>
+	{#if article.containsAdultContents !== AdultContents.NORMAL}
+		<!-- 「청소년 유해매체물의 표시방법」(방송통신위원회고시 제2015-17호)에 따른 전자적 표시 -->
+		{/* @ts-ignore */ null}
+		<!-- prettier-ignore -->
+		<meta http-equiv="PICS-label" content='(PICS-1.1 "http://service.kosec.or.kr/rating.html" l gen false for "{page.url}" r (y 1))' />
+	{/if}
+</svelte:head>
 
 <Header title={article.title} />
 

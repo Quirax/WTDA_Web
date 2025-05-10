@@ -3,7 +3,7 @@ import { superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from '$lib/schema/userInfo';
-import { _userInfoEditCookie } from '../+page.server';
+import { _getPreferences, _userInfoEditCookie } from '../+page.server';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -22,27 +22,13 @@ export const load = (async (event) => {
 		path: '/',
 	});
 
-	const results = (
-		await db
-			.select({
-				user: {
-					preferences: table.user.preferences,
-				},
-			})
-			.from(table.user)
-			.where(eq(table.user.id, event.locals.user.id))
-	).at(0);
-
-	if (!results) throw redirect(302, '/');
+	const preferences = await _getPreferences(event.locals.user.id);
 
 	return {
 		form: await superValidate(zod(userSchema), {
-			defaults: {
-				agree_marketing:
-					(results.user.preferences as Partial<{ agree_marketing: boolean }>).agree_marketing ||
-					false,
-			},
+			defaults: preferences.form,
 		}),
+		auth: preferences.auth,
 	};
 }) satisfies PageServerLoad;
 
@@ -56,16 +42,17 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
 
-		const { password, agree_marketing } = form.data;
+		const { password, agree_marketing, display_adult_contents, display_grotesque_contents } =
+			form.data;
 
 		let set: Partial<{
-			preferences: {
-				agree_marketing: typeof agree_marketing;
-			};
+			preferences: App.Preferences;
 		}> &
 			Partial<{ passwordHash: string }> = {
 			preferences: {
 				agree_marketing,
+				display_adult_contents,
+				display_grotesque_contents,
 			},
 		};
 
@@ -115,5 +102,38 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Deletion of account completed' };
+	},
+
+	authenticate: async ({ locals, request }) => {
+		if (!locals.user) return fail(403);
+
+		const birthday = (await request.formData()).get('birthday');
+
+		if (!birthday) return fail(400, { message: 'Birthday is required' });
+
+		const birthday_ts = new Date(parseInt(birthday as string));
+
+		birthday_ts.setHours(0);
+		birthday_ts.setMinutes(0);
+		birthday_ts.setSeconds(0);
+		birthday_ts.setMilliseconds(0);
+
+		const auth = {
+			status: UserStatus.AUTHENTICATED,
+			birthday: birthday_ts,
+			authExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+		};
+
+		try {
+			await db.update(table.user).set(auth).where(eq(table.user.id, locals.user.id));
+		} catch (e: any) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return {
+			message: 'Authentication is completed',
+			auth,
+		};
 	},
 };

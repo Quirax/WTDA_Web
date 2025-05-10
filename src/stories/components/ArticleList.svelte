@@ -6,7 +6,8 @@
 	import Avatar from './Avatar.svelte';
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
-	import { ArticleType } from '@app';
+	import { AdultContents, ArticleType } from '@app';
+	import { cn } from '$lib/utils';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -48,7 +49,12 @@
 					<img
 						src={article?.thumbnail}
 						alt={article?.title}
-						class="aspect-video w-full object-cover" />
+						class={cn(
+							'aspect-video w-full object-cover',
+							article?.containsAdultContents &&
+								article?.containsAdultContents !== AdultContents.NORMAL &&
+								'blur-sm',
+						)} />
 				{:else}
 					<div
 						class="banner-pattern aspect-video w-full bg-(--primary-color)"
@@ -58,27 +64,35 @@
 			</a>
 			<Card.Header>
 				{#if article?.type}
-					<div>
-						<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+					<div class="my-2 space-x-1">
+						<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
 							{ArticleTypeText[article?.type]()}
 						</Badge>
+						{#if article?.containsAdultContents}
+							{#if article.containsAdultContents === AdultContents.ADULT_RESTRICTED}
+								<Badge class="bg-destructive hover:bg-destructive/90">성인 콘텐츠</Badge>
+							{:else if article.containsAdultContents === AdultContents.GROTESQUE_RESTRICTED}
+								<Badge class="bg-destructive hover:bg-destructive/90">잔인한 콘텐츠</Badge>
+							{/if}
+						{/if}
 					</div>
 				{/if}
-				<Card.Title>
+				<Card.Title class="overflow-hidden">
 					{#if article?.type}
 						<Button
 							variant="link"
 							class="text-[length:inherit] leading-[inherit] font-[weight:inherit]! text-inherit"
 							{href}>
 							{article?.title}
+							<!-- TODO: tooltip으로 전체 제목 표시 -->
 						</Button>
 					{:else}
 						{article?.title}
 					{/if}
 				</Card.Title>
 				{#if !hideAuthor}
-					<Card.Description class="text-right">
-						by
+					<Card.Description class="flex items-center justify-end space-x-2">
+						<span>by</span>
 						<Button variant="link" class="text-inherit" href="/user/{article?.author.id}">
 							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
 							{article?.author.username}
@@ -86,12 +100,11 @@
 					</Card.Description>
 				{/if}
 			</Card.Header>
-			<Card.Content>
-				<Badge class="m-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
+			<Card.Content class="my-2 space-y-1 space-x-1">
+				<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
 					#{CategoryText[article?.category]()}
-				</Badge>
-				{#each article?.tags?.slice(0, 3) || [] as tag}
-					<Badge class="m-1" variant="secondary">#{tag}</Badge>
+				</Badge>{#each article?.tags?.slice(0, 3) || [] as tag}
+					<Badge variant="secondary">#{tag}</Badge>
 				{/each}
 			</Card.Content>
 		</Card.Root>

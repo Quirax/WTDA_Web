@@ -1,4 +1,4 @@
-import { ArticleType } from '@app';
+import { AdultContents, ArticleType } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
 import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, ZodType, type ZodTypeAny } from 'zod';
@@ -111,13 +111,36 @@ const createCriteria = (
 	if (params.commercial_use === 'excluded') criteria.push(ne(t.isForCommercial, true));
 	else if (params.commercial_use === 'required') criteria.push(eq(t.isForCommercial, true));
 
-	if (params.adult_contents === 'excluded') criteria.push(ne(t.containsAdultContents, true));
-	else if (params.adult_contents === 'required') criteria.push(eq(t.containsAdultContents, true));
+	if (params.adult_contents === 'excluded')
+		criteria.push(eq(t.containsAdultContents, AdultContents.NORMAL));
+	else if (params.adult_contents === 'required')
+		switch (params.grotesque_contents) {
+			case 'all':
+				criteria.push(ne(t.containsAdultContents, AdultContents.NORMAL));
+				break;
+			case 'excluded':
+				criteria.push(eq(t.containsAdultContents, AdultContents.ADULT_RESTRICTED));
+				break;
+			case 'required':
+				criteria.push(eq(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+		}
+	else
+		switch (params.grotesque_contents) {
+			case 'all':
+				break;
+			case 'excluded':
+				criteria.push(ne(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+			case 'required':
+				criteria.push(eq(t.containsAdultContents, AdultContents.GROTESQUE_RESTRICTED));
+				break;
+		}
 
 	return and(...criteria);
 };
 
-export const load = (async ({ url, untrack, ...rest }) => {
+export const load = (async ({ url, untrack, locals, ...rest }) => {
 	const page = parseInt(url.searchParams.get('page') || '1');
 
 	// query params
@@ -139,19 +162,23 @@ export const load = (async ({ url, untrack, ...rest }) => {
 
 	if (parsed.success) {
 		try {
-			const all = allArticles(parsed.data.type, {
-				request: createCriteria(parsed.data, table.commissionRequest, {
-					budgetColumn: table.commissionRequest.budget,
-					dateColumn: table.commissionRequest.deadline,
-				}),
-			});
+			const all = allArticles(
+				parsed.data.type,
+				{
+					request: createCriteria(parsed.data, table.commissionRequest, {
+						budgetColumn: table.commissionRequest.budget,
+						dateColumn: table.commissionRequest.deadline,
+					}),
+				},
+				locals.user,
+			);
 
 			if (all) count = await db.$count(all);
 
 			articles =
 				(await all
-					?.orderBy(desc(table.commissionRequest.createDate))
-					.limit(searchResultsPerPage)
+					// ?.orderBy(desc(table.commissionRequest.createDate))
+					?.limit(searchResultsPerPage)
 					.offset(searchResultsPerPage * (page - 1))) || [];
 		} catch (e) {
 			console.error(e);
