@@ -16,6 +16,10 @@ declare global {
 	>;
 
 	namespace App {
+		interface Error {
+			code?: ErrorCode;
+		}
+
 		interface Range<T> {
 			from: T;
 			to: T;
@@ -103,4 +107,8 @@ export enum AdultContents {
 	NORMAL = 'NORMAL',
 	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
 	GROTESQUE_RESTRICTED = 'GROTESQUE_RESTRICTED',
+}
+
+export enum ErrorCode {
+	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
 }
