@@ -13,7 +13,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import * as Popover from '$lib/components/ui/popover';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import { cn } from '$lib/utils';
+	import { cn, isAdult } from '$lib/utils';
 	import { CalendarIcon, X } from 'lucide-svelte';
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
@@ -23,6 +23,8 @@
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
 	import { AdultContents } from '@app';
+	import { userStore } from '$lib/context';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -32,6 +34,9 @@
 		data: SuperValidated<Infer<FormSchema>>;
 		editMode?: boolean;
 	}
+
+	let me = $state<App.User>(null);
+	userStore.subscribe((v) => (me = v));
 
 	const { data, editMode = false }: Props = $props();
 
@@ -318,10 +323,10 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<input name={props.name} value={$formData.containsAdultContents} hidden />
-						<!-- TODO: 본인인증 안 된 경우 성인 콘텐츠 작성 불가 -->
 						<div class="flex flex-row items-center space-y-0 space-x-3">
 							<Checkbox
 								{...props}
+								disabled={!isAdult(me)}
 								bind:checked={
 									() => $formData.containsAdultContents !== AdultContents.NORMAL,
 									(v) =>
@@ -330,14 +335,17 @@
 											: AdultContents.NORMAL)
 								} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip
+									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 작성할 수 없습니다."
+									disabled={isAdult(me)}>
+									<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
+								</Tooltip>
 							</div>
 						</div>
 						<div class="ml-8 flex flex-row items-center space-y-0 space-x-3">
-							<!-- TODO: 본인인증 안 된 경우 잔인한 콘텐츠 작성 불가 -->
 							<Checkbox
 								{...props}
-								disabled={$formData.containsAdultContents === AdultContents.NORMAL}
+								disabled={!isAdult(me) || $formData.containsAdultContents === AdultContents.NORMAL}
 								bind:checked={
 									() => $formData.containsAdultContents === AdultContents.GROTESQUE_RESTRICTED,
 									(v) =>
@@ -346,7 +354,11 @@
 											: AdultContents.ADULT_RESTRICTED)
 								} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip
+									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 작성할 수 없습니다."
+									disabled={isAdult(me)}>
+									<Form.Label>이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.</Form.Label>
+								</Tooltip>
 							</div>
 						</div>
 					{/snippet}
