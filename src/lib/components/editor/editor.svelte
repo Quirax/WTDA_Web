@@ -25,16 +25,39 @@
 		['clean'], // remove formatting button
 	];
 
+	const onUploadImage = async (file: File) => {
+		const formData = new FormData();
+		formData.append('file', file);
+
+		try {
+			const resp = await fetch('/api/file/attach', {
+				method: 'PUT',
+				body: formData,
+			}).then((r) => r.json());
+
+			return '/api/file/' + resp.path;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	$effect(() => {
 		if (!browser) return;
 		if (!holder) return;
 
 		import('quill').then(async ({ default: Quill }) => {
+			// @ts-ignore
+			Quill.register('modules/imageUploader', (await import('quill-image-uploader')).default);
+
 			const options: QuillOptions = {
 				bounds: holder,
 				debug: 'warn',
 				modules: {
 					toolbar: toolbarOptions,
+					imageUploader: {
+						upload: onUploadImage,
+					},
 				},
 				placeholder: '내용을 입력하십시오...', // TODO: props
 				readOnly: false, // TODO: props

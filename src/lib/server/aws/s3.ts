@@ -52,7 +52,7 @@ const commander = <Input extends ServiceInputTypes, Output extends ServiceOutput
 		} & Body
 	>;
 
-export const put = (destPath: string, file: string | Uint8Array | Buffer | ReadableStream) =>
+export const put = (destPath: string, file: string | Uint8Array | Buffer | ReadableStream | File) =>
 	commander(
 		new PutObjectCommand({
 			Bucket: bucket,
