@@ -6,6 +6,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { formSchema } from '$lib/schema/request';
+import { _registerAttaches } from '../../create/+page.server';
 
 export const load = (async ({ params, locals }) => {
 	if (!locals.user) throw redirect(302, '/');
@@ -74,6 +75,8 @@ export const actions: Actions = {
 					...form.data,
 				})
 				.where(eq(table.commissionRequest.id, id));
+
+			await _registerAttaches(id, form.data.content);
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred', form });

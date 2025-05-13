@@ -3,7 +3,8 @@ import * as S3 from '$lib/server/aws/s3';
 import { error, json } from '@sveltejs/kit';
 import { imageMime } from '$lib/config';
 import { join as pathJoin } from 'node:path';
-import { generateID } from '$lib/server/db';
+import { db, generateID, table } from '$lib/server/db';
+import { eq } from 'drizzle-orm';
 
 export const GET: RequestHandler = async ({ params }) => {
 	const path = params.path;
@@ -47,9 +48,14 @@ export const PUT: RequestHandler = async ({ params, locals, request }) => {
 	const stream = new Uint8Array(await file.arrayBuffer());
 
 	try {
+		// 파일 업로드
 		await S3.put(path, stream);
 
-		// TODO: DB를 통해 파일과 소유주 연결
+		// 파일 목록에 등록
+		await db.insert(table.files).values({
+			path,
+			owner: locals.user.id,
+		});
 
 		return json({ message: 'Uploaded successfully', path });
 	} catch (err: any) {
@@ -66,11 +72,24 @@ export const DELETE: RequestHandler = async ({ params, locals }) => {
 	if (!path) throw error(400, { message: 'Requires path' });
 
 	try {
-		// TODO: 파일의 소유주 검증
+		// 파일의 소유주 검증
+		const file = (
+			await db
+				.select()
+				.from(table.files)
+				.where(eq(table.files.path, path))
+				.catch(() => {
+					throw error(404);
+				})
+		)[0];
+
+		if (file.owner !== locals.user.id)
+			throw error(403, { message: 'The current user is not owner of the file' });
 
 		await S3.remove(path);
 
-		// TODO: 파일 등록 해제
+		// 파일 등록 해제
+		await db.delete(table.files).where(eq(table.files.path, path));
 
 		return json({ message: 'Removed successfully ' });
 	} catch (err: any) {
