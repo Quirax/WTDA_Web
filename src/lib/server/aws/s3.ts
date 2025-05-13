@@ -37,7 +37,7 @@ const commander = <Input extends ServiceInputTypes, Output extends ServiceOutput
 ) =>
 	S3.send(command)
 		.then((response) => {
-			if (response.$metadata.httpStatusCode == 200) {
+			if ([200, 204].includes(response.$metadata.httpStatusCode || 0)) {
 				return { success: true, ...bodyGen(response) };
 			} else {
 				throw { success: false, reason: response.$metadata.httpStatusCode };

@@ -42,6 +42,27 @@
 		}
 	};
 
+	const onRemoveImage = async (url: string) => {
+		try {
+			await fetch(url, {
+				method: 'DELETE',
+			}).then((r) => r.json());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const getImagesFromDelta = (delta: Delta) =>
+		delta.ops
+			.map((v) => v.insert)
+			.reduce((acc, cur) => {
+				if (typeof cur === 'object' && typeof cur.image === 'string') {
+					return [...acc, cur.image];
+				} else return acc;
+			}, new Array<string>())
+			.filter((v) => !v.startsWith('data:'));
+
 	$effect(() => {
 		if (!browser) return;
 		if (!holder) return;
@@ -68,10 +89,16 @@
 			quill.clipboard.dangerouslyPasteHTML(value); // ref: https://developer-lte.tistory.com/entry/Quill-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%88%98%EC%A0%95-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-%EC%9E%AC%ED%99%9C%EC%9A%A9
 			onchange(quill.getSemanticHTML(), quill.getContents());
 
-			quill.on('editor-change', () => {
+			quill.on('text-change', (delta, oldDelta, source) => {
 				value = quill.getSemanticHTML();
 
-				onchange(quill.getSemanticHTML(), quill.getContents());
+				const current = quill.getContents();
+				const currentImages = new Set(getImagesFromDelta(current));
+				const oldImages = new Set(getImagesFromDelta(oldDelta));
+
+				oldImages.difference(currentImages).forEach(async (v) => await onRemoveImage(v));
+
+				onchange(quill.getSemanticHTML(), current);
 			});
 
 			holder!.parentElement!.classList.add('ql-ko');
