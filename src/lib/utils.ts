@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge';
 
 import DOMPurify from 'isomorphic-dompurify';
 import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
-import { UserStatus } from '@app';
+import { UserStatus } from '../app';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
