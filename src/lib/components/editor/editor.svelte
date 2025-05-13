@@ -100,7 +100,9 @@
 		}
 
 		.ql-container {
-			overflow-y: hidden;
+			overflow-y: scroll;
+			min-height: 300px;
+			max-height: 80vh;
 		}
 
 		.ql-ko {
