@@ -142,6 +142,19 @@ const filesPerArticle = (name: string, table: ReturnType<typeof articleTable>) =
 
 export const filesPerRequest = filesPerArticle('files_per_request', commissionRequest);
 
+export const filesPerProfile = pgTable(
+	'files_per_profile',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id),
+		path: text('path')
+			.notNull()
+			.references(() => files.path, { onDelete: 'cascade' }),
+	},
+	(table) => [unique().on(table.userId, table.path)],
+);
+
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type EmailConfirm = typeof emailConfirm.$inferSelect;
