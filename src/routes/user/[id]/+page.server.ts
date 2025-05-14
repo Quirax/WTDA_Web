@@ -105,6 +105,9 @@ export const actions: Actions = {
 
 		try {
 			await db.update(table.user).set(set).where(eq(table.user.id, event.locals.user.id));
+
+			// 포함된 이미지 등록
+			await _registerAttaches(event.locals.user.id, introduction || '', profileImage, headerImage);
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred', form });
@@ -263,4 +266,26 @@ export const actions: Actions = {
 
 		return { message: 'Got articles List', list: results };
 	},
+};
+
+const _registerAttaches = async (
+	userId: string,
+	body: string,
+	profileImage?: string | null,
+	headerImage?: string | null,
+) => {
+	// 기존에 등록된 모든 첨부 파일 등록 해제
+	await db.delete(table.filesPerProfile).where(eq(table.filesPerProfile.userId, userId));
+
+	// 모든 첨부 파일을 새로 등록
+	const inserts = [
+		...body.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g),
+		...(profileImage?.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g) ?? []),
+		...(headerImage?.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g) ?? []),
+	].map((match) => ({
+		userId,
+		path: match[1],
+	}));
+
+	if (inserts.length > 0) await db.insert(table.filesPerProfile).values(inserts);
 };
