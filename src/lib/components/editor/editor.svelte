@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { uploadImage } from '$lib/utils';
 	import type { Delta, QuillOptions } from 'quill';
 
 	interface Props {
@@ -25,23 +26,6 @@
 		['clean'], // remove formatting button
 	];
 
-	const onUploadImage = async (file: File) => {
-		const formData = new FormData();
-		formData.append('file', file);
-
-		try {
-			const resp = await fetch('/api/file/attach', {
-				method: 'PUT',
-				body: formData,
-			}).then((r) => r.json());
-
-			return '/api/file/' + resp.path;
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	$effect.pre(() => {
 		if (!browser) return;
 		if (!holder) return;
@@ -56,7 +40,7 @@
 				modules: {
 					toolbar: toolbarOptions,
 					imageUploader: {
-						upload: onUploadImage,
+						upload: uploadImage,
 					},
 				},
 				placeholder: '내용을 입력하십시오...', // TODO: props
