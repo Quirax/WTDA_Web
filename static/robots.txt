@@ -1,0 +1,21 @@
+# ref: https://searchengineland.com/a-deeper-look-at-robotstxt-17573
+
+# 특정 디렉토리의 접근 차단
+# 참고: /api/file 도 차단되므로, 이미지 수집도 차단됨
+User-agent: *
+Disallow: /api
+Disallow: /login
+Disallow: /logout
+Disallow: /register
+Disallow: /settings
+
+# AI 학습용 봇 차단
+# ref: https://commoncrawl.org/ccbot
+# ref: https://help.pinterest.com/ko/business/article/pinterestbot
+# ref: https://platform.openai.com/docs/bots
+# ref: https://docs.perplexity.ai/guides/bots
+User-agent: CCBot
+User-agent: Pinterestbot
+User-agent: GPTBot
+User-agent: PerplexityBot
+Disallow: /
