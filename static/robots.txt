@@ -1,3 +1,6 @@
+# ref: https://searchengineland.com/a-deeper-look-at-robotstxt-17573
+
+# 특정 디렉토리의 접근 차단
 User-agent: *
 Disallow: /api
 Disallow: /login
@@ -5,14 +8,9 @@ Disallow: /logout
 Disallow: /register
 Disallow: /settings
 
-User-agent: CCBot
-Disallow: /
-
-User-agent: Pinterestbot
-Disallow: /
-
-User-agent: GPTBot
-Disallow: /
-
-User-agent: PerplexityBot
+# AI 학습용 봇 차단
+User-agent: CCBot           # https://commoncrawl.org/ccbot
+User-agent: Pinterestbot    # https://help.pinterest.com/ko/business/article/pinterestbot
+User-agent: GPTBot          # https://platform.openai.com/docs/bots
+User-agent: PerplexityBot   # https://docs.perplexity.ai/guides/bots
 Disallow: /
