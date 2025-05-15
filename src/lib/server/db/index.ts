@@ -11,3 +11,5 @@ db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
 db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_bigm;`);
 
 export const generateID = () => encodeBase32LowerCase(crypto.getRandomValues(new Uint8Array(15)));
+
+export * as table from './schema';

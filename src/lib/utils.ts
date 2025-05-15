@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge';
 
 import DOMPurify from 'isomorphic-dompurify';
 import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
-import { UserStatus } from '@app';
+import { UserStatus } from '../app';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -92,3 +92,34 @@ export const isAdult = (user: App.User) => {
 
 	return isAuthenticated && !isNotAdult;
 };
+
+export const uploadImage = async (file: File) => {
+	const formData = new FormData();
+	formData.append('file', file);
+
+	try {
+		const resp = await fetch('/api/file/attach', {
+			method: 'PUT',
+			body: formData,
+		}).then((r) => r.json());
+
+		return '/api/file/' + resp.path;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+};
+
+// ref: https://stackoverflow.com/a/65669404
+export const dataURLtoBlob = (dataurl: string) =>
+	new Promise<Blob>((resolve, reject) =>
+		fetch(dataurl)
+			.then((r) => r.blob())
+			.then((blob) => resolve(blob))
+			.catch((err) => reject(err)),
+	);
+
+export const blobToFile = (blob: Blob, filename: string = 'undefined.ext') =>
+	new File([blob], filename, { type: blob.type });
+
+export const dataURLToFile = async (dataurl: string) => blobToFile(await dataURLtoBlob(dataurl));

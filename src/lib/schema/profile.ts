@@ -7,8 +7,16 @@ export const profileSchema = z
 			.string()
 			.nonempty('닉네임이 필요합니다')
 			.max(20, '닉네임은 20자를 넘을 수 없습니다.'),
-		profileImage: z.string().url().or(z.string().length(0)).nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
-		headerImage: z.string().url().or(z.string().length(0)).nullish(),
+		profileImage: z
+			.string()
+			.regex(/^\/api\/file\/([A-Za-z0-9-\/]+$)/)
+			.or(z.string().length(0))
+			.nullish(), // ref: https://gist.github.com/ciiqr/ee19e9ff3bb603f8c42b00f5ad8c551e
+		headerImage: z
+			.string()
+			.regex(/^\/api\/file\/([A-Za-z0-9-\/]+$)/)
+			.or(z.string().length(0))
+			.nullish(),
 		introduction: z.string().optional(),
 		contactAvailable: z
 			.boolean()

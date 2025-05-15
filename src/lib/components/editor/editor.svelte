@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { uploadImage } from '$lib/utils';
 	import type { Delta, QuillOptions } from 'quill';
 
 	interface Props {
@@ -25,16 +26,22 @@
 		['clean'], // remove formatting button
 	];
 
-	$effect(() => {
+	$effect.pre(() => {
 		if (!browser) return;
 		if (!holder) return;
 
 		import('quill').then(async ({ default: Quill }) => {
+			// @ts-ignore
+			Quill.register('modules/imageUploader', (await import('quill-image-uploader')).default);
+
 			const options: QuillOptions = {
 				bounds: holder,
 				debug: 'warn',
 				modules: {
 					toolbar: toolbarOptions,
+					imageUploader: {
+						upload: uploadImage,
+					},
 				},
 				placeholder: '내용을 입력하십시오...', // TODO: props
 				readOnly: false, // TODO: props
@@ -45,7 +52,7 @@
 			quill.clipboard.dangerouslyPasteHTML(value); // ref: https://developer-lte.tistory.com/entry/Quill-%EA%B2%8C%EC%8B%9C%EA%B8%80-%EC%88%98%EC%A0%95-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8-%EC%9E%AC%ED%99%9C%EC%9A%A9
 			onchange(quill.getSemanticHTML(), quill.getContents());
 
-			quill.on('editor-change', () => {
+			quill.on('text-change', () => {
 				value = quill.getSemanticHTML();
 
 				onchange(quill.getSemanticHTML(), quill.getContents());
@@ -77,7 +84,9 @@
 		}
 
 		.ql-container {
-			overflow-y: hidden;
+			overflow-y: scroll;
+			min-height: 300px;
+			max-height: 80vh;
 		}
 
 		.ql-ko {

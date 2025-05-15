@@ -23,7 +23,14 @@
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import { durationString, formatDatetimeString, isDesktop, sanitizeHTML } from '$lib/utils';
+	import {
+		dataURLToFile,
+		durationString,
+		formatDatetimeString,
+		isDesktop,
+		sanitizeHTML,
+		uploadImage,
+	} from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -146,15 +153,23 @@
 	const onSetProfileImage = () => {
 		if (!profileImageCropper.cropper) return;
 
-		profileImageCropper.cropper.getImage().then((destImage) => {
+		profileImageCropper.cropper.getImage().then(async (destImage) => {
 			if (!destImage) return;
 
-			profileData.update(($profileData: Infer<ProfileSchema>) => {
-				$profileData.profileImage = destImage;
-				return $profileData;
-			});
+			try {
+				const path = await dataURLToFile(destImage).then((file) => uploadImage(file));
 
-			profileImageCropper.open = false;
+				profileData.update(($profileData: Infer<ProfileSchema>) => {
+					$profileData.profileImage = path;
+					return $profileData;
+				});
+
+				profileImageCropper.open = false;
+			} catch (err) {
+				console.error(err);
+				openErrorOnProfileUpdateAlert = true;
+				return;
+			}
 		});
 	};
 
@@ -200,15 +215,22 @@
 	const onSetHeaderImage = () => {
 		if (!headerImageCropper.cropper) return;
 
-		headerImageCropper.cropper.getImage().then((destImage) => {
+		headerImageCropper.cropper.getImage().then(async (destImage) => {
 			if (!destImage) return;
 
-			profileData.update(($profileData: Infer<ProfileSchema>) => {
-				$profileData.headerImage = destImage;
-				return $profileData;
-			});
+			try {
+				const path = await dataURLToFile(destImage).then((file) => uploadImage(file));
 
-			headerImageCropper.open = false;
+				profileData.update(($profileData: Infer<ProfileSchema>) => {
+					$profileData.headerImage = path;
+					return $profileData;
+				});
+
+				headerImageCropper.open = false;
+			} catch (err) {
+				console.error(err);
+				openErrorOnProfileUpdateAlert = true;
+			}
 		});
 	};
 

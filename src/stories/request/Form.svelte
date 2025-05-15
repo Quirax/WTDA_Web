@@ -55,6 +55,11 @@
 
 	let thumbnails = $state<Array<string>>([]);
 
+	$effect(() => {
+		if (!$formData.thumbnail) return;
+		if (!thumbnails.includes($formData.thumbnail)) $formData.thumbnail = null;
+	});
+
 	const doString = editMode ? '수정하기' : '만들기';
 </script>
 

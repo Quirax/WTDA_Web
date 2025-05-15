@@ -9,9 +9,12 @@ import {
 	boolean,
 	index,
 	date,
+	unique,
+	type PgColumnBuilderBase,
+	type PgTableExtraConfigValue,
 } from 'drizzle-orm/pg-core';
 import { AdultContents, ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
-import { sql } from 'drizzle-orm';
+import { sql, type BuildColumns, type BuildExtraConfigColumns } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
@@ -64,45 +67,99 @@ export const profileAnnouncements = pgTable('profile_announcements', {
 	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-const article = {
-	id: text('id').primaryKey(),
-	thumbnail: text('thumbnail'),
-	title: text('title').notNull(),
-	author: text('author')
+const articleTable = <
+	TTableName extends string,
+	TColumnsMap extends Record<string, PgColumnBuilderBase>,
+>(
+	name: TTableName,
+	columns: TColumnsMap,
+	extraConfig?: (
+		self: BuildExtraConfigColumns<TTableName, TColumnsMap, 'pg'>,
+	) => PgTableExtraConfigValue[],
+) =>
+	pgTable(
+		name,
+		{
+			id: text('id').primaryKey(),
+			thumbnail: text('thumbnail'),
+			title: text('title').notNull(),
+			author: text('author')
+				.notNull()
+				.references(() => user.id),
+			category: articleCategory().notNull(),
+			tags: text('tags')
+				.array()
+				.notNull()
+				.default(sql`'{}'::text[]`),
+			createDate: timestamp('create_date', { withTimezone: true, mode: 'date' })
+				.notNull()
+				.defaultNow(),
+			modifyDate: timestamp('modify_date', { withTimezone: true, mode: 'date' })
+				.notNull()
+				.defaultNow(),
+			content: text('content').notNull().default(''),
+			containsAdultContents: adultContents().notNull().default(AdultContents.NORMAL),
+			...columns,
+		},
+		// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
+		// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
+		(table) => [
+			index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
+			index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
+			...(extraConfig?.(table) || []),
+		],
+	);
+
+export const commissionRequest = articleTable('commission_request', {
+	budget: integer('budget'), // null: 조율 가능
+	deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
+	isForCommercial: boolean().notNull().default(false),
+	purpose: text('purpose').notNull(),
+	visibleOnlyToCommissioner: boolean().notNull().default(false),
+});
+
+export const files = pgTable('files', {
+	path: text('path').primaryKey(),
+	owner: text('owner')
 		.notNull()
 		.references(() => user.id),
-	category: articleCategory().notNull(),
-	tags: text('tags')
-		.array()
-		.notNull()
-		.default(sql`'{}'::text[]`),
-	createDate: timestamp('create_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	modifyDate: timestamp('modify_date', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
-	content: text('content').notNull().default(''),
-	containsAdultContents: adultContents().notNull().default(AdultContents.NORMAL),
-};
+});
 
-export const commissionRequest = pgTable(
-	'commission_request',
+// ref: https://orm.drizzle.team/docs/relations#foreign-key-actions
+const filesPerArticle = (name: string, table: ReturnType<typeof articleTable>) =>
+	pgTable(
+		name,
+		{
+			articleId: text('article_id')
+				.notNull()
+				.references(() => table.id, { onDelete: 'cascade' }),
+			path: text('path')
+				.notNull()
+				.references(() => files.path, { onDelete: 'cascade' }),
+		},
+		(table) => [unique().on(table.articleId, table.path)],
+	);
+
+export const filesPerRequest = filesPerArticle('files_per_request', commissionRequest);
+
+export const filesPerProfile = pgTable(
+	'files_per_profile',
 	{
-		...article,
-		budget: integer('budget'), // null: 조율 가능
-		deadline: timestamp('deadline', { withTimezone: true, mode: 'date' }), // null: 조율 가능
-		isForCommercial: boolean().notNull().default(false),
-		purpose: text('purpose').notNull(),
-		visibleOnlyToCommissioner: boolean().notNull().default(false),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id),
+		path: text('path')
+			.notNull()
+			.references(() => files.path, { onDelete: 'cascade' }),
 	},
-	// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
-	// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
-	(table) => [
-		index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
-		index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
-	],
+	(table) => [unique().on(table.userId, table.path)],
 );
 
 export type Session = typeof session.$inferSelect;
 export type User = typeof user.$inferSelect;
 export type EmailConfirm = typeof emailConfirm.$inferSelect;
 export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;
-export type Article = InferSelectModelPartial<typeof article>;
+export type Article = ReturnType<typeof articleTable>['$inferSelect'];
 export type CommissionRequest = typeof commissionRequest.$inferSelect;
+export type Files = typeof files.$inferInsert;
+export type FilesPerArticle = ReturnType<typeof filesPerArticle>['$inferSelect'];
