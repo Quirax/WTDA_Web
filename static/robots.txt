@@ -18,5 +18,4 @@ User-agent: CCBot
 User-agent: Pinterestbot
 User-agent: GPTBot
 User-agent: PerplexityBot
-User-agent: Pinterest
 Disallow: /
