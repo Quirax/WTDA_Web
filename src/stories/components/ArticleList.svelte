@@ -13,7 +13,7 @@
 		articles: App.Articles[];
 		hideAuthor?: boolean;
 		accentColor?: string;
-		hideMore?: boolean;
+		moreLink?: string;
 	}
 
 	const {
@@ -21,7 +21,7 @@
 		hideAuthor = false,
 		style,
 		accentColor,
-		hideMore = false,
+		moreLink,
 		...restProps
 	}: Props = $props();
 
@@ -111,9 +111,9 @@
 	{/each}
 </section>
 
-{#if !hideMore}
+{#if moreLink}
 	<div class="text-right">
-		<Button variant="link" class="text-(--primary-color)">
+		<Button variant="link" class="text-(--primary-color)" href={moreLink}>
 			더 보기
 			<ChevronRight class="size-4" />
 		</Button>

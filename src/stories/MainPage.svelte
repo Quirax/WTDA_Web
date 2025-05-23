@@ -31,7 +31,7 @@
 
 	const { recentCommissionTypes = [], recentRequests = [], introductions = [] }: Props = $props();
 
-	let userMode = $state<UserMode>(UserMode.requester);
+	let userMode = $state<UserMode>(UserMode.commisioner);
 </script>
 
 <Header title="뭐하지공방" />
@@ -41,12 +41,14 @@
 	class="bg-primary text-primary-foreground banner-pattern flex flex-col items-center justify-center space-y-10 p-20">
 	<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
+	<!-- TODO 커미션 타입 관련 기능 추가 후 주석 해제
 	<Tabs.Root bind:value={userMode} class="md:w-[400px]">
 		<Tabs.List class="grid h-full! w-full md:grid-cols-2">
 			<Tabs.Trigger value="requester">저는 의뢰주입니다</Tabs.Trigger>
 			<Tabs.Trigger value="comissioner">저는 커미션주입니다</Tabs.Trigger>
 		</Tabs.List>
 	</Tabs.Root>
+	-->
 
 	<form
 		class="flex w-full max-w-sm flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2"
@@ -78,10 +80,14 @@
 		<ArticleList
 			id="contents-list"
 			class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests} />
+			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests}
+			moreLink="https://192.169.0.3:5173/search?query=&type={userMode === UserMode.requester
+				? 'COMMISSION'
+				: 'REQUEST'}" />
 	</Section>
 {/if}
 
+<!-- TODO 커미션 타입 관련 기능 추가 후 주석 해제
 {#if userMode === UserMode.requester}
 	<section
 		id="suggestion"
@@ -94,7 +100,9 @@
 		</div>
 	</section>
 {/if}
+-->
 
+<!-- TODO 소개란 이미지 수정 기능 추가 후 주석 해제
 {#if introductions.length > 0}
 	<section id="introducing" class="relative mt-20 mb-10 flex justify-center px-17">
 		<Carousel.Root class="align-center aspect-video max-h-[50vh] max-w-full" opts={{ loop: true }}>
@@ -114,3 +122,4 @@
 		</Carousel.Root>
 	</section>
 {/if}
+-->
