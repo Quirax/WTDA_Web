@@ -418,6 +418,15 @@
 		}
 	});
 
+	// Profile link copy
+	let openLinkCopyAlert = $state(false);
+
+	const onCopyProfileLink = () => {
+		navigator.clipboard.writeText(location.href).then(() => {
+			openLinkCopyAlert = true;
+		});
+	};
+
 	// TODO: get values from server
 	const maxSlot = 4,
 		maxOpenSlot = maxSlot,
@@ -558,7 +567,7 @@
 					<MessageSquare />
 					메시지하기
 				</Button>
-				<Button size="icon" variant="outline"><Share2 /></Button>
+				<Button size="icon" variant="outline" onclick={onCopyProfileLink}><Share2 /></Button>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class="m-0 p-0">
 						{#snippet child({ props })}
@@ -1266,6 +1275,10 @@
 	title="공지사항 관련 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnAnnouncementAlert} />
+<AlertDialog
+	title="프로필 링크가 복사되었습니다."
+	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
+	bind:open={openLinkCopyAlert} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {
