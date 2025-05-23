@@ -683,7 +683,9 @@
 						{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
 					{/if}
 				</Alert.Title>
+				<!-- TODO 2차 알파테스트 때 추가
 				<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
+				-->
 			</Alert.Root>
 		{/if}
 
@@ -718,6 +720,7 @@
 			</section>
 		{/if}
 
+		<!-- TODO 베타테스트 전에 추가
 		{#if !profileEditMode}
 			<section class="relative border p-4">
 				<H3 class="hidden">통계</H3>
@@ -748,6 +751,7 @@
 				</div>
 			</section>
 		{/if}
+		-->
 
 		<section class="space-y-2">
 			<H3 class="text-center text-xl">소개</H3>
@@ -761,7 +765,6 @@
 								} />
 						{/snippet}
 					</Form.Control>
-					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
 					<Form.FieldErrors />
 				</Form.Field>
 			{:else}
