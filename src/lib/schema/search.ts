@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const formSchema = z
 	.object({
-		query: z.string(),
+		query: z.string().optional(),
 		type: z.nativeEnum(ArticleType).array().catch(Object.values(ArticleType)),
 		search_range: z
 			.enum(SearchRangeValues)
