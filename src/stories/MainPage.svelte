@@ -80,7 +80,10 @@
 		<ArticleList
 			id="contents-list"
 			class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests} />
+			articles={userMode === UserMode.requester ? recentCommissionTypes : recentRequests}
+			moreLink="https://192.169.0.3:5173/search?query=&type={userMode === UserMode.requester
+				? 'COMMISSION'
+				: 'REQUEST'}" />
 	</Section>
 {/if}
 
