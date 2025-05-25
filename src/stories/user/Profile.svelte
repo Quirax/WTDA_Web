@@ -938,6 +938,7 @@
 					<DropdownMenu.Content class="w-56" align="end">
 						<DropdownMenu.Group>
 							<DropdownMenu.Item onclick={() => goto('/r/create')}>의뢰</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={() => goto('/pf/create')}>포트폴리오</DropdownMenu.Item>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>

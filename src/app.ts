@@ -95,6 +95,7 @@ export enum ArticleCategory {
 export enum ArticleType {
 	REQUEST = 'REQUEST',
 	COMMISSION = 'COMMISSION',
+	PORTFOLIO = 'PORTFOLIO',
 }
 
 export const SearchRangeValues = ['title', 'content', 'tag', 'username'] as const;

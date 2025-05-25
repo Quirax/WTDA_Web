@@ -10,6 +10,7 @@ export const CategoryText = {
 export const ArticleTypeText = {
 	REQUEST: m.ARTICLE_TYPE_REQUEST,
 	COMMISSION: m.ARTICLE_TYPE_COMMISSION,
+	PORTFOLIO: m.ARTICLE_TYPE_PORTFOLIO,
 };
 
 export const SearchRangeText = {

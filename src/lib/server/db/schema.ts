@@ -118,6 +118,14 @@ export const commissionRequest = articleTable('commission_request', {
 	visibleOnlyToCommissioner: boolean().notNull().default(false),
 });
 
+export const portfolio = articleTable('portfolio', {
+	media: text('media')
+		.array()
+		.notNull()
+		.default(sql`'{}'::text[]`),
+	publishDate: timestamp('publishDate', { withTimezone: true, mode: 'date' }), // null: 공개일 미상
+});
+
 export const files = pgTable('files', {
 	path: text('path').primaryKey(),
 	owner: text('owner')
@@ -142,6 +150,8 @@ const filesPerArticle = (name: string, table: ReturnType<typeof articleTable>) =
 
 export const filesPerRequest = filesPerArticle('files_per_request', commissionRequest);
 
+export const filesPerPortfolio = filesPerArticle('files_per_portfolio', portfolio);
+
 export const filesPerProfile = pgTable(
 	'files_per_profile',
 	{
@@ -161,5 +171,6 @@ export type EmailConfirm = typeof emailConfirm.$inferSelect;
 export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;
 export type Article = ReturnType<typeof articleTable>['$inferSelect'];
 export type CommissionRequest = typeof commissionRequest.$inferSelect;
+export type Portfolio = typeof portfolio.$inferSelect;
 export type Files = typeof files.$inferInsert;
 export type FilesPerArticle = ReturnType<typeof filesPerArticle>['$inferSelect'];
