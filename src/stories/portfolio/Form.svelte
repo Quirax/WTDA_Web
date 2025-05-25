@@ -63,10 +63,10 @@
 	const doString = editMode ? '수정하기' : '만들기';
 </script>
 
-<Header title="의뢰 {doString}" />
+<Header title="포트폴리오 {doString}" />
 
 <Section>
-	<H2>의뢰 {doString}</H2>
+	<H2>포트폴리오 {doString}</H2>
 	<form method="POST" use:enhance class="w-full sm:w-2/3">
 		<Form.Field {form} name="title" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
@@ -103,51 +103,13 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- <Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
+		<Form.Field {form} name="publishDate" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 가능한 금액</Form.Label>
+					<Form.Label><Badge variant="destructive">필수</Badge> 작업 및 게시 일자</Form.Label>
 					<RadioGroup.Root
 						name={props.name}
-						value={$formData.budget === null ? 'negotiable' : 'certain-budget'}>
-						<div class="flex items-center space-x-2 max-lg:items-center">
-							<RadioGroup.Item
-								value="certain-budget"
-								id="certain-budget"
-								onclick={() => ($formData.budget = 0)} />
-							<Label for="certain-budget" class="items-center max-lg:flex">
-								<div class="flex items-center">
-									<Input
-										placeholder="금액"
-										type="currency"
-										{...props}
-										bind:value={$formData.budget}
-										disabled={$formData.budget === null}
-										{...$constraints.budget} />
-									<span class="flex-none">&nbsp;포인트</span>
-								</div>
-							</Label>
-						</div>
-						<div class="flex items-center space-x-2">
-							<RadioGroup.Item
-								value="negotiable"
-								id="budget-negotiable"
-								onclick={() => ($formData.budget = null)} />
-							<Label for="budget-negotiable">협상 가능</Label>
-						</div>
-					</RadioGroup.Root>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-
-		<Form.Field {form} name="deadline" class="mt-4 flex flex-col space-y-1">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 작업 기한</Form.Label>
-					<RadioGroup.Root
-						name={props.name}
-						value={$formData.deadline === null ? 'negotiable' : 'certain-date'}>
+						value={$formData.publishDate === null ? 'unknown' : 'certain-date'}>
 						<div class="flex items-center space-x-2 max-lg:items-center">
 							<RadioGroup.Item
 								value="certain-date"
@@ -159,7 +121,7 @@
 									date.setUTCMinutes(0);
 									date.setUTCSeconds(0);
 									date.setUTCMilliseconds(0);
-									$formData.deadline = date;
+									$formData.publishDate = date;
 								}} />
 							<Label for="certain-date" class="items-center max-lg:flex">
 								<div class="flex items-center">
@@ -170,23 +132,25 @@
 													variant: 'outline',
 													class: 'w-[280px] justify-start text-left font-normal',
 												}),
-												$formData.deadline === null && 'text-muted-foreground',
+												$formData.publishDate === null && 'text-muted-foreground',
 											)}
-											disabled={$formData.deadline === null}>
+											disabled={$formData.publishDate === null}>
 											<CalendarIcon />
-											{$formData.deadline !== null ? df.format($formData.deadline) : '날짜 선택'}
+											{$formData.publishDate !== null
+												? df.format($formData.publishDate)
+												: '날짜 선택'}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
 											<Calendar
 												type="single"
-												minValue={today(getLocalTimeZone()).add({ days: 1 })}
+												maxValue={today(getLocalTimeZone()).add({ days: 1 })}
 												locale="ko-KR"
 												bind:value={
 													() =>
-														$formData.deadline === null
+														$formData.publishDate === null
 															? undefined
-															: fromDate($formData.deadline, getLocalTimeZone()),
-													(v) => ($formData.deadline = v?.toDate() ?? null)
+															: fromDate($formData.publishDate, getLocalTimeZone()),
+													(v) => ($formData.publishDate = v?.toDate() ?? null)
 												} />
 										</Popover.Content>
 									</Popover.Root>
@@ -195,16 +159,16 @@
 						</div>
 						<div class="flex items-center space-x-2">
 							<RadioGroup.Item
-								value="negotiable"
-								id="deadline-negotiable"
-								onclick={() => ($formData.deadline = null)} />
-							<Label for="deadline-negotiable">협상 가능</Label>
+								value="unknown"
+								id="publishDate-unknown"
+								onclick={() => ($formData.publishDate = null)} />
+							<Label for="publishDate-unknown">미상</Label>
 						</div>
 					</RadioGroup.Root>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
-		</Form.Field> -->
+		</Form.Field>
 
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
