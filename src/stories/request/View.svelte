@@ -75,7 +75,10 @@
 	<section class="flex-none space-y-2 border p-4 max-md:mt-8 md:w-80">
 		<div>
 			{#if article.thumbnail}
-				<img src={article.thumbnail} class="aspect-video w-full" alt="이 의뢰의 썸네일" />
+				<img
+					src={article.thumbnail}
+					class="aspect-video w-full object-cover"
+					alt="이 의뢰의 썸네일" />
 			{:else}
 				<div class="banner-pattern bg-primary aspect-video w-full"></div>
 			{/if}

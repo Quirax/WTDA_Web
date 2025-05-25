@@ -58,20 +58,20 @@
 
 <Header title={article.title} />
 
-<Section class="flex space-x-4 max-md:flex-col">
+<Section class="flex space-x-4 max-lg:flex-col">
 	<section class="flex-auto">
 		<H2>{article.title}</H2>
 		<!-- media -->
 		{#if article.media.length > 0}
-			<section class="relative flex justify-center px-17">
-				<Carousel.Root class="align-center max-h-[50vh] max-w-full" opts={{ loop: true }}>
+			<section class="relative my-4 flex justify-center px-17">
+				<Carousel.Root class="align-center h-[50vh] max-w-full" opts={{ loop: true }}>
 					<Carousel.Previous />
 					<Carousel.Content class="w-full">
 						{#each article.media as media, idx}
 							<Carousel.Item>
-								<div class="h-[50vh] p-1">
-									<Card.Root class="h-full">
-										<img class="h-full" src={media} alt="첨부 미디어 {idx + 1}" />
+								<div class="flex h-[50vh] items-center justify-center p-1">
+									<Card.Root class="size-full">
+										<img class="size-full object-contain" src={media} alt="첨부 미디어 {idx + 1}" />
 									</Card.Root>
 								</div>
 							</Carousel.Item>
@@ -97,7 +97,10 @@
 	<section class="flex-none space-y-2 border p-4 max-md:mt-8 md:w-80">
 		<div>
 			{#if article.thumbnail}
-				<img src={article.thumbnail} class="aspect-video w-full" alt="이 의뢰의 썸네일" />
+				<img
+					src={article.thumbnail}
+					class="aspect-video w-full object-cover"
+					alt="이 의뢰의 썸네일" />
 			{:else}
 				<div class="banner-pattern bg-primary aspect-video w-full"></div>
 			{/if}
