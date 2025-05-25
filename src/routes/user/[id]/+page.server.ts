@@ -237,10 +237,11 @@ export const actions: Actions = {
 			if (tab === 'all') {
 				results =
 					(await allArticles(
-						[ArticleType.REQUEST, ArticleType.COMMISSION],
+						[ArticleType.REQUEST, ArticleType.COMMISSION, ArticleType.PORTFOLIO],
 						{
 							request: eq(table.commissionRequest.author, id),
 							commission: eq(table.commissionRequest.author, id),
+							portfolio: eq(table.portfolio.author, id),
 						},
 						locals.user,
 					)?.limit(10)) || [];
@@ -250,7 +251,15 @@ export const actions: Actions = {
 						[ArticleType.REQUEST],
 						{
 							request: eq(table.commissionRequest.author, id),
-							commission: eq(table.commissionRequest.author, id),
+						},
+						locals.user,
+					)?.limit(10)) || [];
+			} else if (tab === 'portfolio') {
+				results =
+					(await allArticles(
+						[ArticleType.PORTFOLIO],
+						{
+							portfolio: eq(table.portfolio.author, id),
 						},
 						locals.user,
 					)?.limit(10)) || [];
