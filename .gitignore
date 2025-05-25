@@ -30,3 +30,5 @@ src/lib/paraglide
 
 package-lock.json
 yarn.lock
+
+.fuse_hidden*
