@@ -171,6 +171,8 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
+		<!-- 미디어 -->
+
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -293,7 +295,6 @@
 						</div>
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors />
 			</Form.Field>
 		</div>
 
