@@ -25,6 +25,7 @@
 	import { AdultContents } from '@app';
 	import { userStore } from '$lib/context';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -141,7 +142,7 @@
 												: '날짜 선택'}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
-											<Calendar
+											<CalendarWithSelects
 												type="single"
 												maxValue={today(getLocalTimeZone()).add({ days: 1 })}
 												locale="ko-KR"
