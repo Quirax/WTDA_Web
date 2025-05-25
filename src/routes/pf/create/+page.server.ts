@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { formSchema } from '$lib/schema/request';
+import { formSchema } from '$lib/schema/portfolio';
 import * as table from '$lib/server/db/schema';
 import { db, generateID } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
@@ -28,7 +28,7 @@ export const actions: Actions = {
 		const id = generateID();
 
 		try {
-			await db.insert(table.commissionRequest).values({
+			await db.insert(table.portfolio).values({
 				id,
 				...form.data,
 				author: event.locals.user.id,
@@ -46,7 +46,7 @@ export const actions: Actions = {
 
 export const _registerAttaches = async (articleId: string, body: string) => {
 	// 기존에 등록된 모든 첨부 파일 등록 해제
-	await db.delete(table.filesPerRequest).where(eq(table.filesPerRequest.articleId, articleId));
+	await db.delete(table.filesPerRequest).where(eq(table.filesPerPortfolio.articleId, articleId));
 
 	// 모든 첨부 파일을 새로 등록
 	const inserts = [...body.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)].map((match) => ({
@@ -54,5 +54,5 @@ export const _registerAttaches = async (articleId: string, body: string) => {
 		path: match[1],
 	}));
 
-	if (inserts.length > 0) await db.insert(table.filesPerRequest).values(inserts);
+	if (inserts.length > 0) await db.insert(table.filesPerPortfolio).values(inserts);
 };
