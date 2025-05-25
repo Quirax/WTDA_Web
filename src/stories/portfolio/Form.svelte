@@ -13,7 +13,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group';
 	import * as Popover from '$lib/components/ui/popover';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import { cn, isAdult } from '$lib/utils';
+	import { cn, isAdult, uploadImage } from '$lib/utils';
 	import { CalendarIcon, X } from 'lucide-svelte';
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
@@ -26,6 +26,8 @@
 	import { userStore } from '$lib/context';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
+	import Dropzone from 'svelte-file-dropzone';
+	import { imageFormat } from '$lib/config';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -54,14 +56,28 @@
 	});
 	const { form: formData, enhance, constraints } = form;
 
-	let thumbnails = $state<Array<string>>([]);
-
 	$effect(() => {
 		if (!$formData.thumbnail) return;
-		if (!thumbnails.includes($formData.thumbnail)) $formData.thumbnail = null;
+		if (!$formData.media.includes($formData.thumbnail)) $formData.thumbnail = null;
 	});
 
 	const doString = editMode ? '수정하기' : '만들기';
+
+	const onDropMedia = async ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		try {
+			const path = await uploadImage(imageFile);
+
+			$formData.media = [...$formData.media, path];
+		} catch (err) {
+			console.error(err);
+		}
+	};
 </script>
 
 <Header title="포트폴리오 {doString}" />
@@ -171,39 +187,32 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<!-- 미디어 -->
-
-		<Form.Field {form} name="content" class="mt-4 space-y-2">
+		<Form.Field {form} name="media" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>세부적인 설명</Form.Label>
-					<Editor
-						bind:value={$formData.content}
-						onchange={(_, delta) =>
-							(thumbnails = delta.ops
-								.map((v) => v.insert)
-								.reduce((acc, cur) => {
-									if (typeof cur === 'object' && typeof cur.image === 'string') {
-										return [...acc, cur.image];
-									} else return acc;
-								}, new Array<string>()))} />
+					<Form.Label>첨부할 미디어</Form.Label>
 
-					{#if thumbnails.length > 0}
+					{#if $formData.media.length > 0}
 						<div class="flex w-full justify-center">
 							<Carousel.Root class="align-center" opts={{ loop: true, align: 'start' }}>
 								<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
-									{#each thumbnails as thumbnail}
+									{#each $formData.media as thumbnail}
 										<Carousel.Item
 											class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
 											<div class="size-full p-1">
 												<Card.Root class="size-full">
 													<img class="size-full" src={thumbnail} alt="" />
 													<Checkbox
-														class="absolute top-2 right-2 bg-white"
+														class="absolute top-2 left-6 bg-white"
 														bind:checked={
 															() => $formData.thumbnail === thumbnail,
 															(v) => ($formData.thumbnail = v ? thumbnail : null)
 														} />
+													<X
+														class="bg-destructive text-destructive-foreground absolute top-2 right-2 size-5"
+														onclick={() => {
+															$formData.media = $formData.media.filter((v) => v !== thumbnail);
+														}} />
 												</Card.Root>
 											</div>
 										</Carousel.Item>
@@ -214,6 +223,25 @@
 							</Carousel.Root>
 						</div>
 					{/if}
+
+					<Dropzone
+						accept={imageFormat}
+						on:drop={onDropMedia}
+						multiple={false}
+						class="dropzone size-full justify-center">
+						<p>여기로 첨부할 미디어를 드래그하거나 클릭하여 선택하세요.</p>
+					</Dropzone>
+				{/snippet}
+			</Form.Control>
+			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
+			<Form.FieldErrors />
+		</Form.Field>
+
+		<Form.Field {form} name="content" class="mt-4 space-y-2">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>세부적인 설명</Form.Label>
+					<Editor bind:value={$formData.content} />
 				{/snippet}
 			</Form.Control>
 			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
