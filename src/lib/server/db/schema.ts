@@ -104,8 +104,8 @@ const articleTable = <
 		// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
 		// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
 		(table) => [
-			index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
-			index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
+			index(`${name}_title_idx`).using('gin', table.title.op('gin_bigm_ops')),
+			index(`${name}_content_idx`).using('gin', table.content.op('gin_bigm_ops')),
 			...(extraConfig?.(table) || []),
 		],
 	);

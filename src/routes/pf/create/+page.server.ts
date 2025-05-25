@@ -34,22 +34,25 @@ export const actions: Actions = {
 				author: event.locals.user.id,
 			});
 
-			await _registerAttaches(id, form.data.content);
+			await _registerAttaches(id, form.data.content, form.data.media);
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred', form });
 		}
 
-		return redirect(302, '/r/' + id);
+		return redirect(302, '/pf/' + id);
 	},
 };
 
-export const _registerAttaches = async (articleId: string, body: string) => {
+export const _registerAttaches = async (articleId: string, body: string, attaches: string[]) => {
 	// 기존에 등록된 모든 첨부 파일 등록 해제
-	await db.delete(table.filesPerRequest).where(eq(table.filesPerPortfolio.articleId, articleId));
+	await db.delete(table.filesPerPortfolio).where(eq(table.filesPerPortfolio.articleId, articleId));
 
 	// 모든 첨부 파일을 새로 등록
-	const inserts = [...body.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)].map((match) => ({
+	const inserts = [
+		...body.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g),
+		...attaches.flatMap((v) => [...v.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)]),
+	].map((match) => ({
 		articleId,
 		path: match[1],
 	}));
