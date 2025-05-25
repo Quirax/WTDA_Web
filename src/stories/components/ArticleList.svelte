@@ -36,6 +36,8 @@
 		switch (type) {
 			case ArticleType.REQUEST:
 				return 'r';
+			case ArticleType.PORTFOLIO:
+				return 'pf';
 		}
 	};
 </script>

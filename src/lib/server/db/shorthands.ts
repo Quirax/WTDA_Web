@@ -5,7 +5,10 @@ import { and, desc, eq, ne, SQL, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import { isAdult } from '$lib/utils';
 
-const generateCommonWhere = (t: typeof table.commissionRequest, currentUser?: App.User) => {
+const generateCommonWhere = (
+	t: typeof table.commissionRequest | typeof table.portfolio,
+	currentUser?: App.User,
+) => {
 	const commonWhere = [];
 
 	if (!currentUser || !isAdult(currentUser) || !currentUser.preferences.display_adult_contents)
@@ -21,6 +24,7 @@ export const articlesPerType = (
 	where: {
 		request?: SQL;
 		commission?: SQL;
+		portfolio?: SQL;
 	} = {},
 	currentUser?: App.User,
 ) =>
@@ -54,6 +58,32 @@ export const articlesPerType = (
 					.orderBy(desc(table.commissionRequest.modifyDate));
 			case ArticleType.COMMISSION:
 				return undefined;
+			case ArticleType.PORTFOLIO:
+				return db
+					.select({
+						id: table.portfolio.id,
+						type: sql<ArticleType>`'PORTFOLIO'`,
+						thumbnail: table.portfolio.thumbnail,
+						title: table.portfolio.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+							birthday: table.user.birthday,
+							authExpiresAt: table.user.authExpiresAt,
+						},
+						category: table.portfolio.category,
+						tags: table.portfolio.tags,
+						modifyDate: table.portfolio.modifyDate,
+						containsAdultContents: table.portfolio.containsAdultContents,
+					})
+					.from(table.portfolio)
+					.where(and(...generateCommonWhere(table.portfolio, currentUser), where.portfolio))
+					.innerJoin(table.user, eq(table.portfolio.author, table.user.id))
+					.orderBy(desc(table.portfolio.modifyDate));
 		}
 	});
 
@@ -62,6 +92,7 @@ export const allArticles = (
 	where: {
 		request?: SQL;
 		commission?: SQL;
+		portfolio?: SQL;
 	} = {},
 	currentUser?: App.User,
 ) => {
@@ -72,8 +103,13 @@ export const allArticles = (
 		let rightQuery = subqueries.splice(0, 1)[0];
 
 		if (!rightQuery) return leftQuery;
-		else if (subqueries.length === 0) return unionAll(leftQuery, rightQuery);
-		else return unionAll(leftQuery, rightQuery, ...subqueries);
+		else if (subqueries.length === 0) return leftQuery.unionAll(rightQuery);
+		else {
+			let combined = leftQuery.unionAll(rightQuery);
+
+			subqueries.forEach((q) => (combined = combined.unionAll(q)));
+			return combined;
+		}
 	}
 
 	return undefined;

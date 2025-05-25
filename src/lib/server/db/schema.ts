@@ -104,8 +104,8 @@ const articleTable = <
 		// ref: https://orm.drizzle.team/docs/indexes-constraints#indexes
 		// ref: https://velog.io/@identity230c/postgresql-%EB%AC%B8%EC%9E%90%EC%97%B4-%EA%B2%80%EC%83%89#pg_trgm-vs-pg_bigm
 		(table) => [
-			index('title_idx').using('gin', table.title.op('gin_bigm_ops')),
-			index('content_idx').using('gin', table.content.op('gin_bigm_ops')),
+			index(`${name}_title_idx`).using('gin', table.title.op('gin_bigm_ops')),
+			index(`${name}_content_idx`).using('gin', table.content.op('gin_bigm_ops')),
 			...(extraConfig?.(table) || []),
 		],
 	);
@@ -116,6 +116,14 @@ export const commissionRequest = articleTable('commission_request', {
 	isForCommercial: boolean().notNull().default(false),
 	purpose: text('purpose').notNull(),
 	visibleOnlyToCommissioner: boolean().notNull().default(false),
+});
+
+export const portfolio = articleTable('portfolio', {
+	media: text('media')
+		.array()
+		.notNull()
+		.default(sql`'{}'::text[]`),
+	publishDate: timestamp('publishDate', { withTimezone: true, mode: 'date' }), // null: 공개일 미상
 });
 
 export const files = pgTable('files', {
@@ -142,6 +150,8 @@ const filesPerArticle = (name: string, table: ReturnType<typeof articleTable>) =
 
 export const filesPerRequest = filesPerArticle('files_per_request', commissionRequest);
 
+export const filesPerPortfolio = filesPerArticle('files_per_portfolio', portfolio);
+
 export const filesPerProfile = pgTable(
 	'files_per_profile',
 	{
@@ -161,5 +171,6 @@ export type EmailConfirm = typeof emailConfirm.$inferSelect;
 export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;
 export type Article = ReturnType<typeof articleTable>['$inferSelect'];
 export type CommissionRequest = typeof commissionRequest.$inferSelect;
+export type Portfolio = typeof portfolio.$inferSelect;
 export type Files = typeof files.$inferInsert;
 export type FilesPerArticle = ReturnType<typeof filesPerArticle>['$inferSelect'];
