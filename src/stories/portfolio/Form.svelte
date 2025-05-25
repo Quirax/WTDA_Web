@@ -6,7 +6,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { formSchema, type FormSchema } from '$lib/schema/request';
+	import { formSchema, type FormSchema } from '$lib/schema/portfolio';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
@@ -103,7 +103,7 @@
 			<Form.FieldErrors />
 		</Form.Field>
 
-		<Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
+		<!-- <Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label><Badge variant="destructive">필수</Badge> 가능한 금액</Form.Label>
@@ -204,47 +204,7 @@
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />
-		</Form.Field>
-
-		<Form.Field {form} name="purpose" class="mt-4 flex flex-col space-y-1">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 사용 목적</Form.Label>
-					<Input
-						placeholder="사용 목적"
-						{...props}
-						bind:value={$formData.purpose}
-						{...$constraints.purpose} />
-				{/snippet}
-			</Form.Control>
-			<Form.Description>
-				커미션 작품을 어디에 사용할 것인지 적어주세요. (예: 프로필 이미지, 트위터 헤더)
-			</Form.Description>
-			<Form.FieldErrors />
-		</Form.Field>
-
-		<Form.Field {form} name="isForCommercial" class="mt-1">
-			<div class="flex flex-row items-center space-y-0 space-x-3">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Checkbox {...props} bind:checked={$formData.isForCommercial} />
-						<div class="space-y-1 leading-none">
-							<Form.Label>상업적 목적으로 사용합니다. (예: 인터넷 방송, 홍보물)</Form.Label>
-						</div>
-						<input name={props.name} value={$formData.isForCommercial} hidden />
-					{/snippet}
-				</Form.Control>
-			</div>
-			<Form.Description>
-				상업적 목적으로 사용하는 경우 반드시 체크해야 합니다.
-				<br />
-				<span class="text-destructive font-bold">
-					비상업적 목적으로 커미션 진행 후 상업적 목적으로 사용하는 경우 커미션주의 저작권을
-					침해하는 것으로, 민&middot;형사상의 책임을 질 수 있습니다.
-				</span>
-			</Form.Description>
-			<Form.FieldErrors />
-		</Form.Field>
+		</Form.Field> -->
 
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
@@ -368,21 +328,6 @@
 						</div>
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-
-			<Form.Field {form} name="visibleOnlyToCommissioner">
-				<div class="flex flex-row items-center space-y-0 space-x-3">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Checkbox {...props} bind:checked={$formData.visibleOnlyToCommissioner} />
-							<div class="space-y-1 leading-none">
-								<Form.Label>커미션주만 이 의뢰를 볼 수 있습니다.</Form.Label>
-							</div>
-							<input name={props.name} value={$formData.visibleOnlyToCommissioner} hidden />
-						{/snippet}
-					</Form.Control>
-				</div>
 				<Form.FieldErrors />
 			</Form.Field>
 		</div>
