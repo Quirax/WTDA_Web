@@ -14,6 +14,8 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { AdultContents } from '@app';
 	import { page } from '$app/state';
+	import * as Card from '$lib/components/ui/card';
+	import * as Carousel from '$lib/components/ui/carousel';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Portfolio;
@@ -60,6 +62,25 @@
 	<section class="flex-auto">
 		<H2>{article.title}</H2>
 		<!-- media -->
+		{#if article.media.length > 0}
+			<section class="relative flex justify-center px-17">
+				<Carousel.Root class="align-center max-h-[50vh] max-w-full" opts={{ loop: true }}>
+					<Carousel.Previous />
+					<Carousel.Content class="w-full">
+						{#each article.media as media, idx}
+							<Carousel.Item>
+								<div class="h-[50vh] p-1">
+									<Card.Root class="h-full">
+										<img class="h-full" src={media} alt="첨부 미디어 {idx + 1}" />
+									</Card.Root>
+								</div>
+							</Carousel.Item>
+						{/each}
+					</Carousel.Content>
+					<Carousel.Next />
+				</Carousel.Root>
+			</section>
+		{/if}
 		<article class="html p-4">
 			{#if article.content}
 				{@html sanitizeHTML(article.content)}
