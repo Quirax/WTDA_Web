@@ -16,7 +16,7 @@
 	import { page } from '$app/state';
 
 	interface Props extends ReturnType<typeof $props> {
-		article: App.Request;
+		article: App.Portfolio;
 	}
 
 	const { article }: Props = $props();
@@ -59,6 +59,7 @@
 <Section class="flex space-x-4 max-md:flex-col">
 	<section class="flex-auto">
 		<H2>{article.title}</H2>
+		<!-- media -->
 		<article class="html p-4">
 			{#if article.content}
 				{@html sanitizeHTML(article.content)}
@@ -98,26 +99,9 @@
 						<Table.Cell>{CategoryText[article.category]()}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>사용 목적</Table.Head>
-						<Table.Cell class="break-all">
-							<div>
-								{article.purpose}
-							</div>
-							{#if article.isForCommercial}
-								<div class="text-destructive font-bold">(상업적 목적으로 사용)</div>
-							{/if}
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>가능한 금액</Table.Head>
+						<Table.Head>작업 및 게시 일자</Table.Head>
 						<Table.Cell>
-							{article.budget ? article.budget.toLocaleString() + ' 포인트' : '협의 가능'}
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>작업 기한</Table.Head>
-						<Table.Cell>
-							{article.deadline ? formatDatetimeString(article.deadline) : '협의 가능'}
+							{article.publishDate ? formatDatetimeString(article.publishDate) : '미상'}
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
@@ -142,7 +126,7 @@
 		</section>
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
-				<Button href="/r/{article.id}/edit">수정하기</Button>
+				<Button href="/pf/{article.id}/edit">수정하기</Button>
 				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
 					삭제하기
 				</Button>

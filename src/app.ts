@@ -2,7 +2,7 @@
 // for information about these interfaces
 
 import type { Link } from '$lib/config';
-import type { CommissionRequest } from '$lib/server/db/schema';
+import type { CommissionRequest, Portfolio as PortfolioSchema } from '$lib/server/db/schema';
 import type { Union } from '$lib/utils';
 
 declare global {
@@ -57,6 +57,9 @@ declare global {
 
 		type CommisionType = Articles & {};
 		type Request = Omit<CommissionRequest, 'author'> & {
+			author: Omit<NonNullable<User>, 'status'>;
+		};
+		type Portfolio = Omit<PortfolioSchema, 'author'> & {
 			author: Omit<NonNullable<User>, 'status'>;
 		};
 
