@@ -67,18 +67,16 @@ export const actions: Actions = {
 			const article = (
 				await db
 					.select({
-						author: table.commissionRequest.author,
+						author: table.portfolio.author,
 					})
-					.from(table.commissionRequest)
-					.where(eq(table.commissionRequest.id, id))
+					.from(table.portfolio)
+					.where(eq(table.portfolio.id, id))
 			).at(0);
 
 			if (article?.author !== locals.user.id)
 				return fail(403, { message: 'Not authorized to delete the article' });
 
-			// TODO: 이 의뢰를 기반으로 한 커미션 계약이 있는 경우, 삭제 불가
-
-			await db.delete(table.commissionRequest).where(eq(table.commissionRequest.id, id));
+			await db.delete(table.portfolio).where(eq(table.portfolio.id, id));
 		} catch (e: any) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
