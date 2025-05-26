@@ -48,7 +48,10 @@
 		<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
 			{#each media as medium, idx}
 				<Carousel.Item
-					class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
+					class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5"
+					onclick={() => {
+						api?.scrollTo(idx);
+					}}>
 					<div class="size-full p-1">
 						<Card.Root class={cn('size-full', idx === current && 'border-primary border-3')}>
 							<img class="size-full object-cover" src={medium.src} alt={medium.alt} />
