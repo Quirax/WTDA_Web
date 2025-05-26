@@ -13,9 +13,9 @@ export const load = (async ({ params, locals }) => {
 	const article = (
 		await db
 			.select({
-				id: table.commissionRequest.id,
-				thumbnail: table.commissionRequest.thumbnail,
-				title: table.commissionRequest.title,
+				id: table.portfolio.id,
+				thumbnail: table.portfolio.thumbnail,
+				title: table.portfolio.title,
 				author: {
 					id: table.user.id,
 					username: table.user.username,
@@ -26,28 +26,21 @@ export const load = (async ({ params, locals }) => {
 					birthday: table.user.birthday,
 					authExpiresAt: table.user.authExpiresAt,
 				},
-				category: table.commissionRequest.category,
-				tags: table.commissionRequest.tags,
-				createDate: table.commissionRequest.createDate,
-				modifyDate: table.commissionRequest.modifyDate,
-				content: table.commissionRequest.content,
-				containsAdultContents: table.commissionRequest.containsAdultContents,
-				budget: table.commissionRequest.budget,
-				deadline: table.commissionRequest.deadline,
-				isForCommercial: table.commissionRequest.isForCommercial,
-				purpose: table.commissionRequest.purpose,
-				visibleOnlyToCommissioner: table.commissionRequest.visibleOnlyToCommissioner,
+				category: table.portfolio.category,
+				tags: table.portfolio.tags,
+				createDate: table.portfolio.createDate,
+				modifyDate: table.portfolio.modifyDate,
+				content: table.portfolio.content,
+				containsAdultContents: table.portfolio.containsAdultContents,
+				media: table.portfolio.media,
+				publishDate: table.portfolio.publishDate,
 			})
-			.from(table.commissionRequest)
-			.where(eq(table.commissionRequest.id, id))
-			.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+			.from(table.portfolio)
+			.where(eq(table.portfolio.id, id))
+			.innerJoin(table.user, eq(table.portfolio.author, table.user.id))
 	).at(0);
 
 	if (!article) throw error(404, { message: 'Cannot find matched request' });
-
-	if (article.visibleOnlyToCommissioner) {
-		// TODO: 커미션주인지 확인
-	}
 
 	if (article.containsAdultContents !== AdultContents.NORMAL) {
 		if (!isAdult(locals.user)) {

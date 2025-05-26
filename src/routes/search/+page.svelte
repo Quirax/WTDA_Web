@@ -10,4 +10,4 @@
 	articles={data.articles}
 	count={data.count}
 	page={data.page}
-	query={data.query} />
+	query={data.query || ''} />

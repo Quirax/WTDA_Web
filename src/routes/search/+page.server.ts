@@ -60,27 +60,31 @@ const getSchema = <T extends ZodTypeAny>(schema: T) => {
 
 const createCriteria = (
 	params: Infer<FormSchema>,
-	t: typeof table.commissionRequest,
+	t: typeof table.commissionRequest | typeof table.portfolio,
 	{
 		budgetColumn,
 		dateColumn,
+		isForCommercialColumn,
 	}: {
 		budgetColumn?: typeof table.commissionRequest.budget;
-		dateColumn?: typeof table.commissionRequest.deadline;
+		dateColumn?: typeof table.commissionRequest.deadline | typeof table.portfolio.publishDate;
+		isForCommercialColumn?: typeof table.commissionRequest.isForCommercial;
 	},
 ) => {
 	const criteria = [];
 
+	const query = params.query || '';
+
 	const searchRange = params.search_range.map((v) => {
 		switch (v) {
 			case 'title':
-				return ilike(t.title, `%${params.query.replace(/%/g, '%%')}%`);
+				return ilike(t.title, `%${query.replace(/%/g, '%%')}%`);
 			case 'content':
-				return ilike(t.content, `%${params.query.replace(/%/g, '%%')}%`);
+				return ilike(t.content, `%${query.replace(/%/g, '%%')}%`);
 			case 'tag':
-				return arrayContains(t.tags, [params.query]);
+				return arrayContains(t.tags, [query]);
 			case 'username':
-				return ilike(table.user.username, `%${params.query.replace(/%/g, '%%')}%`);
+				return ilike(table.user.username, `%${query.replace(/%/g, '%%')}%`);
 		}
 	});
 	if (searchRange.length > 0) criteria.push(or(...searchRange));
@@ -108,8 +112,10 @@ const createCriteria = (
 		} else if (!params.date_negotiable) criteria.push(isNotNull(dateColumn));
 	}
 
-	if (params.commercial_use === 'excluded') criteria.push(ne(t.isForCommercial, true));
-	else if (params.commercial_use === 'required') criteria.push(eq(t.isForCommercial, true));
+	if (isForCommercialColumn) {
+		if (params.commercial_use === 'excluded') criteria.push(ne(isForCommercialColumn, true));
+		else if (params.commercial_use === 'required') criteria.push(eq(isForCommercialColumn, true));
+	}
 
 	if (params.adult_contents === 'excluded')
 		criteria.push(eq(t.containsAdultContents, AdultContents.NORMAL));
@@ -168,6 +174,10 @@ export const load = (async ({ url, untrack, locals, ...rest }) => {
 					request: createCriteria(parsed.data, table.commissionRequest, {
 						budgetColumn: table.commissionRequest.budget,
 						dateColumn: table.commissionRequest.deadline,
+						isForCommercialColumn: table.commissionRequest.isForCommercial,
+					}),
+					portfolio: createCriteria(parsed.data, table.portfolio, {
+						dateColumn: table.portfolio.publishDate,
 					}),
 				},
 				locals.user,

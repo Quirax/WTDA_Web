@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { CategoryText } from '$lib/messages';
-	import { formatDatetimeString, sanitizeHTML } from '$lib/utils';
+	import { cn, formatDatetimeString, sanitizeHTML } from '$lib/utils';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
@@ -14,9 +14,13 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { AdultContents } from '@app';
 	import { page } from '$app/state';
+	import * as Card from '$lib/components/ui/card';
+	import * as Carousel from '$lib/components/ui/carousel';
+	import type { CarouselAPI } from '$lib/components/ui/carousel/context';
+	import MediaGallery from '$stories/components/MediaGallery.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
-		article: App.Request;
+		article: App.Portfolio;
 	}
 
 	const { article }: Props = $props();
@@ -56,9 +60,15 @@
 
 <Header title={article.title} />
 
-<Section class="flex space-x-4 max-md:flex-col">
+<Section class="flex space-x-4 max-lg:flex-col">
 	<section class="flex-auto">
 		<H2>{article.title}</H2>
+
+		{#if article.media.length > 0}
+			<MediaGallery
+				media={article.media.map((src, idx) => ({ src, alt: `첨부 미디어 ${idx + 1}` }))} />
+		{/if}
+
 		<article class="html p-4">
 			{#if article.content}
 				{@html sanitizeHTML(article.content)}
@@ -75,7 +85,10 @@
 	<section class="flex-none space-y-2 border p-4 max-md:mt-8 md:w-80">
 		<div>
 			{#if article.thumbnail}
-				<img src={article.thumbnail} class="aspect-video w-full" alt="이 의뢰의 썸네일" />
+				<img
+					src={article.thumbnail}
+					class="aspect-video w-full object-cover"
+					alt="이 의뢰의 썸네일" />
 			{:else}
 				<div class="banner-pattern bg-primary aspect-video w-full"></div>
 			{/if}
@@ -98,26 +111,9 @@
 						<Table.Cell>{CategoryText[article.category]()}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>사용 목적</Table.Head>
-						<Table.Cell class="break-all">
-							<div>
-								{article.purpose}
-							</div>
-							{#if article.isForCommercial}
-								<div class="text-destructive font-bold">(상업적 목적으로 사용)</div>
-							{/if}
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>가능한 금액</Table.Head>
+						<Table.Head>작업 및 게시 일자</Table.Head>
 						<Table.Cell>
-							{article.budget ? article.budget.toLocaleString() + ' 포인트' : '협의 가능'}
-						</Table.Cell>
-					</Table.Row>
-					<Table.Row>
-						<Table.Head>작업 기한</Table.Head>
-						<Table.Cell>
-							{article.deadline ? formatDatetimeString(article.deadline) : '협의 가능'}
+							{article.publishDate ? formatDatetimeString(article.publishDate) : '미상'}
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
@@ -142,7 +138,7 @@
 		</section>
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
-				<Button href="/r/{article.id}/edit">수정하기</Button>
+				<Button href="/pf/{article.id}/edit">수정하기</Button>
 				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
 					삭제하기
 				</Button>
