@@ -178,8 +178,10 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.type}>
-							<Select.Trigger class="w-[12em]">
-								{'타입' + (typeText ? ': ' + typeText : '')}
+							<Select.Trigger>
+								<div class="mr-2">
+									{'타입' + (typeText ? ': ' + typeText : '')}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(ArticleTypeText) as [k, v]}
