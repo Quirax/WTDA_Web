@@ -160,7 +160,7 @@
 										<Popover.Content class="w-auto p-0">
 											<CalendarWithSelects
 												type="single"
-												maxValue={today(getLocalTimeZone()).add({ days: 1 })}
+												maxValue={today(getLocalTimeZone())}
 												locale="ko-KR"
 												bind:value={
 													() =>

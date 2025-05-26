@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { CategoryText } from '$lib/messages';
-	import { cn, formatDatetimeString, sanitizeHTML } from '$lib/utils';
+	import { cn, formatDateString, formatDatetimeString, sanitizeHTML } from '$lib/utils';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
@@ -113,7 +113,7 @@
 					<Table.Row>
 						<Table.Head>작업 및 게시 일자</Table.Head>
 						<Table.Cell>
-							{article.publishDate ? formatDatetimeString(article.publishDate) : '미상'}
+							{article.publishDate ? formatDateString(article.publishDate) : '미상'}
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
