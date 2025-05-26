@@ -73,6 +73,7 @@ export const actions: Actions = {
 				.update(table.commissionRequest)
 				.set({
 					...form.data,
+					modifyDate: new Date(),
 				})
 				.where(eq(table.commissionRequest.id, id));
 

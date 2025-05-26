@@ -72,6 +72,7 @@ export const actions: Actions = {
 				.update(table.portfolio)
 				.set({
 					...form.data,
+					modifyDate: new Date(),
 				})
 				.where(eq(table.portfolio.id, id));
 
