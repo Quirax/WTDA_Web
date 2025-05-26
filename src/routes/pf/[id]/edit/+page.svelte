@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Form from '$stories/request/Form.svelte';
+	import Form from '$stories/portfolio/Form.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
