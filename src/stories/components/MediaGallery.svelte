@@ -3,12 +3,21 @@
 	import * as Carousel from '$lib/components/ui/carousel';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 	import { cn } from '$lib/utils';
+	import 'photoswipe/style.css';
+	import PhotoSwipe, { type PhotoSwipeOptions } from 'photoswipe';
 
 	interface Props {
 		media: { src: string; alt?: string }[];
 	}
 
 	const { media }: Props = $props();
+
+	const dataSource = media.map((medium) => ({
+		src: medium.src,
+		alt: medium.alt,
+		height: 0,
+		width: 0,
+	}));
 
 	let api = $state<CarouselAPI>();
 	let current = $state(0);
@@ -21,6 +30,25 @@
 			});
 		}
 	});
+
+	const onLoadMedia =
+		(idx: number) =>
+		({ target }: Event) => {
+			const tg = target as HTMLImageElement;
+			dataSource[idx].height = tg.naturalHeight;
+			dataSource[idx].width = tg.naturalWidth;
+		};
+
+	const onShowPhotoSwipe = () => {
+		const photoSwipeOptions: PhotoSwipeOptions = {
+			dataSource,
+			showHideAnimationType: 'none',
+			index: current,
+		};
+
+		const pswp = new PhotoSwipe(photoSwipeOptions);
+		pswp.init();
+	};
 </script>
 
 <section class="relative my-4 flex justify-center px-17">
@@ -30,11 +58,15 @@
 		setApi={(emblaApi) => (api = emblaApi)}>
 		<Carousel.Previous />
 		<Carousel.Content class="w-full">
-			{#each media as medium}
+			{#each media as medium, idx}
 				<Carousel.Item>
 					<div class="flex h-[50vh] items-center justify-center p-1">
-						<Card.Root class="size-full">
-							<img class="size-full object-contain" src={medium.src} alt={medium.alt} />
+						<Card.Root class="size-full" onclick={onShowPhotoSwipe}>
+							<img
+								class="size-full object-contain"
+								src={medium.src}
+								alt={medium.alt}
+								onload={onLoadMedia(idx)} />
 						</Card.Root>
 					</div>
 				</Carousel.Item>
