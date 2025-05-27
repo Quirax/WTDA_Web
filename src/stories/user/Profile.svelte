@@ -13,60 +13,35 @@
 		Clock,
 		Link,
 		CircleDashed,
-		ChevronRight,
-		TriangleAlert,
-		NotepadTextDashed,
-		Trash2,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 	import H2 from '$lib/components/typo/h2.svelte';
 	import H3 from '$lib/components/typo/h3.svelte';
-	import {
-		dataURLToFile,
-		durationString,
-		formatDatetimeString,
-		isDesktop,
-		sanitizeHTML,
-		uploadImage,
-	} from '$lib/utils';
+	import { dataURLToFile, durationString, sanitizeHTML, uploadImage } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import DocsImage from '../assets/docs.png';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Chart from '$lib/components/chart/chart.svelte';
-	import * as Drawer from '$lib/components/ui/drawer/index.js';
-	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
-	import { deserialize } from '$app/forms';
-	import Pagination from '$lib/components/pagination/pagination.svelte';
-	import { announcementsPerPage, imageFormat, profileArticlesPerPage } from '$lib/config';
-	import { ArticleCategory, FetchStatus } from '@app';
+	import { imageFormat } from '$lib/config';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import Dropzone from 'svelte-file-dropzone';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { MediaQuery } from 'svelte/reactivity';
 	import X from '@lucide/svelte/icons/x';
 	import ColorPicker from 'svelte-awesome-color-picker';
-	import {
-		announcementSchema,
-		profileSchema,
-		type AnnouncementSchema,
-		type ProfileSchema,
-	} from '$lib/schema/profile';
+	import { profileSchema, type AnnouncementSchema, type ProfileSchema } from '$lib/schema/profile';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Form from '$lib/components/ui/form';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import tinycolor from 'tinycolor2';
 	import Cropper from '$lib/components/cropper/cropper.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
-	import { untrack } from 'svelte';
 	import UserArticles from './UserArticles.svelte';
+	import Announcements from './Announcements.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -248,146 +223,6 @@
 			trigger: 'item',
 		},
 	};
-
-	// Announcements List
-	let openErrorOnAnnouncementAlert = $state(false);
-
-	let announcementsListDrawerState = $state({
-		open: false,
-		list: Array<{ id: string; title: string; createDate: Date }>(),
-		status: FetchStatus.LOADING,
-		total: 0,
-		page: 1,
-	});
-
-	const getAnnouncementsList = async () => {
-		announcementsListDrawerState.status = FetchStatus.LOADING;
-		announcementsListDrawerState.list = [];
-
-		const formData = new FormData();
-		formData.append('page', announcementsListDrawerState.page.toString());
-
-		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
-		const result = await fetch('?/announcementsList', { method: 'post', body: formData })
-			.then((r) => r.text())
-			.then((r) => deserialize(r));
-
-		if (result.type === 'success') {
-			announcementsListDrawerState.list = result.data!.list as Array<{
-				title: string;
-				createDate: Date;
-				id: string;
-			}>;
-			announcementsListDrawerState.status = FetchStatus.COMPLETED;
-			announcementsListDrawerState.total = result.data!.total as number;
-		} else {
-			announcementsListDrawerState.status = FetchStatus.FAILED;
-			announcementsListDrawerState.total = 0;
-
-			console.error(result);
-			openErrorOnAnnouncementAlert = true;
-		}
-	};
-
-	const onOpenAnnouncementsListDrawer = async () => {
-		announcementsListDrawerState.open = true;
-		announcementsListDrawerState.page = 1;
-		announcementsListDrawerState.total = 0;
-	};
-
-	$effect(() => {
-		if (announcementsListDrawerState.open && announcementsListDrawerState.page)
-			getAnnouncementsList();
-	});
-
-	// Announcement Dialog
-	let announcementDialogState = $state({
-		open: false,
-		announcement: { title: '', content: '', createDate: new Date() },
-		status: FetchStatus.LOADING,
-	});
-
-	const openAnnouncementDialog = async (id: string) => {
-		announcementDialogState.open = true;
-		announcementDialogState.status = FetchStatus.LOADING;
-
-		const formData = new FormData();
-		formData.append('id', id);
-
-		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
-		const result = await fetch('?/announcement', { method: 'post', body: formData })
-			.then((r) => r.text())
-			.then((r) => deserialize(r));
-
-		if (result.type === 'success' && result.data!.announcement) {
-			announcementDialogState.announcement = result.data!.announcement as {
-				title: string;
-				content: string;
-				createDate: Date;
-			};
-			announcementDialogState.status = FetchStatus.COMPLETED;
-		} else {
-			announcementDialogState.status = FetchStatus.FAILED;
-
-			console.error(result);
-			openErrorOnAnnouncementAlert = true;
-		}
-	};
-
-	// Delete Announcement Alert
-	let deleteAnnouncementAlertState = $state({
-		open: false,
-		announcementID: '',
-	});
-
-	const deleteAnnouncement = async () => {
-		if (!deleteAnnouncementAlertState.announcementID) return;
-
-		const formData = new FormData();
-		formData.append('id', deleteAnnouncementAlertState.announcementID);
-
-		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
-		const result = await fetch('?/deleteAnnouncement', { method: 'post', body: formData })
-			.then((r) => r.text())
-			.then((r) => deserialize(r));
-
-		if (result.type === 'success') {
-			getAnnouncementsList();
-			invalidateAll();
-		} else {
-			console.error(result);
-			openErrorOnAnnouncementAlert = true;
-		}
-	};
-
-	// Announcement Editor
-	let openAnnouncementEditor = $state(false);
-
-	const announcementForm = superForm(announcementFormData, {
-		validators: zodClient(announcementSchema),
-		dataType: 'json',
-		resetForm: false, // ref: https://superforms.rocks/faq#how-can-i-prevent-the-form-from-being-reset-after-its-submitted
-		onResult({ result, cancel }) {
-			if (result.type !== 'success' || [200, 204, 302].indexOf(result.status || 0) === -1) {
-				console.error(result);
-				if (result.status !== 400) {
-					cancel();
-
-					console.error(result);
-					openErrorOnAnnouncementAlert = true;
-				}
-			} else {
-				invalidateAll();
-				openAnnouncementEditor = false;
-			}
-		},
-	});
-
-	const {
-		form: announcementData,
-		enhance: announcementEnhance,
-		constraints: announcementConstraints,
-	} = announcementForm;
 
 	// Profile Edit Mode
 	let profileEditMode = $state(false);
@@ -849,49 +684,7 @@
 		{/if}
 	</form>
 	<section class="w-full space-y-8 p-4">
-		<section class="bg-accent text-accent-foreground flex border p-2">
-			<h3 class="flex-none font-bold">공지사항</h3>
-			<Separator orientation="vertical" class="mx-2 flex-none" />
-			<div class="flex w-full flex-col overflow-hidden">
-				{#if announcements}
-					<Button
-						variant="link"
-						class="text-accent-foreground w-full justify-start text-left whitespace-pre-wrap"
-						onclick={() => openAnnouncementDialog(announcements.id)}>
-						{announcements.title}
-					</Button>
-					<p class="text-muted-foreground text-right text-sm">
-						{formatDatetimeString(announcements.createDate)}
-					</p>
-				{:else}
-					<p
-						class="text-muted-foreground w-full overflow-hidden text-ellipsis whitespace-nowrap italic">
-						등록된 공지사항이 없습니다
-					</p>
-				{/if}
-				<Separator orientation="horizontal" class="my-2 flex-none" />
-				<div class="flex max-sm:flex-col max-sm:items-end sm:justify-end">
-					<Button
-						variant="link"
-						class="flex-none text-(--primary-color)"
-						onclick={onOpenAnnouncementsListDrawer}>
-						과거 공지사항 보기
-						<ChevronRight class="size-4" />
-					</Button>
-					{#if me && me.id === user.id}
-						{#if new MediaQuery('width >= 40rem').current}
-							<Separator orientation="vertical" class="mx-2 flex-none" />
-						{/if}
-						<Button
-							variant="link"
-							class="flex-none text-(--primary-color) max-sm:mt-2"
-							onclick={() => (openAnnouncementEditor = true)}>
-							<Pencil />새 공지사항 쓰기
-						</Button>
-					{/if}
-				</div>
-			</div>
-		</section>
+		<Announcements {user} {announcements} {announcementFormData} />
 		<UserArticles {user} />
 	</section>
 </main>
@@ -931,185 +724,6 @@
 				</Table.Row>
 			</Table.Body>
 		</Table.Root>
-	</Dialog.Content>
-</Dialog.Root>
-
-<Drawer.Root bind:open={announcementsListDrawerState.open}>
-	<Drawer.Content class="transition-none">
-		<Drawer.Header>
-			<Drawer.Title>공지사항 변경 이력</Drawer.Title>
-			<Drawer.Description>
-				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
-			</Drawer.Description>
-		</Drawer.Header>
-		<div
-			class="mb-2 max-h-[calc(100vh-210px)] overflow-x-hidden overflow-y-auto p-4 pb-0 transition-none">
-			{#if announcementsListDrawerState.status === FetchStatus.COMPLETED}
-				{#if announcementsListDrawerState.list.length > 0}
-					<Table.Root class="table-fixed">
-						<Table.Header>
-							<Table.Row>
-								<Table.Head>제목</Table.Head>
-								<Table.Head class="w-[13em]">작성일자</Table.Head>
-								{#if me && me.id === user.id}
-									<Table.Head class="w-20 text-center">삭제</Table.Head>
-								{/if}
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each announcementsListDrawerState.list as item}
-								<Table.Row>
-									<Table.Cell>
-										<Button
-											variant="link"
-											class="text-accent-foreground w-full justify-start overflow-hidden text-ellipsis whitespace-nowrap"
-											onclick={() => openAnnouncementDialog(item.id)}
-											title={item.title}>
-											{item.title}
-										</Button>
-									</Table.Cell>
-									<Table.Cell>{formatDatetimeString(item.createDate)}</Table.Cell>
-									{#if me && me.id === user.id}
-										<Table.Cell class="text-center">
-											<Button
-												variant="ghost"
-												size="icon"
-												onclick={() => {
-													deleteAnnouncementAlertState.announcementID = item.id;
-													deleteAnnouncementAlertState.open = true;
-												}}>
-												<Trash2 />
-											</Button>
-										</Table.Cell>
-									{/if}
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				{:else}
-					<div class="text-muted-foreground flex flex-col items-center space-y-2">
-						<NotepadTextDashed class="size-12" />
-						<span>등록된 공지사항이 없습니다</span>
-					</div>
-				{/if}
-			{:else if announcementsListDrawerState.status === FetchStatus.LOADING}
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>제목</Table.Head>
-							<Table.Head class="w-[13em]">작성일자</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each Array(announcementsPerPage)}
-							<Table.Row style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
-								<Table.Cell>
-									<Skeleton class="h-(--height) w-full" />
-								</Table.Cell>
-								<Table.Cell>
-									<Skeleton class="h-(--height) w-full" />
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			{:else}
-				<div class="text-muted-foreground flex flex-col items-center space-y-2">
-					<TriangleAlert class="size-12" />
-					<span>불러오는 도중 오류가 발생했습니다.</span>
-				</div>
-			{/if}
-		</div>
-		{#if announcementsListDrawerState.total > 0}
-			<Pagination
-				bind:page={announcementsListDrawerState.page}
-				count={announcementsListDrawerState.total}
-				perPage={announcementsPerPage}
-				siblingCount={isDesktop() ? 1 : 0} />
-		{/if}
-		<Drawer.Footer>
-			<Drawer.Close>닫기</Drawer.Close>
-		</Drawer.Footer>
-	</Drawer.Content>
-</Drawer.Root>
-
-<Dialog.Root bind:open={announcementDialogState.open}>
-	<Dialog.Content
-		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
-		<Dialog.Header>
-			<Dialog.Title
-				style="--height: calc(var(--text-lg--line-height) * var(--text-lg));"
-				class="mt-4">
-				{#if announcementDialogState.status === FetchStatus.COMPLETED}
-					{announcementDialogState.announcement.title}
-				{:else}
-					<Skeleton class="h-(--height) w-full" />
-				{/if}
-			</Dialog.Title>
-			<Dialog.Description style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
-				작성일시: {#if announcementDialogState.status === FetchStatus.COMPLETED}
-					{formatDatetimeString(announcementDialogState.announcement.createDate)}
-				{:else}
-					<Skeleton class="inline-block h-(--height) w-[11em]" />
-				{/if}
-			</Dialog.Description>
-		</Dialog.Header>
-		<div class="html h-100 overflow-y-scroll p-4 pb-0">
-			{#if announcementDialogState.status === FetchStatus.COMPLETED}
-				{@html sanitizeHTML(announcementDialogState.announcement.content)}
-			{:else if announcementDialogState.status === FetchStatus.FAILED}
-				<div
-					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
-					<TriangleAlert class="size-12" />
-					<span>불러오는 도중 오류가 발생했습니다.</span>
-				</div>
-			{:else}
-				<Skeleton class="size-full" />
-			{/if}
-		</div>
-	</Dialog.Content>
-</Dialog.Root>
-
-<Dialog.Root bind:open={openAnnouncementEditor}>
-	<Dialog.Content
-		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[600px]">
-		<form method="POST" use:announcementEnhance class="w-full" action="?/saveAnnouncement">
-			<Dialog.Header>
-				<Dialog.Title style="--height: calc(var(--text-lg--line-height) * var(--text-lg));">
-					<Form.Field form={announcementForm} name="title">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Input
-									{...props}
-									bind:value={$announcementData.title}
-									placeholder="공지 제목을 입력하십시오."
-									class="mt-4"
-									{...$announcementConstraints.title} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</Dialog.Title>
-			</Dialog.Header>
-			<Form.Field form={announcementForm} name="content" class="h-100 pb-2">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Editor bind:value={$announcementData.content} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-			<Dialog.Footer>
-				<Form.Button variant="default">저장</Form.Button>
-				<Button
-					onclick={() => {
-						openAnnouncementEditor = false;
-					}}
-					variant="secondary">
-					취소
-				</Button>
-			</Dialog.Footer>
-		</form>
 	</Dialog.Content>
 </Dialog.Root>
 
@@ -1162,19 +776,9 @@
 </Dialog.Root>
 
 <AlertDialog
-	title="정말로 이 공지를 삭제하시겠습니까?"
-	description="삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다."
-	cancel={true}
-	onAction={deleteAnnouncement}
-	bind:open={deleteAnnouncementAlertState.open} />
-<AlertDialog
 	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnProfileUpdateAlert} />
-<AlertDialog
-	title="공지사항 관련 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
-	bind:open={openErrorOnAnnouncementAlert} />
 <AlertDialog
 	title="프로필 링크가 복사되었습니다."
 	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
