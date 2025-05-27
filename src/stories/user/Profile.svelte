@@ -384,7 +384,16 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						<DropdownMenu.Item onclick={() => {}}>차단하기</DropdownMenu.Item>
+						{#if false}
+							<!-- TODO 차단 기능 구현 시 -->
+							<DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
+								차단 해제하기
+							</DropdownMenu.Item>
+						{:else}
+							<DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
+								차단하기
+							</DropdownMenu.Item>
+						{/if}
 						<!-- TODO 구현 완료 시 재활성화
 						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
 						-->
