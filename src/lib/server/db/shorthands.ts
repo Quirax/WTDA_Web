@@ -54,8 +54,7 @@ export const articlesPerType = (
 					})
 					.from(table.commissionRequest)
 					.where(and(...generateCommonWhere(table.commissionRequest, currentUser), where.request))
-					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
-					.orderBy(desc(table.commissionRequest.modifyDate));
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id));
 			case ArticleType.COMMISSION:
 				return undefined;
 			case ArticleType.PORTFOLIO:
@@ -82,8 +81,7 @@ export const articlesPerType = (
 					})
 					.from(table.portfolio)
 					.where(and(...generateCommonWhere(table.portfolio, currentUser), where.portfolio))
-					.innerJoin(table.user, eq(table.portfolio.author, table.user.id))
-					.orderBy(desc(table.portfolio.modifyDate));
+					.innerJoin(table.user, eq(table.portfolio.author, table.user.id));
 		}
 	});
 
@@ -102,13 +100,12 @@ export const allArticles = (
 		let leftQuery = subqueries.splice(0, 1)[0];
 		let rightQuery = subqueries.splice(0, 1)[0];
 
-		if (!rightQuery) return leftQuery;
-		else if (subqueries.length === 0) return leftQuery.unionAll(rightQuery);
+		if (!rightQuery) return leftQuery.orderBy(desc(leftQuery._.selectedFields.modifyDate));
 		else {
 			let combined = leftQuery.unionAll(rightQuery);
 
 			subqueries.forEach((q) => (combined = combined.unionAll(q)));
-			return combined;
+			return combined.orderBy(desc(combined._.selectedFields.modifyDate));
 		}
 	}
 

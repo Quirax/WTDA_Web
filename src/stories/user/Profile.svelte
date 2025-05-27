@@ -68,6 +68,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import ArticleList from '$stories/components/ArticleList.svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import { untrack } from 'svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -396,26 +397,42 @@
 	// Article List
 	let articleListTab = $state<'all' | 'requests'>('all');
 	let articleList = $state<App.Articles[] | undefined | null>();
+	let articlePage = $state(1);
+	let articleTotal = $state(0);
 
 	$effect(() => {
-		if (articleListTab) {
-			(async () => {
-				const formData = new FormData();
-				formData.append('tab', articleListTab);
+		if (articleListTab) articlePage = 0;
+	});
 
-				// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
-				const result = await fetch('?/articles', { method: 'post', body: formData })
-					.then((r) => r.text())
-					.then((r) => deserialize(r));
-
-				if (result.type === 'success') {
-					articleList = result.data?.list as App.Articles[];
-				} else {
-					articleList = null;
-					console.error(result);
-				}
-			})();
+	$effect(() => {
+		if (articlePage === 0) {
+			articlePage = 1;
+			return;
 		}
+
+		(async () => {
+			const formData = new FormData();
+			formData.append(
+				'tab',
+				untrack(() => articleListTab),
+			);
+			formData.append('page', articlePage.toString());
+
+			// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+			const result = await fetch('?/articles', { method: 'post', body: formData })
+				.then((r) => r.text())
+				.then((r) => deserialize(r));
+
+			if (result.type === 'success') {
+				articleList = result.data?.list as App.Articles[];
+				articleTotal = (result.data?.count as number) || 0;
+			} else {
+				articleList = null;
+				articleTotal = 0;
+				articlePage = 1;
+				console.error(result);
+			}
+		})();
 	});
 
 	// Profile link copy
@@ -948,6 +965,15 @@
 				class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
 				accentColor={user.profile.accentColor}
 				articles={articleList || []} />
+
+			{#if articleTotal > 0}
+				<!-- perPage={announcementsPerPage} -->
+				<Pagination
+					bind:page={articlePage}
+					count={articleTotal}
+					perPage={1}
+					siblingCount={isDesktop() ? 1 : 0} />
+			{/if}
 		</section>
 	</section>
 </main>
