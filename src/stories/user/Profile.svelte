@@ -42,6 +42,8 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import UserArticles from './UserArticles.svelte';
 	import Announcements from './Announcements.svelte';
+	import P from '$lib/components/typo/p.svelte';
+	import Ul from '$lib/components/typo/ul.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -236,6 +238,13 @@
 		});
 	};
 
+	// Block
+	let openBlockAlert = $state(false);
+
+	const onBlock = () => {
+		alert('테스트');
+	};
+
 	// TODO: get values from server
 	const maxSlot = 4,
 		maxOpenSlot = maxSlot,
@@ -390,7 +399,11 @@
 								차단 해제하기
 							</DropdownMenu.Item>
 						{:else}
-							<DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
+							<DropdownMenu.Item
+								onclick={() => {
+									openBlockAlert = true;
+								}}
+								disabled={!!me && user.id === me.id}>
 								차단하기
 							</DropdownMenu.Item>
 						{/if}
@@ -792,6 +805,26 @@
 	title="프로필 링크가 복사되었습니다."
 	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
 	bind:open={openLinkCopyAlert} />
+
+{#snippet blockDescription()}
+	<Ul>
+		<li>
+			메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해
+			접속하는 경우 게시물을 볼 수는 있습니다.)
+		</li>
+		<li>이 사용자와 메시지를 주고받을 수 없습니다.</li>
+		<li>이 사용자로부터 커미션 의뢰 또는 커미션 제안을 받을 수 없습니다.</li>
+		<li>이 사용자에게 커미션 의뢰 또는 커미션 제안을 할 수 없습니다.</li>
+		<li>차단 조치는 귀하가 원하는 시점에 해제할 수 있습니다.</li>
+	</Ul>
+{/snippet}
+
+<AlertDialog
+	title="정말로 이 사용자를 차단하시겠습니까?"
+	description={blockDescription}
+	cancel={true}
+	onAction={onBlock}
+	bind:open={openBlockAlert} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {
