@@ -42,7 +42,7 @@
 	import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
 	import { deserialize } from '$app/forms';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
-	import { announcementsPerPage, imageFormat } from '$lib/config';
+	import { announcementsPerPage, imageFormat, profileArticlesPerPage } from '$lib/config';
 	import { ArticleCategory, FetchStatus } from '@app';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from '$lib/components/editor/editor.svelte';
@@ -967,11 +967,10 @@
 				articles={articleList || []} />
 
 			{#if articleTotal > 0}
-				<!-- perPage={announcementsPerPage} -->
 				<Pagination
 					bind:page={articlePage}
 					count={articleTotal}
-					perPage={1}
+					perPage={profileArticlesPerPage}
 					siblingCount={isDesktop() ? 1 : 0} />
 			{/if}
 		</section>

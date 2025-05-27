@@ -65,3 +65,4 @@ export const imageMime = [
 
 export const announcementsPerPage = 5;
 export const searchResultsPerPage = 10;
+export const profileArticlesPerPage = 10;

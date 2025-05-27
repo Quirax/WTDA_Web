@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { announcementsPerPage } from '$lib/config';
+import { announcementsPerPage, profileArticlesPerPage } from '$lib/config';
 import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -264,7 +264,10 @@ export const actions: Actions = {
 
 			if (articleQuery) count = await db.$count(articleQuery);
 
-			results = (await articleQuery?.limit(1).offset(1 * (page - 1))) || [];
+			results =
+				(await articleQuery
+					?.limit(profileArticlesPerPage)
+					.offset(profileArticlesPerPage * (page - 1))) || [];
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
