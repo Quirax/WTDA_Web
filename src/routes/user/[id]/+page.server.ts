@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { db, generateID } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { announcementsPerPage } from '$lib/config';
+import { announcementsPerPage, profileArticlesPerPage } from '$lib/config';
 import { announcementSchema, profileSchema } from '../../../lib/schema/profile';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -232,50 +232,48 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 		const tab = formData.get('tab') as string;
+		const page = parseInt(formData.get('page') as string);
 
-		let results: (App.Articles & { modifyDate: Date })[] = [];
+		let types: ArticleType[] = [];
+
+		switch (tab) {
+			case 'all':
+				types = [ArticleType.REQUEST, ArticleType.COMMISSION, ArticleType.PORTFOLIO];
+				break;
+			case 'requests':
+				types = [ArticleType.REQUEST];
+				break;
+			case 'portfolio':
+				types = [ArticleType.PORTFOLIO];
+				break;
+		}
+
+		let results = [];
+		let count = 0;
 
 		try {
-			if (tab === 'all') {
-				results =
-					(await allArticles(
-						[ArticleType.REQUEST, ArticleType.COMMISSION, ArticleType.PORTFOLIO],
-						{
-							request: eq(table.commissionRequest.author, id),
-							commission: eq(table.commissionRequest.author, id),
-							portfolio: eq(table.portfolio.author, id),
-						},
-						locals.user,
-					)?.limit(10)) || [];
-			} else if (tab === 'requests') {
-				results =
-					(await allArticles(
-						[ArticleType.REQUEST],
-						{
-							request: eq(table.commissionRequest.author, id),
-						},
-						locals.user,
-					)?.limit(10)) || [];
-			} else if (tab === 'portfolio') {
-				results =
-					(await allArticles(
-						[ArticleType.PORTFOLIO],
-						{
-							portfolio: eq(table.portfolio.author, id),
-						},
-						locals.user,
-					)?.limit(10)) || [];
-			}
+			const articleQuery = allArticles(
+				types,
+				{
+					request: eq(table.commissionRequest.author, id),
+					commission: eq(table.commissionRequest.author, id),
+					portfolio: eq(table.portfolio.author, id),
+				},
+				locals.user,
+			);
+
+			if (articleQuery) count = await db.$count(articleQuery);
+
+			results =
+				(await articleQuery
+					?.limit(profileArticlesPerPage)
+					.offset(profileArticlesPerPage * (page - 1))) || [];
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
 		}
 
-		results = results
-			.sort((a, b) => b.modifyDate.getTime() - a.modifyDate.getTime())
-			.slice(undefined, 10);
-
-		return { message: 'Got articles List', list: results };
+		return { message: 'Got articles List', list: results, count };
 	},
 };
 
