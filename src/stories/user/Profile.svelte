@@ -395,9 +395,9 @@
 					<DropdownMenu.Content class="w-56" align="end">
 						{#if false}
 							<!-- TODO 차단 기능 구현 시 -->
-							<DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
+							<!-- <DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
 								차단 해제하기
-							</DropdownMenu.Item>
+							</DropdownMenu.Item> -->
 						{:else}
 							<DropdownMenu.Item
 								onclick={() => {
