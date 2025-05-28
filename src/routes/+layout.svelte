@@ -4,6 +4,8 @@
 	import { sessionStore, userStore } from '$lib/context';
 	import Layout from '$stories/Layout.svelte';
 	import { afterNavigate, invalidate } from '$app/navigation';
+	import { Toaster } from '$lib/components/ui/sonner';
+	import { ModeWatcher } from 'mode-watcher';
 
 	interface Props extends ReturnType<typeof $props> {
 		data: LayoutServerData;
@@ -21,6 +23,9 @@
 		});
 	});
 </script>
+
+<ModeWatcher />
+<Toaster />
 
 <Layout>
 	{@render children()}
