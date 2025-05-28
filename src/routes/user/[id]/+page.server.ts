@@ -283,11 +283,18 @@ export const actions: Actions = {
 		const toUser = params.id;
 
 		try {
-			await db.insert(table.userRelationship).values({
-				from: fromUser,
-				to: toUser,
-				relationship: UserRelationship.BLOCKED,
-			});
+			await db
+				.insert(table.userRelationship)
+				.values({
+					from: fromUser,
+					to: toUser,
+					relationship: UserRelationship.BLOCKED,
+				})
+				// ref: https://orm.drizzle.team/docs/guides/upsert
+				.onConflictDoUpdate({
+					target: [table.userRelationship.from, table.userRelationship.to],
+					set: { relationship: UserRelationship.BLOCKED },
+				});
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

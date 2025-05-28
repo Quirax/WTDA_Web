@@ -12,6 +12,7 @@ import {
 	unique,
 	type PgColumnBuilderBase,
 	type PgTableExtraConfigValue,
+	primaryKey,
 } from 'drizzle-orm/pg-core';
 import {
 	AdultContents,
@@ -45,15 +46,19 @@ export const user = pgTable(
 	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
 );
 
-export const userRelationship = pgTable('user_relationship', {
-	from: text('from')
-		.notNull()
-		.references(() => user.id),
-	to: text('to')
-		.notNull()
-		.references(() => user.id),
-	relationship: relationshipEnum('relationship').notNull().default(UserRelationship.BLOCKED),
-});
+export const userRelationship = pgTable(
+	'user_relationship',
+	{
+		from: text('from')
+			.notNull()
+			.references(() => user.id),
+		to: text('to')
+			.notNull()
+			.references(() => user.id),
+		relationship: relationshipEnum('relationship').notNull().default(UserRelationship.BLOCKED),
+	},
+	(table) => [primaryKey({ columns: [table.from, table.to] })],
+);
 
 export const session = pgTable('session', {
 	id: text('id').primaryKey(),
