@@ -116,3 +116,7 @@ export enum AdultContents {
 export enum ErrorCode {
 	ADULT_RESTRICTED = 'ADULT_RESTRICTED',
 }
+
+export enum UserRelationship {
+	BLOCKED = 'BLOCKED',
+}
