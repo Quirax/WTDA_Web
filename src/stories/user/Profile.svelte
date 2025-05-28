@@ -44,6 +44,8 @@
 	import Announcements from './Announcements.svelte';
 	import P from '$lib/components/typo/p.svelte';
 	import Ul from '$lib/components/typo/ul.svelte';
+	import { deserialize } from '$app/forms';
+	import { toast } from 'svelte-sonner';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -240,9 +242,29 @@
 
 	// Block
 	let openBlockAlert = $state(false);
+	let openErrorOnBlock = $state(false);
+	let openErrorOnUnblock = $state(false);
 
-	const onBlock = () => {
-		alert('테스트');
+	const onBlock = async () => {
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/block', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			toast.success('사용자를 차단하였습니다.', {
+				action: {
+					label: '차단 해제',
+					onClick: onUnblock,
+				},
+			});
+		} else {
+			openErrorOnBlock = true;
+		}
+	};
+
+	const onUnblock = async () => {
+		toast.success('사용자 차단을 해제하였습니다.');
 	};
 
 	// TODO: get values from server
@@ -825,6 +847,14 @@
 	cancel={true}
 	onAction={onBlock}
 	bind:open={openBlockAlert} />
+<AlertDialog
+	title="사용자 차단 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnBlock} />
+<AlertDialog
+	title="사용자 차단 해제 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnUnblock} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

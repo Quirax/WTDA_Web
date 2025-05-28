@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { ArticleType } from '@app';
+import { ArticleType, UserRelationship } from '@app';
 import { allArticles } from '$lib/server/db/shorthands';
 
 export const load = (async ({ params, locals }) => {
@@ -274,6 +274,26 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Got articles List', list: results, count };
+	},
+
+	block: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		const fromUser = locals.user.id;
+		const toUser = params.id;
+
+		try {
+			await db.insert(table.userRelationship).values({
+				from: fromUser,
+				to: toUser,
+				relationship: UserRelationship.BLOCKED,
+			});
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Blocked the user' };
 	},
 };
 
