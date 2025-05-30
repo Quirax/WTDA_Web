@@ -119,4 +119,5 @@ export enum ErrorCode {
 
 export enum UserRelationship {
 	BLOCKED = 'BLOCKED',
+	NONE = 'NONE',
 }

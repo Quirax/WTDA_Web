@@ -22,56 +22,77 @@ export const load = (async ({ params, locals }) => {
 		else throw redirect(302, '/login');
 	}
 
-	const user = (
-		await db
-			.select({
-				username: table.user.username,
-				profileImage: table.user.profileImage,
-				email: table.user.email,
-				preferences: table.user.preferences,
-				profile: table.user.profile,
-				id: table.user.id,
-				birthday: table.user.birthday,
-				authExpiresAt: table.user.authExpiresAt,
-			})
-			.from(table.user)
-			.where(eq(table.user.id, id))
-	).at(0);
+	try {
+		const user = (
+			await db
+				.select({
+					username: table.user.username,
+					profileImage: table.user.profileImage,
+					email: table.user.email,
+					preferences: table.user.preferences,
+					profile: table.user.profile,
+					id: table.user.id,
+					birthday: table.user.birthday,
+					authExpiresAt: table.user.authExpiresAt,
+				})
+				.from(table.user)
+				.where(eq(table.user.id, id))
+		).at(0);
 
-	if (!user) throw error(404, { message: 'Cannot find matched user' });
+		if (!user) throw error(404, { message: 'Cannot find matched user' });
 
-	const profileAnnouncements = (
-		await db
-			.select()
-			.from(table.profileAnnouncements)
-			.where(eq(table.profileAnnouncements.userId, id))
-			// ref: https://stackoverflow.com/a/79132920
-			.orderBy(desc(table.profileAnnouncements.createDate))
-			// ref: https://orm.drizzle.team/docs/select#limit--offset
-			.limit(1)
-	).at(0);
+		const profileAnnouncements = (
+			await db
+				.select()
+				.from(table.profileAnnouncements)
+				.where(eq(table.profileAnnouncements.userId, id))
+				// ref: https://stackoverflow.com/a/79132920
+				.orderBy(desc(table.profileAnnouncements.createDate))
+				// ref: https://orm.drizzle.team/docs/select#limit--offset
+				.limit(1)
+		).at(0);
 
-	return {
-		user,
-		profileAnnouncements,
-		profileForm: await superValidate(zod(profileSchema), {
-			defaults: {
-				username: user.username,
-				profileImage: user.profileImage,
-				headerImage: user.profile.headerImage,
-				introduction: user.profile.introduction,
-				contactAvailable: user.profile.contactAvailable || null,
-				links: user.profile.links,
-				accentColor: user.profile.accentColor,
-			},
-		}),
-		announcementForm: await superValidate(zod(announcementSchema)),
-	};
+		let relationship = UserRelationship.NONE;
+
+		if (locals.user) {
+			const result = (
+				await db
+					.select({ relationship: table.userRelationship.relationship })
+					.from(table.userRelationship)
+					.where(
+						and(eq(table.userRelationship.from, locals.user.id), eq(table.userRelationship.to, id)),
+					)
+			).at(0);
+
+			if (result) relationship = result.relationship;
+		}
+
+		return {
+			user,
+			profileAnnouncements,
+			profileForm: await superValidate(zod(profileSchema), {
+				defaults: {
+					username: user.username,
+					profileImage: user.profileImage,
+					headerImage: user.profile.headerImage,
+					introduction: user.profile.introduction,
+					contactAvailable: user.profile.contactAvailable || null,
+					links: user.profile.links,
+					accentColor: user.profile.accentColor,
+				},
+			}),
+			announcementForm: await superValidate(zod(announcementSchema)),
+			relationship,
+		};
+	} catch (e) {
+		console.error(e);
+		throw error(500, { message: 'An error has occurred' });
+	}
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
 	update: async (event) => {
-		if (!event.locals.user) throw redirect(302, '/');
+		// if (!event.locals.user || event.locals.user.id !== event.params.id) return fail(403, { message: 'Unauthorized access' });
 
 		const form = await superValidate(event.request, zod(profileSchema));
 
