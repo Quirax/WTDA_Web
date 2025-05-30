@@ -328,6 +328,28 @@ export const actions: Actions = {
 
 		return { message: 'Blocked the user' };
 	},
+
+	unblock: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		const fromUser = locals.user.id;
+		const toUser = params.id;
+
+		if (fromUser === toUser) return fail(400, { message: 'Cannot unblock yourself' });
+
+		try {
+			await db
+				.delete(table.userRelationship)
+				.where(
+					and(eq(table.userRelationship.from, fromUser), eq(table.userRelationship.to, toUser)),
+				);
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Unblocked the user' };
+	},
 };
 
 const _registerAttaches = async (

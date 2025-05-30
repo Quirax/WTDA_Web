@@ -48,7 +48,7 @@
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { UserRelationship } from '@app';
-	import { invalidate } from '$app/navigation';
+	import { invalidate, invalidateAll } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -263,15 +263,23 @@
 					onClick: onUnblock,
 				},
 			});
-			invalidate('.');
+			invalidateAll();
 		} else {
 			openErrorOnBlock = true;
 		}
 	};
 
 	const onUnblock = async () => {
-		invalidate('.');
-		toast.success('사용자 차단을 해제하였습니다.');
+		const result = await fetch('?/unblock', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			toast.success('사용자 차단을 해제하였습니다.');
+			invalidateAll();
+		} else {
+			openErrorOnBlock = true;
+		}
 	};
 
 	// TODO: get values from server
