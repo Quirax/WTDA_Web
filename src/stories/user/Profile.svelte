@@ -13,6 +13,7 @@
 		Clock,
 		Link,
 		CircleDashed,
+		UserX,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -46,15 +47,19 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { UserRelationship } from '@app';
+	import { invalidate } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
 		profileFormData: SuperValidated<Infer<ProfileSchema>>;
 		announcementFormData: SuperValidated<Infer<AnnouncementSchema>>;
+		relationship: UserRelationship;
 	}
 
-	const { user, announcements, profileFormData, announcementFormData }: Props = $props();
+	const { user, announcements, profileFormData, announcementFormData, relationship }: Props =
+		$props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -258,12 +263,14 @@
 					onClick: onUnblock,
 				},
 			});
+			invalidate('.');
 		} else {
 			openErrorOnBlock = true;
 		}
 	};
 
 	const onUnblock = async () => {
+		invalidate('.');
 		toast.success('사용자 차단을 해제하였습니다.');
 	};
 
@@ -341,23 +348,32 @@
 				class="flex w-full flex-col items-center space-y-2">
 				<Form.Control>
 					{#snippet children({ props })}
-						<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
-							{#if $profileData.profileImage}
-								<img
-									src={$profileData.profileImage}
-									alt="{user.username} 님의 프로필 이미지"
-									class="size-full" />
-								{#if profileEditMode}
-									<Button
-										onclick={removeProfileImage}
-										variant="link"
-										class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
-										<span>이미지 제거</span>
-									</Button>
-									<input name={props.name} value={$profileData.profileImage} hidden />
+						<div class="relative">
+							<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
+								{#if $profileData.profileImage}
+									<img
+										src={$profileData.profileImage}
+										alt="{user.username} 님의 프로필 이미지"
+										class="size-full" />
+									{#if profileEditMode}
+										<Button
+											onclick={removeProfileImage}
+											variant="link"
+											class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
+											<span>이미지 제거</span>
+										</Button>
+										<input name={props.name} value={$profileData.profileImage} hidden />
+									{/if}
+								{:else}
+									<User class="size-full" />
 								{/if}
-							{:else}
-								<User class="size-full" />
+							</div>
+							{#if relationship === UserRelationship.BLOCKED}
+								<div
+									class="bg-destructive text-destructive-foreground absolute right-1 bottom-1 size-7 rounded-full border p-1"
+									title="차단된 사용자">
+									<UserX class="size-full" />
+								</div>
 							{/if}
 						</div>
 						{#if profileEditMode && !$profileData.profileImage}
@@ -415,11 +431,10 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						{#if false}
-							<!-- TODO 차단 기능 구현 시 -->
-							<!-- <DropdownMenu.Item onclick={() => {}} disabled={!!me && user.id === me.id}>
+						{#if relationship === UserRelationship.BLOCKED}
+							<DropdownMenu.Item onclick={onUnblock} disabled={!!me && user.id === me.id}>
 								차단 해제하기
-							</DropdownMenu.Item> -->
+							</DropdownMenu.Item>
 						{:else}
 							<DropdownMenu.Item
 								onclick={() => {
@@ -832,6 +847,10 @@
 	<Ul>
 		<li>
 			메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해
+			접속하는 경우 게시물을 볼 수는 있습니다.)
+		</li>
+		<li>
+			이 사용자도 메인 페이지나 검색 결과 등에서 귀하의 게시물을 볼 수 없습니다. (다만, URL을 통해
 			접속하는 경우 게시물을 볼 수는 있습니다.)
 		</li>
 		<li>이 사용자와 메시지를 주고받을 수 없습니다.</li>
