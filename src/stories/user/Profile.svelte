@@ -250,6 +250,8 @@
 	let openErrorOnBlock = $state(false);
 	let openErrorOnUnblock = $state(false);
 
+	let userArticlesKey = $state(Date.now());
+
 	const onBlock = async () => {
 		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
 		const result = await fetch('?/block', { method: 'post', body: new FormData() })
@@ -264,6 +266,7 @@
 				},
 			});
 			invalidateAll();
+			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
 			openErrorOnBlock = true;
 		}
@@ -277,6 +280,7 @@
 		if (result.type === 'success') {
 			toast.success('사용자 차단을 해제하였습니다.');
 			invalidateAll();
+			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
 			openErrorOnBlock = true;
 		}
@@ -752,7 +756,7 @@
 	</form>
 	<section class="w-full space-y-8 p-4">
 		<Announcements {user} {announcements} {announcementFormData} />
-		<UserArticles {user} />
+		<UserArticles {user} key={userArticlesKey.toString()} />
 	</section>
 </main>
 
