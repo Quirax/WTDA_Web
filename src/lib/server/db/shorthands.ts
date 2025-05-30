@@ -1,7 +1,7 @@
-import { AdultContents, ArticleType, UserStatus } from '@app';
+import { AdultContents, ArticleType, UserRelationship, UserStatus } from '@app';
 import { db } from '.';
 import * as table from './schema';
-import { and, desc, eq, ne, SQL, sql } from 'drizzle-orm';
+import { and, desc, eq, exists, ne, notExists, or, SQL, sql } from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import { isAdult } from '$lib/utils';
 
@@ -10,6 +10,29 @@ const generateCommonWhere = (
 	currentUser?: App.User,
 ) => {
 	const commonWhere = [];
+
+	if (currentUser) {
+		const isBlocked = db
+			.select({})
+			.from(table.userRelationship)
+			.where(
+				and(
+					or(
+						and(
+							eq(table.userRelationship.from, t.author),
+							eq(table.userRelationship.to, currentUser.id),
+						),
+						and(
+							eq(table.userRelationship.to, t.author),
+							eq(table.userRelationship.from, currentUser.id),
+						),
+					),
+					eq(table.userRelationship.relationship, UserRelationship.BLOCKED),
+				),
+			);
+
+		commonWhere.push(notExists(isBlocked));
+	}
 
 	if (!currentUser || !isAdult(currentUser) || !currentUser.preferences.display_adult_contents)
 		commonWhere.push(eq(t.containsAdultContents, AdultContents.NORMAL));
