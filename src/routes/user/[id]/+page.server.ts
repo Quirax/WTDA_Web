@@ -92,7 +92,8 @@ export const load = (async ({ params, locals }) => {
 
 export const actions: Actions = {
 	update: async (event) => {
-		// if (!event.locals.user || event.locals.user.id !== event.params.id) return fail(403, { message: 'Unauthorized access' });
+		if (!event.locals.user || event.locals.user.id !== event.params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const form = await superValidate(event.request, zod(profileSchema));
 
@@ -199,7 +200,8 @@ export const actions: Actions = {
 	},
 
 	saveAnnouncement: async (event) => {
-		if (!event.locals.user) return fail(403, { message: 'Access denied' });
+		if (!event.locals.user || event.locals.user.id !== event.params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const form = await superValidate(event.request, zod(announcementSchema));
 
@@ -224,8 +226,9 @@ export const actions: Actions = {
 		}
 	},
 
-	deleteAnnouncement: async ({ request, locals }) => {
-		if (!locals.user) return fail(403, { message: 'Access denied' });
+	deleteAnnouncement: async ({ params, request, locals }) => {
+		if (!locals.user || locals.user.id !== params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const id = (await request.formData()).get('id') as string | null;
 
@@ -302,6 +305,8 @@ export const actions: Actions = {
 
 		const fromUser = locals.user.id;
 		const toUser = params.id;
+
+		if (fromUser === toUser) return fail(400, { message: 'Cannot block yourself' });
 
 		try {
 			await db
