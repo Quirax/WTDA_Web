@@ -33,6 +33,15 @@
 	});
 
 	$effect(() => {
+		if (user) {
+			articleListTab = 'all';
+			articleList = [];
+			articlePage = 0;
+			articleTotal = 0;
+		}
+	});
+
+	$effect(() => {
 		if (articlePage === 0) {
 			articlePage = 1;
 			return;
