@@ -13,6 +13,7 @@
 		Clock,
 		Link,
 		CircleDashed,
+		UserX,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Alert from '$lib/components/ui/alert/index.js';
@@ -42,15 +43,31 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import UserArticles from './UserArticles.svelte';
 	import Announcements from './Announcements.svelte';
+	import P from '$lib/components/typo/p.svelte';
+	import Ul from '$lib/components/typo/ul.svelte';
+	import { deserialize } from '$app/forms';
+	import { toast } from 'svelte-sonner';
+	import { UserRelationship } from '@app';
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
 		profileFormData: SuperValidated<Infer<ProfileSchema>>;
 		announcementFormData: SuperValidated<Infer<AnnouncementSchema>>;
+		relationshipFromUser: UserRelationship;
+		relationshipToUser: UserRelationship;
 	}
 
-	const { user, announcements, profileFormData, announcementFormData }: Props = $props();
+	const {
+		user,
+		announcements,
+		profileFormData,
+		announcementFormData,
+		relationshipFromUser,
+		relationshipToUser,
+	}: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -236,6 +253,47 @@
 		});
 	};
 
+	// Block
+	let openBlockAlert = $state(false);
+	let openErrorOnBlock = $state(false);
+	let openErrorOnUnblock = $state(false);
+
+	let userArticlesKey = $state(Date.now());
+
+	const onBlock = async () => {
+		// ref: https://svelte.dev/docs/kit/$app-forms#applyAction
+		const result = await fetch('?/block', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			toast.success('사용자를 차단하였습니다.', {
+				action: {
+					label: '차단 해제',
+					onClick: onUnblock,
+				},
+			});
+			invalidateAll();
+			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
+		} else {
+			openErrorOnBlock = true;
+		}
+	};
+
+	const onUnblock = async () => {
+		const result = await fetch('?/unblock', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			toast.success('사용자 차단을 해제하였습니다.');
+			invalidateAll();
+			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
+		} else {
+			openErrorOnBlock = true;
+		}
+	};
+
 	// TODO: get values from server
 	const maxSlot = 4,
 		maxOpenSlot = maxSlot,
@@ -310,23 +368,32 @@
 				class="flex w-full flex-col items-center space-y-2">
 				<Form.Control>
 					{#snippet children({ props })}
-						<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
-							{#if $profileData.profileImage}
-								<img
-									src={$profileData.profileImage}
-									alt="{user.username} 님의 프로필 이미지"
-									class="size-full" />
-								{#if profileEditMode}
-									<Button
-										onclick={removeProfileImage}
-										variant="link"
-										class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
-										<span>이미지 제거</span>
-									</Button>
-									<input name={props.name} value={$profileData.profileImage} hidden />
+						<div class="relative">
+							<div class="relative aspect-square w-30 overflow-hidden rounded-full border">
+								{#if $profileData.profileImage}
+									<img
+										src={$profileData.profileImage}
+										alt="{user.username} 님의 프로필 이미지"
+										class="size-full" />
+									{#if profileEditMode}
+										<Button
+											onclick={removeProfileImage}
+											variant="link"
+											class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
+											<span>이미지 제거</span>
+										</Button>
+										<input name={props.name} value={$profileData.profileImage} hidden />
+									{/if}
+								{:else}
+									<User class="size-full" />
 								{/if}
-							{:else}
-								<User class="size-full" />
+							</div>
+							{#if relationshipToUser === UserRelationship.BLOCKED}
+								<div
+									class="bg-destructive text-destructive-foreground absolute right-1 bottom-1 size-7 rounded-full border p-1"
+									title="차단된 사용자">
+									<UserX class="size-full" />
+								</div>
 							{/if}
 						</div>
 						{#if profileEditMode && !$profileData.profileImage}
@@ -372,10 +439,19 @@
 
 		{#if !profileEditMode}
 			<section class="flex">
-				<Button class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
-					<MessageSquare />
-					메시지하기
-				</Button>
+				<Tooltip
+					class="w-full"
+					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
+						relationshipToUser !== UserRelationship.BLOCKED}>
+					<Button
+						class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
+						disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+							relationshipToUser === UserRelationship.BLOCKED}>
+						<MessageSquare />
+						메시지하기
+					</Button>
+				</Tooltip>
 				<Button size="icon" variant="outline" onclick={onCopyProfileLink}><Share2 /></Button>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class="m-0 p-0">
@@ -384,7 +460,19 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						<DropdownMenu.Item onclick={() => {}}>차단하기</DropdownMenu.Item>
+						{#if relationshipToUser === UserRelationship.BLOCKED}
+							<DropdownMenu.Item onclick={onUnblock} disabled={!!me && user.id === me.id}>
+								차단 해제하기
+							</DropdownMenu.Item>
+						{:else}
+							<DropdownMenu.Item
+								onclick={() => {
+									openBlockAlert = true;
+								}}
+								disabled={!!me && user.id === me.id}>
+								차단하기
+							</DropdownMenu.Item>
+						{/if}
 						<!-- TODO 구현 완료 시 재활성화
 						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
 						-->
@@ -498,6 +586,7 @@
 			</Alert.Root>
 		{/if}
 
+		<!-- TODO 2차 알파테스트 전에 추가
 		{#if profileEditMode}
 			<H3 class="text-xl">최대 슬롯 갯수</H3>
 			<div class="mt-2 flex items-center">
@@ -528,6 +617,7 @@
 				</div>
 			</section>
 		{/if}
+		-->
 
 		<!-- TODO 베타테스트 전에 추가
 		{#if !profileEditMode}
@@ -685,7 +775,7 @@
 	</form>
 	<section class="w-full space-y-8 p-4">
 		<Announcements {user} {announcements} {announcementFormData} />
-		<UserArticles {user} />
+		<UserArticles {user} key={userArticlesKey.toString()} />
 	</section>
 </main>
 
@@ -783,6 +873,38 @@
 	title="프로필 링크가 복사되었습니다."
 	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
 	bind:open={openLinkCopyAlert} />
+
+{#snippet blockDescription()}
+	<Ul>
+		<li>
+			메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해
+			접속하는 경우 게시물을 볼 수는 있습니다.)
+		</li>
+		<li>
+			이 사용자도 메인 페이지나 검색 결과 등에서 귀하의 게시물을 볼 수 없습니다. (다만, URL을 통해
+			접속하는 경우 게시물을 볼 수는 있습니다.)
+		</li>
+		<li>이 사용자와 메시지를 주고받을 수 없습니다.</li>
+		<li>이 사용자로부터 커미션 의뢰 또는 커미션 제안을 받을 수 없습니다.</li>
+		<li>이 사용자에게 커미션 의뢰 또는 커미션 제안을 할 수 없습니다.</li>
+		<li>차단 조치는 귀하가 원하는 시점에 해제할 수 있습니다.</li>
+	</Ul>
+{/snippet}
+
+<AlertDialog
+	title="정말로 이 사용자를 차단하시겠습니까?"
+	description={blockDescription}
+	cancel={true}
+	onAction={onBlock}
+	bind:open={openBlockAlert} />
+<AlertDialog
+	title="사용자 차단 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnBlock} />
+<AlertDialog
+	title="사용자 차단 해제 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnUnblock} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

@@ -12,14 +12,22 @@ import {
 	unique,
 	type PgColumnBuilderBase,
 	type PgTableExtraConfigValue,
+	primaryKey,
 } from 'drizzle-orm/pg-core';
-import { AdultContents, ArticleCategory, EmailConfirmFor, UserStatus } from '../../../app';
+import {
+	AdultContents,
+	ArticleCategory,
+	EmailConfirmFor,
+	UserRelationship,
+	UserStatus,
+} from '../../../app';
 import { sql, type BuildColumns, type BuildExtraConfigColumns } from 'drizzle-orm';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
 export const articleCategory = pgEnum('article_category', enumToPgEnum(ArticleCategory));
 export const adultContents = pgEnum('adult_contents', enumToPgEnum(AdultContents));
+export const relationshipEnum = pgEnum('user_relationship_enum', enumToPgEnum(UserRelationship));
 
 export const user = pgTable(
 	'user',
@@ -36,6 +44,20 @@ export const user = pgTable(
 		authExpiresAt: timestamp('auth_expires_at', { withTimezone: true, mode: 'date' }),
 	},
 	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
+);
+
+export const userRelationship = pgTable(
+	'user_relationship',
+	{
+		from: text('from')
+			.notNull()
+			.references(() => user.id),
+		to: text('to')
+			.notNull()
+			.references(() => user.id),
+		relationship: relationshipEnum('relationship').notNull().default(UserRelationship.BLOCKED),
+	},
+	(table) => [primaryKey({ columns: [table.from, table.to] })],
 );
 
 export const session = pgTable('session', {

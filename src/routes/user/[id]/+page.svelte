@@ -9,4 +9,6 @@
 	user={data.user}
 	profileFormData={data.profileForm}
 	announcementFormData={data.announcementForm}
-	announcements={data.profileAnnouncements} />
+	announcements={data.profileAnnouncements}
+	relationshipFromUser={data.relationshipFromUser}
+	relationshipToUser={data.relationshipToUser} />

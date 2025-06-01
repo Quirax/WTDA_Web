@@ -13,9 +13,10 @@
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
+		key: string;
 	}
 
-	const { user }: Props = $props();
+	const { user, key }: Props = $props();
 
 	// Article List
 	let articleListTab = $state<'all' | 'requests'>('all');
@@ -25,6 +26,19 @@
 
 	$effect(() => {
 		if (articleListTab) articlePage = 0;
+	});
+
+	$effect(() => {
+		if (key) articlePage = 0;
+	});
+
+	$effect(() => {
+		if (user) {
+			articleListTab = 'all';
+			articleList = [];
+			articlePage = 0;
+			articleTotal = 0;
+		}
 	});
 
 	$effect(() => {

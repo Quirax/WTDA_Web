@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { sanitizeHTML } from '$lib/utils';
 import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
-import { ArticleType } from '@app';
+import { ArticleType, UserRelationship } from '@app';
 import { allArticles } from '$lib/server/db/shorthands';
 
 export const load = (async ({ params, locals }) => {
@@ -22,56 +22,100 @@ export const load = (async ({ params, locals }) => {
 		else throw redirect(302, '/login');
 	}
 
-	const user = (
-		await db
-			.select({
-				username: table.user.username,
-				profileImage: table.user.profileImage,
-				email: table.user.email,
-				preferences: table.user.preferences,
-				profile: table.user.profile,
-				id: table.user.id,
-				birthday: table.user.birthday,
-				authExpiresAt: table.user.authExpiresAt,
-			})
-			.from(table.user)
-			.where(eq(table.user.id, id))
-	).at(0);
+	try {
+		const user = (
+			await db
+				.select({
+					username: table.user.username,
+					profileImage: table.user.profileImage,
+					email: table.user.email,
+					preferences: table.user.preferences,
+					profile: table.user.profile,
+					id: table.user.id,
+					birthday: table.user.birthday,
+					authExpiresAt: table.user.authExpiresAt,
+				})
+				.from(table.user)
+				.where(eq(table.user.id, id))
+		).at(0);
 
-	if (!user) throw error(404, { message: 'Cannot find matched user' });
+		if (!user) throw error(404, { message: 'Cannot find matched user' });
 
-	const profileAnnouncements = (
-		await db
-			.select()
-			.from(table.profileAnnouncements)
-			.where(eq(table.profileAnnouncements.userId, id))
-			// ref: https://stackoverflow.com/a/79132920
-			.orderBy(desc(table.profileAnnouncements.createDate))
-			// ref: https://orm.drizzle.team/docs/select#limit--offset
-			.limit(1)
-	).at(0);
+		const profileAnnouncements = (
+			await db
+				.select()
+				.from(table.profileAnnouncements)
+				.where(eq(table.profileAnnouncements.userId, id))
+				// ref: https://stackoverflow.com/a/79132920
+				.orderBy(desc(table.profileAnnouncements.createDate))
+				// ref: https://orm.drizzle.team/docs/select#limit--offset
+				.limit(1)
+		).at(0);
 
-	return {
-		user,
-		profileAnnouncements,
-		profileForm: await superValidate(zod(profileSchema), {
-			defaults: {
-				username: user.username,
-				profileImage: user.profileImage,
-				headerImage: user.profile.headerImage,
-				introduction: user.profile.introduction,
-				contactAvailable: user.profile.contactAvailable || null,
-				links: user.profile.links,
-				accentColor: user.profile.accentColor,
-			},
-		}),
-		announcementForm: await superValidate(zod(announcementSchema)),
-	};
+		let relationshipFromUser = UserRelationship.NONE;
+		let relationshipToUser = UserRelationship.NONE;
+
+		if (locals.user) {
+			{
+				const result = (
+					await db
+						.select({ relationship: table.userRelationship.relationship })
+						.from(table.userRelationship)
+						.where(
+							and(
+								eq(table.userRelationship.from, locals.user.id),
+								eq(table.userRelationship.to, id),
+							),
+						)
+				).at(0);
+
+				if (result) relationshipToUser = result.relationship;
+			}
+			{
+				const result = (
+					await db
+						.select({ relationship: table.userRelationship.relationship })
+						.from(table.userRelationship)
+						.where(
+							and(
+								eq(table.userRelationship.to, locals.user.id),
+								eq(table.userRelationship.from, id),
+							),
+						)
+				).at(0);
+
+				if (result) relationshipFromUser = result.relationship;
+			}
+		}
+
+		return {
+			user,
+			profileAnnouncements,
+			profileForm: await superValidate(zod(profileSchema), {
+				defaults: {
+					username: user.username,
+					profileImage: user.profileImage,
+					headerImage: user.profile.headerImage,
+					introduction: user.profile.introduction,
+					contactAvailable: user.profile.contactAvailable || null,
+					links: user.profile.links,
+					accentColor: user.profile.accentColor,
+				},
+			}),
+			announcementForm: await superValidate(zod(announcementSchema)),
+			relationshipFromUser,
+			relationshipToUser,
+		};
+	} catch (e) {
+		console.error(e);
+		throw error(500, { message: 'An error has occurred' });
+	}
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
 	update: async (event) => {
-		if (!event.locals.user) throw redirect(302, '/');
+		if (!event.locals.user || event.locals.user.id !== event.params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const form = await superValidate(event.request, zod(profileSchema));
 
@@ -178,7 +222,8 @@ export const actions: Actions = {
 	},
 
 	saveAnnouncement: async (event) => {
-		if (!event.locals.user) return fail(403, { message: 'Access denied' });
+		if (!event.locals.user || event.locals.user.id !== event.params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const form = await superValidate(event.request, zod(announcementSchema));
 
@@ -203,8 +248,9 @@ export const actions: Actions = {
 		}
 	},
 
-	deleteAnnouncement: async ({ request, locals }) => {
-		if (!locals.user) return fail(403, { message: 'Access denied' });
+	deleteAnnouncement: async ({ params, request, locals }) => {
+		if (!locals.user || locals.user.id !== params.id)
+			return fail(403, { message: 'Unauthorized access' });
 
 		const id = (await request.formData()).get('id') as string | null;
 
@@ -274,6 +320,57 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Got articles List', list: results, count };
+	},
+
+	block: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		const fromUser = locals.user.id;
+		const toUser = params.id;
+
+		if (fromUser === toUser) return fail(400, { message: 'Cannot block yourself' });
+
+		try {
+			await db
+				.insert(table.userRelationship)
+				.values({
+					from: fromUser,
+					to: toUser,
+					relationship: UserRelationship.BLOCKED,
+				})
+				// ref: https://orm.drizzle.team/docs/guides/upsert
+				.onConflictDoUpdate({
+					target: [table.userRelationship.from, table.userRelationship.to],
+					set: { relationship: UserRelationship.BLOCKED },
+				});
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Blocked the user' };
+	},
+
+	unblock: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		const fromUser = locals.user.id;
+		const toUser = params.id;
+
+		if (fromUser === toUser) return fail(400, { message: 'Cannot unblock yourself' });
+
+		try {
+			await db
+				.delete(table.userRelationship)
+				.where(
+					and(eq(table.userRelationship.from, fromUser), eq(table.userRelationship.to, toUser)),
+				);
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+
+		return { message: 'Unblocked the user' };
 	},
 };
 
