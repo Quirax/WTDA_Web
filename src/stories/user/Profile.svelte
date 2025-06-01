@@ -586,6 +586,7 @@
 			</Alert.Root>
 		{/if}
 
+		<!-- TODO 2차 알파테스트 전에 추가
 		{#if profileEditMode}
 			<H3 class="text-xl">최대 슬롯 갯수</H3>
 			<div class="mt-2 flex items-center">
@@ -616,6 +617,7 @@
 				</div>
 			</section>
 		{/if}
+		-->
 
 		<!-- TODO 베타테스트 전에 추가
 		{#if !profileEditMode}
