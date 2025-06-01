@@ -52,19 +52,40 @@ export const load = (async ({ params, locals }) => {
 				.limit(1)
 		).at(0);
 
-		let relationship = UserRelationship.NONE;
+		let relationshipFromUser = UserRelationship.NONE;
+		let relationshipToUser = UserRelationship.NONE;
 
 		if (locals.user) {
-			const result = (
-				await db
-					.select({ relationship: table.userRelationship.relationship })
-					.from(table.userRelationship)
-					.where(
-						and(eq(table.userRelationship.from, locals.user.id), eq(table.userRelationship.to, id)),
-					)
-			).at(0);
+			{
+				const result = (
+					await db
+						.select({ relationship: table.userRelationship.relationship })
+						.from(table.userRelationship)
+						.where(
+							and(
+								eq(table.userRelationship.from, locals.user.id),
+								eq(table.userRelationship.to, id),
+							),
+						)
+				).at(0);
 
-			if (result) relationship = result.relationship;
+				if (result) relationshipToUser = result.relationship;
+			}
+			{
+				const result = (
+					await db
+						.select({ relationship: table.userRelationship.relationship })
+						.from(table.userRelationship)
+						.where(
+							and(
+								eq(table.userRelationship.to, locals.user.id),
+								eq(table.userRelationship.from, id),
+							),
+						)
+				).at(0);
+
+				if (result) relationshipFromUser = result.relationship;
+			}
 		}
 
 		return {
@@ -82,7 +103,8 @@ export const load = (async ({ params, locals }) => {
 				},
 			}),
 			announcementForm: await superValidate(zod(announcementSchema)),
-			relationship,
+			relationshipFromUser,
+			relationshipToUser,
 		};
 	} catch (e) {
 		console.error(e);

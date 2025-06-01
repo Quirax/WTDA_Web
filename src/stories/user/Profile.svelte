@@ -49,17 +49,25 @@
 	import { toast } from 'svelte-sonner';
 	import { UserRelationship } from '@app';
 	import { invalidate, invalidateAll } from '$app/navigation';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
 		announcements?: App.ProfileAnnouncements;
 		profileFormData: SuperValidated<Infer<ProfileSchema>>;
 		announcementFormData: SuperValidated<Infer<AnnouncementSchema>>;
-		relationship: UserRelationship;
+		relationshipFromUser: UserRelationship;
+		relationshipToUser: UserRelationship;
 	}
 
-	const { user, announcements, profileFormData, announcementFormData, relationship }: Props =
-		$props();
+	const {
+		user,
+		announcements,
+		profileFormData,
+		announcementFormData,
+		relationshipFromUser,
+		relationshipToUser,
+	}: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -380,7 +388,7 @@
 									<User class="size-full" />
 								{/if}
 							</div>
-							{#if relationship === UserRelationship.BLOCKED}
+							{#if relationshipToUser === UserRelationship.BLOCKED}
 								<div
 									class="bg-destructive text-destructive-foreground absolute right-1 bottom-1 size-7 rounded-full border p-1"
 									title="차단된 사용자">
@@ -431,10 +439,19 @@
 
 		{#if !profileEditMode}
 			<section class="flex">
-				<Button class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90">
-					<MessageSquare />
-					메시지하기
-				</Button>
+				<Tooltip
+					class="w-full"
+					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
+						relationshipToUser !== UserRelationship.BLOCKED}>
+					<Button
+						class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
+						disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+							relationshipToUser === UserRelationship.BLOCKED}>
+						<MessageSquare />
+						메시지하기
+					</Button>
+				</Tooltip>
 				<Button size="icon" variant="outline" onclick={onCopyProfileLink}><Share2 /></Button>
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class="m-0 p-0">
@@ -443,7 +460,7 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						{#if relationship === UserRelationship.BLOCKED}
+						{#if relationshipToUser === UserRelationship.BLOCKED}
 							<DropdownMenu.Item onclick={onUnblock} disabled={!!me && user.id === me.id}>
 								차단 해제하기
 							</DropdownMenu.Item>
