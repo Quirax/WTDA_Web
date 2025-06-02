@@ -55,7 +55,8 @@ export const actions: Actions = {
 				result,
 			};
 		} catch (e: any) {
-			return fail(500, { message: 'An error has occurred', error: e });
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
@@ -80,7 +81,8 @@ export const actions: Actions = {
 			if (!emailConfirm)
 				return fail(404, { message: 'Not found email confirmation with the code', form });
 		} catch (e: any) {
-			return fail(500, { message: 'An error has occurred', error: e, form });
+			console.error(e);
+			return fail(500, { message: 'An error has occurred', form });
 		}
 
 		return redirect(302, '/login/reset-password/reset');
