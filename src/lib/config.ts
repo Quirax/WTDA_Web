@@ -1,5 +1,5 @@
 import type { SimpleIcon } from 'simple-icons';
-import { siX, siMastodon, siBluesky } from 'simple-icons';
+import { siX, siMastodon, siBluesky, siTistory } from 'simple-icons';
 
 export type Link = {
 	href: string;
@@ -24,15 +24,31 @@ export const footerInfo: {
 	disclaimar: string;
 } = {
 	links: [
-		{ href: '.', text: '공지사항' },
+		{ href: 'https://ofc.whattodo.at/notice', target: '_blank', text: '공지사항' },
 		{ href: '.', text: '고객센터' },
 		{ href: '.', text: '이용약관' },
 		{ href: '.', text: '개인정보처리방침' },
 	],
 	sns: [
-		{ href: '.', text: 'X(구 트위터) 공식 계정', icon: siX },
-		{ href: '.', text: '마스토돈 공식 계정', icon: siMastodon },
-		{ href: '.', text: '블루스카이 공식 계정', icon: siBluesky },
+		{
+			href: 'https://x.com/whattodo_at',
+			target: '_blank',
+			text: 'X(구 트위터) 공식 계정',
+			icon: siX,
+		},
+		{
+			href: 'https://planet.moe/@whattodo_at',
+			target: '_blank',
+			text: '마스토돈 공식 계정',
+			icon: siMastodon,
+		},
+		{
+			href: 'https://bsky.app/profile/whattodo-at.bsky.social',
+			target: '_blank',
+			text: '블루스카이 공식 계정',
+			icon: siBluesky,
+		},
+		{ href: 'https://ofc.whattodo.at', target: '_blank', text: '공식 블로그', icon: siTistory },
 	],
 	info: [
 		{ subject: '상호', info: '뭐하지공방' },
