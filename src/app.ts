@@ -121,3 +121,9 @@ export enum UserRelationship {
 	BLOCKED = 'BLOCKED',
 	NONE = 'NONE',
 }
+
+export enum DMChannelType {
+	GENERAL = 'GENERAL', // 일반 DM
+	REQUEST = 'REQUEST', // 의뢰 관련 DM
+	COMMISSION = 'COMMISSION', // 커미션 신청 관련 DM
+}
