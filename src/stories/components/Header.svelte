@@ -35,7 +35,7 @@
 	<title>{title === '뭐하지공방' ? '' : title + ' - '}뭐하지공방</title>
 </svelte:head>
 
-<header class="bg-background t-0 fixed z-10 w-full border-b-2">
+<header class="bg-background fixed top-0 left-0 z-10 w-full border-b-2">
 	<div class="flex h-16 items-center justify-between px-4">
 		<div class="flex items-center">
 			<Button
