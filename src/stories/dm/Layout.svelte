@@ -15,7 +15,7 @@
 </script>
 
 <div class="flex h-[90vh] w-full">
-	<nav class="bg-background mt-16 w-70 overflow-y-auto">
+	<nav class="bg-background mt-16 w-70 flex-none overflow-y-auto">
 		{#each Array(20) as a, i}
 			<a
 				href="/dm/{i}"
@@ -36,7 +36,7 @@
 		{/each}
 	</nav>
 
-	<div>
+	<div class="size-full">
 		{@render children()}
 	</div>
 </div>
