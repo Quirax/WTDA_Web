@@ -107,6 +107,7 @@
 		"svelte-awesome-color-picker": "^4.0.1",
 		"svelte-crop-window": "^0.1.1",
 		"svelte-file-dropzone": "^2.0.9",
+		"svelte-twemoji": "^1.0.4",
 		"tinycolor2": "^1.6.0"
 	},
 	"main": "index.js",
