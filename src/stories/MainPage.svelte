@@ -38,7 +38,7 @@
 
 <section
 	id="search"
-	class="bg-primary text-primary-foreground banner-pattern flex flex-col items-center justify-center space-y-10 p-20">
+	class="bg-primary text-primary-foreground banner-pattern flex flex-col items-center justify-center space-y-10 p-20 pt-36">
 	<H1 class="text-center break-keep">뭐하지공방에 오신 것을 환영합니다</H1>
 
 	<!-- TODO 커미션 타입 관련 기능 추가 후 주석 해제
@@ -68,7 +68,7 @@
 </section>
 
 {#if (userMode === UserMode.requester ? recentCommissionTypes : recentRequests).length > 0}
-	<Section id="recently-added">
+	<Section class="pt-10" id="recently-added">
 		<H2 class="break-keep">
 			{#if userMode === UserMode.requester}
 				새로 개장한 커미션 타입들입니다

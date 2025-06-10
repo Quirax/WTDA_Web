@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script module lang="ts">
-	export const Class = 'm-10';
+	export const Class = 'p-10 pt-26';
 </script>
 
 <script lang="ts">
