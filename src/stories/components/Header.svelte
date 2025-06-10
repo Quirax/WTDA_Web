@@ -9,6 +9,7 @@
 	import './header.css';
 	import { userStore } from '$lib/context';
 	import { goto } from '$app/navigation';
+	import { MessageSquare } from 'lucide-svelte';
 
 	interface Props {
 		title?: string;
@@ -64,6 +65,12 @@
 				</form>
 			{/if}{#if showUserPanel}
 				{#if user}
+					<!-- 메시지 목록 버튼 -->
+					<Button variant="ghost" class="size-9 rounded-full p-0" href="/dm">
+						<MessageSquare class="size-9" />
+					</Button>
+
+					<!-- 사용자 드롭다운 메뉴 -->
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger class="m-0 p-0">
 							{#snippet child({ props })}
@@ -86,6 +93,7 @@
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
 								<DropdownMenu.Item onclick={() => goto('/user/@me')}>내 프로필</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/dm')}>메시지</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
