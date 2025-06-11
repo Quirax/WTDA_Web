@@ -67,6 +67,24 @@ declare global {
 			user: User;
 			session: Session;
 		}
+
+		// DM
+		type DM = {
+			id: string;
+			sender: User;
+			sentAt: Date;
+		} & (
+			| {
+					type: 'general';
+					message: string;
+					attachments?: string[];
+					relatedPost?: string;
+					relatedMessageId?: string;
+			  }
+			| {
+					type: 'join' | 'leave';
+			  }
+		);
 	}
 }
 

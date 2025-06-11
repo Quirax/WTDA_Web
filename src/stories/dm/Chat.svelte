@@ -22,19 +22,51 @@
 <Section class="flex size-full flex-col">
 	<H2 class="flex-none">뫄뫄 님과의 대화</H2>
 	<section class="bg-background mt-4 size-full space-y-2 overflow-y-auto border p-2">
-		<Message dir={Direction.RECEIVE} {user} sentAt={new Date()}>텍스트 메시지 테스트</Message>
-		<Message dir={Direction.RECEIVE} {user} sentAt={new Date()}>
-			장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다
-		</Message>
-		<Message dir={Direction.RECEIVE} {user} sentAt={new Date()}>
-			장문의 기이이이이이이이다란
-			<br />
-			텍스트 메시지를 테스트해봅니다
-		</Message>
-		<Message dir={Direction.SEND} {user} sentAt={new Date()}>텍스트 메시지 테스트</Message>
-		<Message dir={Direction.SEND} {user} sentAt={new Date()}>
-			장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다
-		</Message>
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
+				message: '텍스트 메시지 테스트',
+			}} />
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
+				message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
+			}} />
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
+				message: '장문의 기이이이이이이이다란\n텍스트 메시지를 테스트해봅니다',
+			}} />
+		<Message
+			dir={Direction.SEND}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
+				message: '텍스트 메시지 테스트',
+			}} />
+		<Message
+			dir={Direction.SEND}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
+				message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
+			}} />
 	</section>
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
 		<Button size="icon" variant="secondary">
