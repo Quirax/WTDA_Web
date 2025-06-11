@@ -46,6 +46,15 @@
 				type: 'general',
 				sender: user,
 				sentAt: new Date(),
+				message: '이모티콘 테스트: 😂👨‍🦳✨🎂✈️💓',
+			}} />
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(),
 				message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
 			}} />
 		<Message

@@ -8,7 +8,7 @@
 <script lang="ts">
 	import Muted from '$lib/components/typo/muted.svelte';
 
-	import { cn, formatDatetimeString, sanitizeHTML } from '$lib/utils';
+	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -29,8 +29,9 @@
 				class={cn(
 					'relative size-fit p-4 text-left',
 					dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
-				)}>
-				{sanitizeHTML(dm.message)}
+				)}
+				use:twemoji>
+				{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
 				<div
 					class={cn(
 						'absolute top-4.5 z-50 size-4 rotate-45',
