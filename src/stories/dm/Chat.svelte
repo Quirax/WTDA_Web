@@ -26,6 +26,14 @@
 			dir={Direction.RECEIVE}
 			dm={{
 				id: 'asdf',
+				type: 'join',
+				sender: user,
+				sentAt: new Date(),
+			}} />
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
 				type: 'general',
 				sender: user,
 				sentAt: new Date(),
@@ -66,6 +74,14 @@
 				sender: user,
 				sentAt: new Date(),
 				message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
+			}} />
+		<Message
+			dir={Direction.RECEIVE}
+			dm={{
+				id: 'asdf',
+				type: 'leave',
+				sender: user,
+				sentAt: new Date(),
 			}} />
 	</section>
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">

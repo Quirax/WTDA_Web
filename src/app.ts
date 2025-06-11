@@ -71,7 +71,7 @@ declare global {
 		// DM
 		type DM = {
 			id: string;
-			sender: User;
+			sender: User; // TODO: NonNullable<User>
 			sentAt: Date;
 		} & (
 			| {

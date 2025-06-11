@@ -20,10 +20,10 @@
 </script>
 
 <article class={cn('flex', dir === Direction.SEND && 'flex-row-reverse')}>
-	{#if dir === Direction.RECEIVE}
+	{#if dir === Direction.RECEIVE && !['join', 'leave'].includes(dm.type)}
 		<UserAvatar class="m-2 size-9 flex-none" user={dm.sender} />
 	{/if}
-	<div class={cn('flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
+	<div class={cn('flex w-full flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 		{#if dm.type === 'general'}
 			<section
 				class={cn(
@@ -39,6 +39,11 @@
 				</div>
 			</section>
 			<Muted class="mx-3 flex-none">{formatDatetimeString(dm.sentAt)}</Muted>
-		{/if}
+		{:else if dm.type === 'join'}
+			<Muted class="w-full text-center">{dm.sender?.username} 님이 대화방에 들어왔습니다.</Muted>
+		{:else if dm.type === 'leave'}
+			<Muted class="w-full text-center">
+				{dm.sender?.username} 님이 대화방에서 나갔습니다.
+			</Muted>{/if}
 	</div>
 </article>
