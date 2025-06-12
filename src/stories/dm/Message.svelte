@@ -9,6 +9,8 @@
 	import { goto } from '$app/navigation';
 
 	import Muted from '$lib/components/typo/muted.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { ArticleTypeText } from '$lib/messages';
 	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import emojiRegex from 'emoji-regex';
@@ -84,7 +86,7 @@
 						use:twemoji>
 						{#if dm.relatedMessage}
 							<a
-								class="bg-secondary relative mb-2 block cursor-pointer border p-2 text-left"
+								class="bg-secondary relative mb-2 block cursor-pointer space-y-2 border p-2 text-left"
 								href="#dm-{dm.relatedMessage.id}"
 								onclick={(event) => {
 									event.preventDefault(); // 화면 전체 스크롤을 차단
@@ -92,7 +94,7 @@
 								}}
 								use:twemoji>
 								<div class="flex items-center space-x-2 bg-inherit">
-									<UserAvatar class="m-2 size-[2em] flex-none" user={dm.relatedMessage.sender} />
+									<UserAvatar class="size-[2em] flex-none" user={dm.relatedMessage.sender} />
 									<strong>{dm.relatedMessage.sender?.username}</strong>
 									<Muted class="">{formatDatetimeString(dm.relatedMessage.sentAt)}</Muted>
 								</div>
@@ -114,7 +116,7 @@
 								class="bg-secondary relative mb-2 flex cursor-pointer border p-2 text-left"
 								{href}
 								target="_blank">
-								<div class="mr-2 aspect-video h-18">
+								<div class="mr-2 aspect-video h-16">
 									{#if dm.relatedPost.article.thumbnail}
 										<img
 											src={dm.relatedPost.article.thumbnail}
@@ -124,11 +126,12 @@
 										<div class="banner-pattern bg-primary aspect-video h-full"></div>
 									{/if}
 								</div>
-								<div class="flex flex-col">
+								<div class="flex flex-col space-y-2">
 									<div class="flex items-center space-x-2 bg-inherit">
-										<UserAvatar
-											class="m-2 size-[2em] flex-none"
-											user={dm.relatedPost.article.author} />
+										<Badge>
+											{ArticleTypeText[dm.relatedPost.type]()}
+										</Badge>
+										<UserAvatar class="size-[2em] flex-none" user={dm.relatedPost.article.author} />
 										<strong>{dm.relatedPost.article.author.username}</strong>
 									</div>
 									<strong class="overflow-hidden text-ellipsis whitespace-nowrap">
