@@ -4,6 +4,7 @@
 import type { Link } from '$lib/config';
 import type { CommissionRequest, Portfolio as PortfolioSchema } from '$lib/server/db/schema';
 import type { Union } from '$lib/utils';
+import 'photoswipe/style.css';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
@@ -76,10 +77,10 @@ declare global {
 		} & (
 			| {
 					type: 'general';
-					message: string;
+					message?: string;
 					attachments?: string[];
-					relatedPost?: string;
-					relatedMessageId?: string;
+					relatedPost?: Articles;
+					relatedMessage?: DM;
 			  }
 			| {
 					type: 'join' | 'leave';

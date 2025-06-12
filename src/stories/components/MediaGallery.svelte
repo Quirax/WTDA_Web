@@ -3,7 +3,6 @@
 	import * as Carousel from '$lib/components/ui/carousel';
 	import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 	import { cn } from '$lib/utils';
-	import 'photoswipe/style.css';
 	import PhotoSwipe, { type PhotoSwipeOptions } from 'photoswipe';
 
 	interface Props {
