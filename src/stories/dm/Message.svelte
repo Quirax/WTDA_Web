@@ -9,7 +9,7 @@
 	import Muted from '$lib/components/typo/muted.svelte';
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
-	import PhotoSwipe, { type PhotoSwipeOptions } from 'photoswipe';
+	import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
 	interface Props extends ReturnType<typeof $props> {
 		dir: Direction;
@@ -24,6 +24,38 @@
 		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
 	const sameSenderAsNext =
 		!['join', 'leave'].includes(next?.type || '') && next?.sender?.id === dm.sender?.id;
+
+	const dataSource = $state(
+		(dm.type === 'general' &&
+			dm.attachments?.map((medium, idx) => ({
+				src: medium,
+				alt: `첨부 이미지 ${idx + 1}`,
+				height: 0,
+				width: 0,
+			}))) ||
+			[],
+	);
+
+	const onLoadMedia =
+		(idx: number) =>
+		({ target }: Event) => {
+			const tg = target as HTMLImageElement;
+			dataSource[idx].height = tg.naturalHeight;
+			dataSource[idx].width = tg.naturalWidth;
+		};
+
+	let galleryElement = $state<HTMLElement>();
+
+	$effect(() => {
+		if (!galleryElement) return;
+
+		const lightbox = new PhotoSwipeLightbox({
+			gallery: galleryElement,
+			children: 'a',
+			pswpModule: () => import('photoswipe'),
+		});
+		lightbox.init();
+	});
 </script>
 
 <article class={cn('flex', dir === Direction.SEND && 'flex-row-reverse')}>
@@ -56,8 +88,29 @@
 					{/if}
 				</section>
 			{/if}
-			{#if dm.attachments && dm.attachments.length > 0}
-				이미지!
+			{#if dataSource.length > 0}
+				<div
+					bind:this={galleryElement}
+					class={cn(
+						'pswp-gallery pswp-gallery--single-column grid grid-cols-3 gap-2 border p-2',
+						dm.message && 'mt-2',
+						dir === Direction.SEND ? 'mr-3' : 'ml-2',
+					)}>
+					{#each dataSource as img, idx}
+						<a
+							href={img.src}
+							data-pswp-width={img.width}
+							data-pswp-height={img.height}
+							data-cropped="true"
+							target="_blank">
+							<img
+								src={img.src}
+								alt={img.alt}
+								onload={onLoadMedia(idx)}
+								class="size-30 object-cover" />
+						</a>
+					{/each}
+				</div>
 			{/if}
 			{#if !sameSenderAsNext || formatDatetimeString(next?.sentAt || new Date(0)) !== formatDatetimeString(dm.sentAt)}
 				<!-- 다음 사용자와 같은 경우 보낸 시간 미표시 -->
