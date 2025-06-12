@@ -6,6 +6,8 @@
 </script>
 
 <script lang="ts">
+	import { goto } from '$app/navigation';
+
 	import Muted from '$lib/components/typo/muted.svelte';
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
@@ -17,9 +19,10 @@
 		dm: App.DM;
 		prev?: App.DM;
 		next?: App.DM;
+		onScrollToDM?: (id: string) => void;
 	}
 
-	const { dir, dm, prev, next }: Props = $props();
+	const { dir, dm, prev, next, id, onScrollToDM = () => {} }: Props = $props();
 
 	const sameSenderAsPrev =
 		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
@@ -59,7 +62,7 @@
 	});
 </script>
 
-<article class={cn('flex', dir === Direction.SEND && 'flex-row-reverse')}>
+<article class={cn('flex', dir === Direction.SEND && 'flex-row-reverse')} id="dm-{dm.id}">
 	{#if dir === Direction.RECEIVE && !['join', 'leave'].includes(dm.type)}
 		{#if !sameSenderAsPrev}
 			<UserAvatar class="m-2 size-9 flex-none" user={dm.sender} />
@@ -70,6 +73,7 @@
 	{/if}
 	<div class={cn('flex w-full flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 		{#if dm.type === 'general'}
+			{@const sentAtString = formatDatetimeString(dm.sentAt)}
 			{#if dm.message}
 				{#if dm.message.replace(emojiRegex(), '') !== ''}
 					<section
@@ -78,12 +82,36 @@
 							dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
 						)}
 						use:twemoji>
+						{#if dm.relatedMessage}
+							<a
+								class="bg-secondary relative mb-2 block cursor-pointer border p-2 text-left"
+								href="#dm-{dm.relatedMessage.id}"
+								onclick={(event) => {
+									event.preventDefault(); // 화면 전체 스크롤을 차단
+									onScrollToDM(dm.relatedMessage!.id);
+								}}
+								use:twemoji>
+								<div class="flex items-center space-x-2 bg-inherit">
+									<UserAvatar class="m-2 size-[2em] flex-none" user={dm.relatedMessage.sender} />
+									<strong>{dm.relatedMessage.sender?.username}</strong>
+									<Muted class="">{formatDatetimeString(dm.relatedMessage.sentAt)}</Muted>
+								</div>
+								<div class="bg-inherit">
+									{@html sanitizeHTML(
+										(
+											(dm.relatedMessage.type === 'general' && dm.relatedMessage.message) ||
+											'<i>내용 없음</i>'
+										).replace(/\n/g, '<br>'),
+									)}
+								</div>
+							</a>
+						{/if}
 						{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
 						{#if !sameSenderAsPrev}
 							<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
 							<div
 								class={cn(
-									'absolute top-4.5 z-50 size-4 rotate-45',
+									'absolute top-4.5 z-1 size-4 rotate-45',
 									dir === Direction.SEND ? 'bg-primary right-[-8px]' : 'bg-secondary left-[-8px]',
 								)}>
 							</div>
@@ -121,9 +149,9 @@
 					{/each}
 				</div>
 			{/if}
-			{#if !sameSenderAsNext || formatDatetimeString(next?.sentAt || new Date(0)) !== formatDatetimeString(dm.sentAt)}
+			{#if !sameSenderAsNext || formatDatetimeString(next?.sentAt || new Date(0)) !== sentAtString}
 				<!-- 다음 사용자와 같은 경우 보낸 시간 미표시 -->
-				<Muted class="mx-3 flex-none">{formatDatetimeString(dm.sentAt)}</Muted>
+				<Muted class="mx-3 flex-none">{sentAtString}</Muted>
 			{/if}
 		{:else if dm.type === 'join'}
 			<Muted class="w-full text-center">{dm.sender?.username} 님이 대화방에 들어왔습니다.</Muted>

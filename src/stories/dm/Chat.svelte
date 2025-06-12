@@ -24,7 +24,7 @@
 			sentAt: new Date(1000000),
 		},
 		{
-			id: 'asdf',
+			id: '1234',
 			type: 'general',
 			sender: user,
 			sentAt: new Date(1100000),
@@ -78,7 +78,7 @@
 			],
 		},
 		{
-			id: 'asdf',
+			id: '5678',
 			type: 'general',
 			sender: null,
 			sentAt: new Date(1200000),
@@ -108,6 +108,20 @@
 			type: 'general',
 			sender: null,
 			sentAt: new Date(1200000),
+			relatedMessage: {
+				id: '1234',
+				type: 'general',
+				sender: user,
+				sentAt: new Date(1100000),
+				message: '텍스트 메시지 테스트',
+			},
+			message: '답장형 메시지 테스트',
+		},
+		{
+			id: 'asdf',
+			type: 'general',
+			sender: null,
+			sentAt: new Date(1200000),
 			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
 		},
 		{
@@ -119,24 +133,67 @@
 		},
 		{
 			id: 'asdf',
+			type: 'general',
+			sender: user,
+			sentAt: new Date(1250000),
+			relatedMessage: {
+				id: '5678',
+				type: 'general',
+				sender: null,
+				sentAt: new Date(1200000),
+				// message: '이미지 테스트',
+				attachments: [
+					'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
+					'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
+					'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
+				],
+			},
+			message: '답장형 메시지 테스트',
+		},
+		{
+			id: 'asdf',
 			type: 'leave',
 			sender: user,
-			sentAt: new Date(1200000),
+			sentAt: new Date(1300000),
 		},
 	]);
+
+	let container = $state<HTMLElement>();
+
+	const scrollToDM = (id: string) => {
+		if (!container) return;
+
+		const targetId = `dm-${id}`;
+		const element = document.getElementById(targetId);
+
+		if (!element) return;
+
+		container.scroll({ top: element.offsetTop });
+	};
 </script>
 
 <Header title="뫄뫄 님과의 대화" />
 
 <Section class="flex size-full flex-col">
 	<H2 class="flex-none">뫄뫄 님과의 대화</H2>
-	<section class="bg-background mt-4 size-full space-y-2 overflow-y-auto border p-2">
+	<section
+		bind:this={container}
+		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
 		{#each dms as dm, i}
 			<Message
 				dir={dm.sender ? Direction.RECEIVE : Direction.SEND}
 				{dm}
 				prev={dms[i - 1]}
-				next={dms[i + 1]} />
+				next={dms[i + 1]}
+				id="dm-{dm.id}"
+				onScrollToDM={scrollToDM} />
 		{/each}
 	</section>
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
