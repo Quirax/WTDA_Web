@@ -7,9 +7,9 @@
 
 <script lang="ts">
 	import Muted from '$lib/components/typo/muted.svelte';
-
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
+	import PhotoSwipe, { type PhotoSwipeOptions } from 'photoswipe';
 
 	interface Props extends ReturnType<typeof $props> {
 		dir: Direction;
@@ -18,7 +18,7 @@
 		next?: App.DM;
 	}
 
-	const { children, dir, dm, prev, next }: Props = $props();
+	const { dir, dm, prev, next }: Props = $props();
 
 	const sameSenderAsPrev =
 		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
@@ -37,23 +37,28 @@
 	{/if}
 	<div class={cn('flex w-full flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 		{#if dm.type === 'general'}
-			<section
-				class={cn(
-					'relative size-fit p-4 text-left',
-					dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
-				)}
-				use:twemoji>
-				{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
-				{#if !sameSenderAsPrev}
-					<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
-					<div
-						class={cn(
-							'absolute top-4.5 z-50 size-4 rotate-45',
-							dir === Direction.SEND ? 'bg-primary right-[-8px]' : 'bg-secondary left-[-8px]',
-						)}>
-					</div>
-				{/if}
-			</section>
+			{#if dm.message}
+				<section
+					class={cn(
+						'relative size-fit p-4 text-left',
+						dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
+					)}
+					use:twemoji>
+					{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
+					{#if !sameSenderAsPrev}
+						<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
+						<div
+							class={cn(
+								'absolute top-4.5 z-50 size-4 rotate-45',
+								dir === Direction.SEND ? 'bg-primary right-[-8px]' : 'bg-secondary left-[-8px]',
+							)}>
+						</div>
+					{/if}
+				</section>
+			{/if}
+			{#if dm.attachments && dm.attachments.length > 0}
+				이미지!
+			{/if}
 			{#if !sameSenderAsNext || formatDatetimeString(next?.sentAt || new Date(0)) !== formatDatetimeString(dm.sentAt)}
 				<!-- 다음 사용자와 같은 경우 보낸 시간 미표시 -->
 				<Muted class="mx-3 flex-none">{formatDatetimeString(dm.sentAt)}</Muted>
