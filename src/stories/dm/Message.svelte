@@ -9,7 +9,7 @@
 	import { goto } from '$app/navigation';
 
 	import Muted from '$lib/components/typo/muted.svelte';
-	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
+	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import emojiRegex from 'emoji-regex';
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
@@ -103,6 +103,37 @@
 											'<i>내용 없음</i>'
 										).replace(/\n/g, '<br>'),
 									)}
+								</div>
+							</a>
+						{/if}
+						{#if dm.relatedPost}
+							{@const href = dm.relatedPost.type
+								? `/${getLinkPrefix(dm.relatedPost.type)}/${dm.relatedPost.article.id}`
+								: ''}
+							<a
+								class="bg-secondary relative mb-2 flex cursor-pointer border p-2 text-left"
+								{href}
+								target="_blank">
+								<div class="mr-2 aspect-video h-18">
+									{#if dm.relatedPost.article.thumbnail}
+										<img
+											src={dm.relatedPost.article.thumbnail}
+											class="aspect-video h-full object-cover"
+											alt="이 의뢰의 썸네일" />
+									{:else}
+										<div class="banner-pattern bg-primary aspect-video h-full"></div>
+									{/if}
+								</div>
+								<div class="flex flex-col">
+									<div class="flex items-center space-x-2 bg-inherit">
+										<UserAvatar
+											class="m-2 size-[2em] flex-none"
+											user={dm.relatedPost.article.author} />
+										<strong>{dm.relatedPost.article.author.username}</strong>
+									</div>
+									<strong class="overflow-hidden text-ellipsis whitespace-nowrap">
+										{dm.relatedPost.article.title}
+									</strong>
 								</div>
 							</a>
 						{/if}

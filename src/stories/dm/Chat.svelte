@@ -7,6 +7,7 @@
 	import { Paperclip, SendHorizontal, SmilePlus } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
+	import { ArticleCategory, ArticleType } from '@app';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -29,6 +30,18 @@
 			sender: user,
 			sentAt: new Date(1100000),
 			message: '텍스트 메시지 테스트',
+			relatedPost: {
+				type: ArticleType.REQUEST,
+				article: {
+					thumbnail:
+						'https://media.planet.moe/cache/media_attachments/files/114/667/992/480/752/949/original/482dbc6092f63524.jpeg',
+					title: '없는 게시물',
+					author: user!,
+					category: ArticleCategory.TEXT,
+					tags: [],
+					id: 'asdf',
+				},
+			},
 		},
 		{
 			id: 'asdf',
@@ -123,6 +136,18 @@
 			sender: null,
 			sentAt: new Date(1200000),
 			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
+			relatedPost: {
+				type: ArticleType.REQUEST,
+				article: {
+					thumbnail:
+						'https://media.planet.moe/cache/media_attachments/files/114/667/992/480/752/949/original/482dbc6092f63524.jpeg',
+					title: '없는 게시물',
+					author: user!,
+					category: ArticleCategory.TEXT,
+					tags: [],
+					id: 'asdf',
+				},
+			},
 		},
 		{
 			id: 'asdf',

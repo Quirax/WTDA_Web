@@ -79,7 +79,10 @@ declare global {
 					type: 'general';
 					message?: string;
 					attachments?: string[];
-					relatedPost?: Articles;
+					relatedPost?: {
+						type: ArticleType;
+						article: Articles;
+					};
 					relatedMessage?: DM;
 			  }
 			| {
