@@ -41,6 +41,13 @@
 			id: 'asdf',
 			type: 'general',
 			sender: user,
+			sentAt: new Date(1100000),
+			message: '😂👨‍🦳✨🎂✈️💓',
+		},
+		{
+			id: 'asdf',
+			type: 'general',
+			sender: user,
 			sentAt: new Date(1200000),
 			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
 		},
@@ -102,6 +109,13 @@
 			sender: null,
 			sentAt: new Date(1200000),
 			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
+		},
+		{
+			id: 'asdf',
+			type: 'general',
+			sender: null,
+			sentAt: new Date(1200000),
+			message: '😂👨‍🦳✨🎂✈️💓',
 		},
 		{
 			id: 'asdf',

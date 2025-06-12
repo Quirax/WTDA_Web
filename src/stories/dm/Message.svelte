@@ -9,6 +9,7 @@
 	import Muted from '$lib/components/typo/muted.svelte';
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
+	import emojiRegex from 'emoji-regex';
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -70,23 +71,31 @@
 	<div class={cn('flex w-full flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 		{#if dm.type === 'general'}
 			{#if dm.message}
-				<section
-					class={cn(
-						'relative size-fit p-4 text-left',
-						dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
-					)}
-					use:twemoji>
-					{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
-					{#if !sameSenderAsPrev}
-						<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
-						<div
-							class={cn(
-								'absolute top-4.5 z-50 size-4 rotate-45',
-								dir === Direction.SEND ? 'bg-primary right-[-8px]' : 'bg-secondary left-[-8px]',
-							)}>
-						</div>
-					{/if}
-				</section>
+				{#if dm.message.replace(emojiRegex(), '') !== ''}
+					<section
+						class={cn(
+							'relative size-fit p-4 text-left',
+							dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
+						)}
+						use:twemoji>
+						{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
+						{#if !sameSenderAsPrev}
+							<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
+							<div
+								class={cn(
+									'absolute top-4.5 z-50 size-4 rotate-45',
+									dir === Direction.SEND ? 'bg-primary right-[-8px]' : 'bg-secondary left-[-8px]',
+								)}>
+							</div>
+						{/if}
+					</section>
+				{:else}
+					<section
+						class={cn('text-left', dir === Direction.SEND ? 'mr-3' : 'ml-2')}
+						use:twemoji={{ className: 'emoji large' }}>
+						{dm.message}
+					</section>
+				{/if}
 			{/if}
 			{#if dataSource.length > 0}
 				<div
