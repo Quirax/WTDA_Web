@@ -7,7 +7,7 @@
 	import { ArticleTypeText, CategoryText } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
 	import { AdultContents, ArticleType } from '@app';
-	import { cn } from '$lib/utils';
+	import { cn, getLinkPrefix } from '$lib/utils';
 
 	interface Props extends ReturnType<typeof $props> {
 		articles: App.Articles[];
@@ -31,15 +31,6 @@
 			? patternTinycolor.darken(7.7).toHexString()
 			: patternTinycolor.brighten(7.7).toHexString(),
 	);
-
-	const getLinkPrefix = (type: ArticleType) => {
-		switch (type) {
-			case ArticleType.REQUEST:
-				return 'r';
-			case ArticleType.PORTFOLIO:
-				return 'pf';
-		}
-	};
 </script>
 
 <section style="--primary-color: {accentColor || 'hsl(var(--primary));'} {style}" {...restProps}>

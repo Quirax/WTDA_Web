@@ -3,7 +3,7 @@ import { MediaQuery } from 'svelte/reactivity';
 import { twMerge } from 'tailwind-merge';
 import DOMPurify from 'isomorphic-dompurify';
 import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
-import { UserStatus } from '../app';
+import { ArticleType, UserStatus } from '../app';
 import { twemoji as originalTwemoji } from 'twemoji-svelte-action';
 
 export function cn(...inputs: ClassValue[]) {
@@ -129,3 +129,12 @@ export const blobToFile = (blob: Blob, filename: string = 'undefined.ext') =>
 	new File([blob], filename, { type: blob.type });
 
 export const dataURLToFile = async (dataurl: string) => blobToFile(await dataURLtoBlob(dataurl));
+
+export const getLinkPrefix = (type: ArticleType) => {
+	switch (type) {
+		case ArticleType.REQUEST:
+			return 'r';
+		case ArticleType.PORTFOLIO:
+			return 'pf';
+	}
+};
