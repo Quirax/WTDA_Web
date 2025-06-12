@@ -218,7 +218,8 @@
 				prev={dms[i - 1]}
 				next={dms[i + 1]}
 				id="dm-{dm.id}"
-				onScrollToDM={scrollToDM} />
+				onScrollToDM={scrollToDM}
+				tabindex={i + 1} />
 		{/each}
 	</section>
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">

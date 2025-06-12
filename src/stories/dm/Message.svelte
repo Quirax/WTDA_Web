@@ -10,10 +10,12 @@
 
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import { ArticleTypeText } from '$lib/messages';
 	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import emojiRegex from 'emoji-regex';
+	import { CornerDownRight, SmilePlus } from 'lucide-svelte';
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -22,9 +24,10 @@
 		prev?: App.DM;
 		next?: App.DM;
 		onScrollToDM?: (id: string) => void;
+		tabindex?: number;
 	}
 
-	const { dir, dm, prev, next, id, onScrollToDM = () => {} }: Props = $props();
+	const { dir, dm, prev, next, id, tabindex = 0, onScrollToDM = () => {} }: Props = $props();
 
 	const sameSenderAsPrev =
 		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
@@ -62,9 +65,28 @@
 		});
 		lightbox.init();
 	});
+
+	let isFocused = $state(false);
+	let isMouseHover = $state(false);
+
+	let articleElement = $state<HTMLElement>();
+
+	$effect(() => {
+		if (!articleElement) return;
+
+		// ref: https://ko.javascript.info/focus-blur
+		articleElement.tabIndex = tabindex;
+		articleElement.addEventListener('focusin', () => (isFocused = true));
+		articleElement.addEventListener('focusout', () => (isFocused = false));
+		articleElement.addEventListener('mouseenter', () => (isMouseHover = true));
+		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
+	});
 </script>
 
-<article class={cn('flex', dir === Direction.SEND && 'flex-row-reverse')} id="dm-{dm.id}">
+<article
+	bind:this={articleElement}
+	class={cn('flex w-full', dir === Direction.SEND && 'flex-row-reverse')}
+	{id}>
 	{#if dir === Direction.RECEIVE && !['join', 'leave'].includes(dm.type)}
 		{#if !sameSenderAsPrev}
 			<UserAvatar class="m-2 size-9 flex-none" user={dm.sender} />
@@ -73,9 +95,9 @@
 			<div class="m-2 size-9 flex-none"></div>
 		{/if}
 	{/if}
-	<div class={cn('flex w-full flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
-		{#if dm.type === 'general'}
-			{@const sentAtString = formatDatetimeString(dm.sentAt)}
+	{#if dm.type === 'general'}
+		{@const sentAtString = formatDatetimeString(dm.sentAt)}
+		<div class={cn('relative flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 			{#if dm.message}
 				{#if dm.message.replace(emojiRegex(), '') !== ''}
 					<section
@@ -187,11 +209,26 @@
 				<!-- 다음 사용자와 같은 경우 보낸 시간 미표시 -->
 				<Muted class="mx-3 flex-none">{sentAtString}</Muted>
 			{/if}
-		{:else if dm.type === 'join'}
-			<Muted class="w-full text-center">{dm.sender?.username} 님이 대화방에 들어왔습니다.</Muted>
-		{:else if dm.type === 'leave'}
-			<Muted class="w-full text-center">
-				{dm.sender?.username} 님이 대화방에서 나갔습니다.
-			</Muted>{/if}
-	</div>
+			<aside
+				class={cn(
+					'bg-background absolute -right-2 -bottom-10 z-1 border p-2',
+					!(isFocused || isMouseHover) && 'hidden',
+				)}>
+				<Button size="icon" variant="ghost" class="size-8 border">
+					<!-- 답글 -->
+					<CornerDownRight />
+				</Button>
+				<Button size="icon" variant="ghost" class="size-8 border">
+					<!-- 이모티콘 반응 -->
+					<SmilePlus />
+				</Button>
+			</aside>
+		</div>
+	{:else if dm.type === 'join'}
+		<Muted class="w-full text-center">{dm.sender?.username} 님이 대화방에 들어왔습니다.</Muted>
+	{:else if dm.type === 'leave'}
+		<Muted class="w-full text-center">
+			{dm.sender?.username} 님이 대화방에서 나갔습니다.
+		</Muted>
+	{/if}
 </article>
