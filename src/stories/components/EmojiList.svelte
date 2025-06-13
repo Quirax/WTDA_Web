@@ -4,6 +4,7 @@
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
 	import { cn, twemoji } from '$lib/utils';
+	import type { Emoji } from 'emoji-type';
 	import { untrack } from 'svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 
@@ -13,7 +14,7 @@
 		xMargin?: number;
 		yMargin?: number;
 		open?: boolean;
-		onEmoji?: (emoji: string) => void;
+		onEmoji?: (emoji: Emoji) => void;
 		autoClose?: boolean;
 	}
 
@@ -87,7 +88,7 @@
 								variant="ghost"
 								class="text-2xl"
 								onclick={() => {
-									onEmoji(emoji.emoji);
+									onEmoji(emoji.emoji as Emoji);
 									autoClose && onClose();
 								}}>
 								{emoji.emoji}

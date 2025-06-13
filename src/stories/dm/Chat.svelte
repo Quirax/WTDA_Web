@@ -11,6 +11,7 @@
 	import EmojiList from '$stories/components/EmojiList.svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 	import { onNavigate } from '$app/navigation';
+	import type { Emoji } from 'emoji-type';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -51,6 +52,10 @@
 			sender: user,
 			sentAt: new Date(1100000),
 			message: '이모티콘 테스트: 😂👨‍🦳✨🎂✈️💓',
+			reactions: {
+				'🤪': 1,
+				'😵': 1,
+			},
 		},
 		{
 			id: 'asdf',
@@ -72,6 +77,11 @@
 			sender: user,
 			sentAt: new Date(1200000),
 			message: '장문의 기이이이이이이이다란\n텍스트 메시지를 테스트해봅니다',
+			reactions: {
+				'🤪': 1,
+				'😵': 1,
+			},
+			myReaction: '😵',
 		},
 		{
 			id: 'asdf',
@@ -224,7 +234,7 @@
 		y: 0,
 		xMargin: 0,
 		yMargin: 0,
-		onEmoji: (_: string) => {},
+		onEmoji: (_: Emoji) => {},
 		autoClose: false,
 	});
 
@@ -232,7 +242,7 @@
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLElement;
 		},
-		onEmoji: (emoji: string) => void,
+		onEmoji: (emoji: Emoji) => void,
 		autoClose = false,
 	) => {
 		event.stopPropagation(); // window.onclick 이벤트에 bubbling 되지 않도록 전파 방지 조치

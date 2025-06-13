@@ -13,6 +13,7 @@
 	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import emojiRegex from 'emoji-regex';
+	import type { Emoji } from 'emoji-type';
 	import { CornerDownRight, SmilePlus } from 'lucide-svelte';
 	import PhotoSwipeLightbox from 'photoswipe/lightbox';
 
@@ -24,7 +25,7 @@
 		onScrollToDM?: (id: string) => void;
 		onOpenEmojiList?: (
 			event: MouseEvent & { currentTarget: EventTarget & HTMLElement },
-			onEmoji: (emoji: string) => void,
+			onEmoji: (emoji: Emoji) => void,
 			autoClose: boolean,
 		) => void;
 		tabindex?: number;
@@ -94,7 +95,7 @@
 		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
 	});
 
-	const onEmoji = (emoji: string) => {
+	const onEmoji = (emoji: Emoji) => {
 		console.log(emoji); // TODO: 이모티콘 반응 등록
 	};
 </script>
