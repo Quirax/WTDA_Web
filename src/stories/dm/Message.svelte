@@ -6,8 +6,6 @@
 </script>
 
 <script lang="ts">
-	import { goto } from '$app/navigation';
-
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -24,10 +22,24 @@
 		prev?: App.DM;
 		next?: App.DM;
 		onScrollToDM?: (id: string) => void;
+		onOpenEmojiList?: (
+			event: MouseEvent & { currentTarget: EventTarget & HTMLElement },
+			onEmoji: (emoji: string) => void,
+			autoClose: boolean,
+		) => void;
 		tabindex?: number;
 	}
 
-	const { dir, dm, prev, next, id, tabindex = 0, onScrollToDM = () => {} }: Props = $props();
+	const {
+		dir,
+		dm,
+		prev,
+		next,
+		id,
+		tabindex = 0,
+		onScrollToDM = () => {},
+		onOpenEmojiList = () => {},
+	}: Props = $props();
 
 	const sameSenderAsPrev =
 		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
@@ -81,6 +93,10 @@
 		articleElement.addEventListener('mouseenter', () => (isMouseHover = true));
 		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
 	});
+
+	const onEmoji = (emoji: string) => {
+		console.log(emoji); // TODO: 이모티콘 반응 등록
+	};
 </script>
 
 <article
@@ -218,7 +234,11 @@
 					<!-- 답글 -->
 					<CornerDownRight />
 				</Button>
-				<Button size="icon" variant="ghost" class="size-8 border">
+				<Button
+					size="icon"
+					variant="ghost"
+					class="size-8 border"
+					onclick={(event) => onOpenEmojiList(event, onEmoji, true)}>
 					<!-- 이모티콘 반응 -->
 					<SmilePlus />
 				</Button>

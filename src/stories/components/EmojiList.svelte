@@ -14,6 +14,7 @@
 		yMargin?: number;
 		open?: boolean;
 		onEmoji?: (emoji: string) => void;
+		autoClose?: boolean;
 	}
 
 	let {
@@ -23,6 +24,7 @@
 		yMargin = 0,
 		open = $bindable(false),
 		onEmoji = () => {},
+		autoClose = false,
 	}: Props = $props();
 
 	let listView = $state<HTMLElement>();
@@ -84,7 +86,10 @@
 								size="icon"
 								variant="ghost"
 								class="text-2xl"
-								onclick={() => onEmoji(emoji.emoji)}>
+								onclick={() => {
+									onEmoji(emoji.emoji);
+									autoClose && onClose();
+								}}>
 								{emoji.emoji}
 							</Button>
 						</Tooltip>

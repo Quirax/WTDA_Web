@@ -224,16 +224,28 @@
 		y: 0,
 		xMargin: 0,
 		yMargin: 0,
+		onEmoji: (_: string) => {},
+		autoClose: false,
 	});
 
-	const onOpenEmojiList: MouseEventHandler<HTMLElement> = (event) => {
+	const onOpenEmojiList = (
+		event: MouseEvent & {
+			currentTarget: EventTarget & HTMLElement;
+		},
+		onEmoji: (emoji: string) => void,
+		autoClose = false,
+	) => {
 		event.stopPropagation(); // window.onclick 이벤트에 bubbling 되지 않도록 전파 방지 조치
 
+		const clientRects = event.currentTarget.getClientRects()[0];
+
 		emojiListProps = {
-			x: event.currentTarget.offsetLeft,
-			y: event.currentTarget.offsetTop,
-			xMargin: event.currentTarget.offsetWidth,
-			yMargin: event.currentTarget.offsetHeight,
+			x: clientRects.x,
+			y: clientRects.y,
+			xMargin: clientRects.width,
+			yMargin: clientRects.height,
+			onEmoji,
+			autoClose,
 		};
 		openEmojiList = true;
 	};
@@ -262,6 +274,7 @@
 				next={dms[i + 1]}
 				id="dm-{dm.id}"
 				onScrollToDM={scrollToDM}
+				{onOpenEmojiList}
 				tabindex={i + 1} />
 		{/each}
 	</section>
@@ -271,7 +284,7 @@
 			<Paperclip />
 		</Button>
 		<Input name="chat" placeholder="메시지를 입력하세요..." bind:value={dmDraft.message} />
-		<Button size="icon" variant="secondary" onclick={onOpenEmojiList}>
+		<Button size="icon" variant="secondary" onclick={(event) => onOpenEmojiList(event, onEmoji)}>
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />
 		</Button>
@@ -282,4 +295,4 @@
 	</section>
 </Section>
 
-<EmojiList bind:open={openEmojiList} {onEmoji} {...emojiListProps} />
+<EmojiList bind:open={openEmojiList} {...emojiListProps} />
