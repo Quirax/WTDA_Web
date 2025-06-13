@@ -227,8 +227,9 @@
 			{/if}
 			<aside
 				class={cn(
-					'bg-background absolute -right-2 -bottom-10 z-1 border p-2',
+					'bg-background absolute -bottom-10 z-1 border p-2',
 					!(isFocused || isMouseHover) && 'hidden',
+					dir === Direction.SEND ? '-left-2' : '-right-2',
 				)}>
 				<Button size="icon" variant="ghost" class="size-8 border">
 					<!-- 답글 -->
