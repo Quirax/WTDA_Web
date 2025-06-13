@@ -180,6 +180,21 @@
 							</a>
 						{/if}
 						{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
+						{#if dm.reactions}
+							{@const reactions = Object.entries(dm.reactions)}
+							{#if reactions.length > 0}
+								<div class="mt-2 space-x-2 text-right">
+									{#each reactions as [emoji, num]}
+										<Badge
+											variant={emoji === dm.myReaction ? 'default' : 'outline'}
+											class="space-x-1">
+											<span>{emoji}</span>
+											<span>{num}</span>
+										</Badge>
+									{/each}
+								</div>
+							{/if}
+						{/if}
 						{#if !sameSenderAsPrev}
 							<!-- 이전 사용자와 같은 경우 말풍선 꼬리 미표시 -->
 							<div
