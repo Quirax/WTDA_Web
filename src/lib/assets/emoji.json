@@ -772,34 +772,6 @@
 				"name": "lying face"
 			},
 			{
-				"emoji": "🫨",
-				"keywords": [
-					"crazy",
-					"daze",
-					"earthquake",
-					"face",
-					"omg",
-					"panic",
-					"shaking",
-					"shock",
-					"surprise",
-					"vibrate",
-					"whoa",
-					"wow"
-				],
-				"name": "shaking face"
-			},
-			{
-				"emoji": "🙂‍↔️",
-				"keywords": ["head", "horizontally", "no", "shake", "shaking"],
-				"name": "head shaking horizontally"
-			},
-			{
-				"emoji": "🙂‍↕️",
-				"keywords": ["head", "nod", "shaking", "vertically", "yes"],
-				"name": "head shaking vertically"
-			},
-			{
 				"emoji": "😌",
 				"keywords": ["calm", "face", "peace", "relief", "relieved", "zen"],
 				"name": "relieved face"
@@ -859,22 +831,6 @@
 					"zzz"
 				],
 				"name": "sleeping face"
-			},
-			{
-				"emoji": "🫩",
-				"keywords": [
-					"bags",
-					"bored",
-					"exhausted",
-					"eyes",
-					"face",
-					"fatigued",
-					"late",
-					"sleepy",
-					"tired",
-					"weary"
-				],
-				"name": "⊛ face with bags under eyes"
 			},
 			{
 				"emoji": "😷",
@@ -2043,23 +1999,6 @@
 				"name": "red heart"
 			},
 			{
-				"emoji": "🩷",
-				"keywords": [
-					"143",
-					"adorable",
-					"cute",
-					"emotion",
-					"heart",
-					"ily",
-					"like",
-					"love",
-					"pink",
-					"special",
-					"sweet"
-				],
-				"name": "pink heart"
-			},
-			{
 				"emoji": "🧡",
 				"keywords": ["143", "heart", "orange"],
 				"name": "orange heart"
@@ -2080,25 +2019,6 @@
 				"name": "blue heart"
 			},
 			{
-				"emoji": "🩵",
-				"keywords": [
-					"143",
-					"blue",
-					"cute",
-					"cyan",
-					"emotion",
-					"heart",
-					"ily",
-					"light",
-					"like",
-					"love",
-					"sky",
-					"special",
-					"teal"
-				],
-				"name": "light blue heart"
-			},
-			{
 				"emoji": "💜",
 				"keywords": ["143", "bestest", "emotion", "heart", "ily", "love", "purple"],
 				"name": "purple heart"
@@ -2112,22 +2032,6 @@
 				"emoji": "🖤",
 				"keywords": ["black", "evil", "heart", "wicked"],
 				"name": "black heart"
-			},
-			{
-				"emoji": "🩶",
-				"keywords": [
-					"143",
-					"emotion",
-					"gray",
-					"grey",
-					"heart",
-					"ily",
-					"love",
-					"silver",
-					"slate",
-					"special"
-				],
-				"name": "grey heart"
 			},
 			{
 				"emoji": "🤍",
@@ -2242,11 +2146,6 @@
 					"typing"
 				],
 				"name": "speech balloon"
-			},
-			{
-				"emoji": "👁️‍🗨️",
-				"keywords": ["balloon", "bubble", "eye", "speech", "witness"],
-				"name": "eye in speech bubble"
 			},
 			{
 				"emoji": "🗨",
@@ -2391,48 +2290,6 @@
 					"tell"
 				],
 				"name": "palm up hand"
-			},
-			{
-				"emoji": "🫷",
-				"keywords": [
-					"block",
-					"five",
-					"halt",
-					"hand",
-					"high",
-					"hold",
-					"leftward",
-					"leftwards",
-					"pause",
-					"push",
-					"pushing",
-					"refuse",
-					"slap",
-					"stop",
-					"wait"
-				],
-				"name": "leftwards pushing hand"
-			},
-			{
-				"emoji": "🫸",
-				"keywords": [
-					"block",
-					"five",
-					"halt",
-					"hand",
-					"high",
-					"hold",
-					"pause",
-					"push",
-					"pushing",
-					"refuse",
-					"rightward",
-					"rightwards",
-					"slap",
-					"stop",
-					"wait"
-				],
-				"name": "rightwards pushing hand"
 			},
 			{
 				"emoji": "👌",
@@ -4619,56 +4476,6 @@
 				"name": "woman walking"
 			},
 			{
-				"emoji": "🚶‍➡️",
-				"keywords": [
-					"amble",
-					"gait",
-					"hike",
-					"man",
-					"pace",
-					"pedestrian",
-					"person",
-					"stride",
-					"stroll",
-					"walk",
-					"walking"
-				],
-				"name": "person walking facing right"
-			},
-			{
-				"emoji": "🚶‍♀️‍➡️",
-				"keywords": [
-					"amble",
-					"gait",
-					"hike",
-					"man",
-					"pace",
-					"pedestrian",
-					"stride",
-					"stroll",
-					"walk",
-					"walking",
-					"woman"
-				],
-				"name": "woman walking facing right"
-			},
-			{
-				"emoji": "🚶‍♂️‍➡️",
-				"keywords": [
-					"amble",
-					"gait",
-					"hike",
-					"man",
-					"pace",
-					"pedestrian",
-					"stride",
-					"stroll",
-					"walk",
-					"walking"
-				],
-				"name": "man walking facing right"
-			},
-			{
 				"emoji": "🧍",
 				"keywords": ["person", "stand", "standing"],
 				"name": "person standing"
@@ -4699,29 +4506,9 @@
 				"name": "woman kneeling"
 			},
 			{
-				"emoji": "🧎‍➡️",
-				"keywords": ["kneel", "kneeling", "knees", "person"],
-				"name": "person kneeling facing right"
-			},
-			{
-				"emoji": "🧎‍♀️‍➡️",
-				"keywords": ["kneel", "kneeling", "knees", "woman"],
-				"name": "woman kneeling facing right"
-			},
-			{
-				"emoji": "🧎‍♂️‍➡️",
-				"keywords": ["kneel", "kneeling", "knees", "man"],
-				"name": "man kneeling facing right"
-			},
-			{
 				"emoji": "🧑‍🦯",
 				"keywords": ["accessibility", "blind", "cane", "person", "probing", "white"],
 				"name": "person with white cane"
-			},
-			{
-				"emoji": "🧑‍🦯‍➡️",
-				"keywords": ["accessibility", "blind", "cane", "person", "probing", "white"],
-				"name": "person with white cane facing right"
 			},
 			{
 				"emoji": "👨‍🦯",
@@ -4729,19 +4516,9 @@
 				"name": "man with white cane"
 			},
 			{
-				"emoji": "👨‍🦯‍➡️",
-				"keywords": ["accessibility", "blind", "cane", "man", "probing", "white"],
-				"name": "man with white cane facing right"
-			},
-			{
 				"emoji": "👩‍🦯",
 				"keywords": ["accessibility", "blind", "cane", "probing", "white", "woman"],
 				"name": "woman with white cane"
-			},
-			{
-				"emoji": "👩‍🦯‍➡️",
-				"keywords": ["accessibility", "blind", "cane", "probing", "white", "woman"],
-				"name": "woman with white cane facing right"
 			},
 			{
 				"emoji": "🧑‍🦼",
@@ -4749,19 +4526,9 @@
 				"name": "person in motorized wheelchair"
 			},
 			{
-				"emoji": "🧑‍🦼‍➡️",
-				"keywords": ["accessibility", "motorized", "person", "wheelchair"],
-				"name": "person in motorized wheelchair facing right"
-			},
-			{
 				"emoji": "👨‍🦼",
 				"keywords": ["accessibility", "man", "motorized", "wheelchair"],
 				"name": "man in motorized wheelchair"
-			},
-			{
-				"emoji": "👨‍🦼‍➡️",
-				"keywords": ["accessibility", "man", "motorized", "wheelchair"],
-				"name": "man in motorized wheelchair facing right"
 			},
 			{
 				"emoji": "👩‍🦼",
@@ -4769,19 +4536,9 @@
 				"name": "woman in motorized wheelchair"
 			},
 			{
-				"emoji": "👩‍🦼‍➡️",
-				"keywords": ["accessibility", "motorized", "wheelchair", "woman"],
-				"name": "woman in motorized wheelchair facing right"
-			},
-			{
 				"emoji": "🧑‍🦽",
 				"keywords": ["accessibility", "manual", "person", "wheelchair"],
 				"name": "person in manual wheelchair"
-			},
-			{
-				"emoji": "🧑‍🦽‍➡️",
-				"keywords": ["accessibility", "manual", "person", "wheelchair"],
-				"name": "person in manual wheelchair facing right"
 			},
 			{
 				"emoji": "👨‍🦽",
@@ -4789,19 +4546,9 @@
 				"name": "man in manual wheelchair"
 			},
 			{
-				"emoji": "👨‍🦽‍➡️",
-				"keywords": ["accessibility", "man", "manual", "wheelchair"],
-				"name": "man in manual wheelchair facing right"
-			},
-			{
 				"emoji": "👩‍🦽",
 				"keywords": ["accessibility", "manual", "wheelchair", "woman"],
 				"name": "woman in manual wheelchair"
-			},
-			{
-				"emoji": "👩‍🦽‍➡️",
-				"keywords": ["accessibility", "manual", "wheelchair", "woman"],
-				"name": "woman in manual wheelchair facing right"
 			},
 			{
 				"emoji": "🏃",
@@ -4853,57 +4600,6 @@
 					"woman"
 				],
 				"name": "woman running"
-			},
-			{
-				"emoji": "🏃‍➡️",
-				"keywords": [
-					"fast",
-					"hurry",
-					"marathon",
-					"move",
-					"person",
-					"quick",
-					"race",
-					"racing",
-					"run",
-					"rush",
-					"speed"
-				],
-				"name": "person running facing right"
-			},
-			{
-				"emoji": "🏃‍♀️‍➡️",
-				"keywords": [
-					"fast",
-					"hurry",
-					"marathon",
-					"move",
-					"quick",
-					"race",
-					"racing",
-					"run",
-					"rush",
-					"speed",
-					"woman"
-				],
-				"name": "woman running facing right"
-			},
-			{
-				"emoji": "🏃‍♂️‍➡️",
-				"keywords": [
-					"fast",
-					"hurry",
-					"man",
-					"marathon",
-					"move",
-					"quick",
-					"race",
-					"racing",
-					"run",
-					"rush",
-					"speed"
-				],
-				"name": "man running facing right"
 			},
 			{
 				"emoji": "💃",
@@ -6157,45 +5853,9 @@
 				"name": "family"
 			},
 			{
-				"emoji": "🧑‍🧑‍🧒",
-				"keywords": ["adult", "child", "family"],
-				"name": "family: adult, adult, child"
-			},
-			{
-				"emoji": "🧑‍🧑‍🧒‍🧒",
-				"keywords": ["adult", "child", "family"],
-				"name": "family: adult, adult, child, child"
-			},
-			{
-				"emoji": "🧑‍🧒",
-				"keywords": ["adult", "child", "family"],
-				"name": "family: adult, child"
-			},
-			{
-				"emoji": "🧑‍🧒‍🧒",
-				"keywords": ["adult", "child", "family"],
-				"name": "family: adult, child, child"
-			},
-			{
 				"emoji": "👣",
 				"keywords": ["barefoot", "clothing", "footprint", "footprints", "omw", "print", "walk"],
 				"name": "footprints"
-			},
-			{
-				"emoji": "🫆",
-				"keywords": [
-					"clue",
-					"crime",
-					"detective",
-					"fingerprint",
-					"forensics",
-					"identity",
-					"mystery",
-					"print",
-					"safety",
-					"trace"
-				],
-				"name": "⊛ fingerprint"
 			}
 		]
 	},
@@ -6339,16 +5999,6 @@
 				"emoji": "🐴",
 				"keywords": ["animal", "dressage", "equine", "face", "farm", "horse", "horses"],
 				"name": "horse face"
-			},
-			{
-				"emoji": "🫎",
-				"keywords": ["alces", "animal", "antlers", "elk", "mammal", "moose"],
-				"name": "moose"
-			},
-			{
-				"emoji": "🫏",
-				"keywords": ["animal", "ass", "burro", "donkey", "hinny", "mammal", "mule", "stubborn"],
-				"name": "donkey"
 			},
 			{
 				"emoji": "🐎",
@@ -6671,78 +6321,6 @@
 				"name": "parrot"
 			},
 			{
-				"emoji": "🪽",
-				"keywords": [
-					"angelic",
-					"ascend",
-					"aviation",
-					"bird",
-					"fly",
-					"flying",
-					"heavenly",
-					"mythology",
-					"soar",
-					"wing"
-				],
-				"name": "wing"
-			},
-			{
-				"emoji": "🐦‍⬛",
-				"keywords": [
-					"animal",
-					"beak",
-					"bird",
-					"black",
-					"caw",
-					"corvid",
-					"crow",
-					"ornithology",
-					"raven",
-					"rook"
-				],
-				"name": "black bird"
-			},
-			{
-				"emoji": "🪿",
-				"keywords": [
-					"animal",
-					"bird",
-					"duck",
-					"flock",
-					"fowl",
-					"gaggle",
-					"gander",
-					"geese",
-					"goose",
-					"honk",
-					"ornithology",
-					"silly"
-				],
-				"name": "goose"
-			},
-			{
-				"emoji": "🐦‍🔥",
-				"keywords": [
-					"ascend",
-					"ascension",
-					"emerge",
-					"fantasy",
-					"firebird",
-					"glory",
-					"immortal",
-					"phoenix",
-					"rebirth",
-					"reincarnation",
-					"reinvent",
-					"renewal",
-					"revival",
-					"revive",
-					"rise",
-					"transform"
-				],
-				"name": "phoenix"
-			},
-			{
 				"emoji": "🐸",
 				"keywords": ["animal", "face", "frog"],
 				"name": "frog"
@@ -6841,27 +6419,6 @@
 				"emoji": "🪸",
 				"keywords": ["change", "climate", "coral", "ocean", "reef", "sea"],
 				"name": "coral"
-			},
-			{
-				"emoji": "🪼",
-				"keywords": [
-					"animal",
-					"aquarium",
-					"burn",
-					"invertebrate",
-					"jelly",
-					"jellyfish",
-					"life",
-					"marine",
-					"ocean",
-					"ouch",
-					"plankton",
-					"sea",
-					"sting",
-					"stinger",
-					"tentacles"
-				],
-				"name": "jellyfish"
 			},
 			{
 				"emoji": "🦀",
@@ -7061,26 +6618,6 @@
 				"name": "tulip"
 			},
 			{
-				"emoji": "🪻",
-				"keywords": [
-					"bloom",
-					"bluebonnet",
-					"flower",
-					"hyacinth",
-					"indigo",
-					"lavender",
-					"lilac",
-					"lupine",
-					"plant",
-					"purple",
-					"shrub",
-					"snapdragon",
-					"spring",
-					"violet"
-				],
-				"name": "hyacinth"
-			},
-			{
 				"emoji": "🌱",
 				"keywords": ["plant", "sapling", "seedling", "sprout", "young"],
 				"name": "seedling"
@@ -7159,22 +6696,6 @@
 				"emoji": "🍄",
 				"keywords": ["fungus", "mushroom", "toadstool"],
 				"name": "mushroom"
-			},
-			{
-				"emoji": "🪾",
-				"keywords": [
-					"bare",
-					"barren",
-					"branches",
-					"dead",
-					"drought",
-					"leafless",
-					"tree",
-					"trunk",
-					"winter",
-					"wood"
-				],
-				"name": "⊛ leafless tree"
 			}
 		]
 	},
@@ -7205,28 +6726,6 @@
 				"emoji": "🍋",
 				"keywords": ["citrus", "fruit", "lemon", "sour"],
 				"name": "lemon"
-			},
-			{
-				"emoji": "🍋‍🟩",
-				"keywords": [
-					"acidity",
-					"citrus",
-					"cocktail",
-					"fruit",
-					"garnish",
-					"key",
-					"lime",
-					"margarita",
-					"mojito",
-					"refreshing",
-					"salsa",
-					"sour",
-					"tangy",
-					"tequila",
-					"tropical",
-					"zest"
-				],
-				"name": "lime"
 			},
 			{
 				"emoji": "🍌",
@@ -7391,63 +6890,6 @@
 				"emoji": "🌰",
 				"keywords": ["almond", "chestnut", "plant"],
 				"name": "chestnut"
-			},
-			{
-				"emoji": "🫚",
-				"keywords": ["beer", "ginger", "health", "herb", "natural", "root", "spice"],
-				"name": "ginger root"
-			},
-			{
-				"emoji": "🫛",
-				"keywords": [
-					"beans",
-					"beanstalk",
-					"edamame",
-					"legume",
-					"pea",
-					"pod",
-					"soybean",
-					"vegetable",
-					"veggie"
-				],
-				"name": "pea pod"
-			},
-			{
-				"emoji": "🍄‍🟫",
-				"keywords": [
-					"food",
-					"fungi",
-					"fungus",
-					"mushroom",
-					"nature",
-					"pizza",
-					"portobello",
-					"shiitake",
-					"shroom",
-					"spore",
-					"sprout",
-					"toppings",
-					"truffle",
-					"vegetable",
-					"vegetarian",
-					"veggie"
-				],
-				"name": "brown mushroom"
-			},
-			{
-				"emoji": "🫜",
-				"keywords": [
-					"beet",
-					"food",
-					"garden",
-					"radish",
-					"root",
-					"salad",
-					"turnip",
-					"vegetable",
-					"vegetarian"
-				],
-				"name": "⊛ root vegetable"
 			},
 			{
 				"emoji": "🍞",
@@ -9836,11 +9278,6 @@
 				"name": "club suit"
 			},
 			{
-				"emoji": "♟",
-				"keywords": ["chess", "dupe", "expendable", "pawn"],
-				"name": "chess pawn"
-			},
-			{
 				"emoji": "🃏",
 				"keywords": ["card", "game", "joker", "wildcard"],
 				"name": "joker"
@@ -10074,24 +9511,6 @@
 				"name": "woman’s clothes"
 			},
 			{
-				"emoji": "🪭",
-				"keywords": [
-					"clack",
-					"clap",
-					"cool",
-					"cooling",
-					"dance",
-					"fan",
-					"flirt",
-					"flutter",
-					"folding",
-					"hand",
-					"hot",
-					"shy"
-				],
-				"name": "folding hand fan"
-			},
-			{
 				"emoji": "👛",
 				"keywords": [
 					"clothes",
@@ -10235,11 +9654,6 @@
 					"woman’s"
 				],
 				"name": "woman’s boot"
-			},
-			{
-				"emoji": "🪮",
-				"keywords": ["Afro", "comb", "groom", "hair", "pick"],
-				"name": "hair pick"
 			},
 			{
 				"emoji": "👑",
@@ -10478,45 +9892,6 @@
 				"emoji": "🪘",
 				"keywords": ["beat", "conga", "drum", "instrument", "long", "rhythm"],
 				"name": "long drum"
-			},
-			{
-				"emoji": "🪇",
-				"keywords": [
-					"cha",
-					"dance",
-					"instrument",
-					"maracas",
-					"music",
-					"party",
-					"percussion",
-					"rattle",
-					"shake",
-					"shaker"
-				],
-				"name": "maracas"
-			},
-			{
-				"emoji": "🪈",
-				"keywords": [
-					"band",
-					"fife",
-					"flautist",
-					"flute",
-					"instrument",
-					"marching",
-					"music",
-					"orchestra",
-					"piccolo",
-					"pipe",
-					"recorder",
-					"woodwind"
-				],
-				"name": "flute"
-			},
-			{
-				"emoji": "🪉",
-				"keywords": ["cupid", "harp", "instrument", "love", "music", "orchestra"],
-				"name": "⊛ harp"
 			},
 			{
 				"emoji": "📱",
@@ -11363,11 +10738,6 @@
 				"name": "link"
 			},
 			{
-				"emoji": "⛓️‍💥",
-				"keywords": ["break", "breaking", "broken", "chain", "cuffs", "freedom"],
-				"name": "broken chain"
-			},
-			{
 				"emoji": "⛓",
 				"keywords": ["chain", "chains"],
 				"name": "chains"
@@ -11400,11 +10770,6 @@
 				"emoji": "🪜",
 				"keywords": ["climb", "ladder", "rung", "step"],
 				"name": "ladder"
-			},
-			{
-				"emoji": "🪏",
-				"keywords": ["bury", "dig", "garden", "hole", "plant", "scoop", "shovel", "snow", "spade"],
-				"name": "⊛ shovel"
 			},
 			{
 				"emoji": "⚗",
@@ -12115,11 +11480,6 @@
 				"name": "dotted six-pointed star"
 			},
 			{
-				"emoji": "🪯",
-				"keywords": ["Deg", "Fateh", "Khalsa", "Khanda", "religion", "Sikh", "Sikhism", "Tegh"],
-				"name": "khanda"
-			},
-			{
 				"emoji": "♈",
 				"keywords": ["Aries", "horoscope", "ram", "zodiac"],
 				"name": "Aries"
@@ -12303,24 +11663,6 @@
 					"telephone"
 				],
 				"name": "antenna bars"
-			},
-			{
-				"emoji": "🛜",
-				"keywords": [
-					"broadband",
-					"computer",
-					"connectivity",
-					"hotspot",
-					"internet",
-					"network",
-					"router",
-					"smartphone",
-					"wi-fi",
-					"wifi",
-					"wireless",
-					"wlan"
-				],
-				"name": "wireless"
 			},
 			{
 				"emoji": "📳",
@@ -12552,36 +11894,6 @@
 				"emoji": "❇",
 				"keywords": ["*", "sparkle"],
 				"name": "sparkle"
-			},
-			{
-				"emoji": "©",
-				"keywords": ["C", "copyright"],
-				"name": "copyright"
-			},
-			{
-				"emoji": "®",
-				"keywords": ["R", "registered"],
-				"name": "registered"
-			},
-			{
-				"emoji": "™",
-				"keywords": ["mark", "TM", "trade", "trademark"],
-				"name": "trade mark"
-			},
-			{
-				"emoji": "🫟",
-				"keywords": [
-					"drip",
-					"holi",
-					"ink",
-					"liquid",
-					"mess",
-					"paint",
-					"spill",
-					"splatter",
-					"stain"
-				],
-				"name": "⊛ splatter"
 			},
 			{
 				"emoji": "#️⃣",
@@ -13339,11 +12651,6 @@
 				"emoji": "🇨🇵",
 				"keywords": ["flag"],
 				"name": "flag: Clipperton Island"
-			},
-			{
-				"emoji": "🇨🇶",
-				"keywords": ["flag"],
-				"name": "⊛ flag: Sark"
 			},
 			{
 				"emoji": "🇨🇷",
