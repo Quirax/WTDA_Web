@@ -1,3 +1,7 @@
+<script lang="ts" module>
+	export type EmojiEventHandler = (emoji: Emoji | undefined) => void;
+</script>
+
 <script lang="ts">
 	import emojiList from '$lib/assets/emoji.json';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
@@ -5,6 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { cn, twemoji } from '$lib/utils';
 	import type { Emoji } from 'emoji-type';
+	import { Trash } from 'lucide-svelte';
 	import { untrack } from 'svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 
@@ -14,8 +19,9 @@
 		xMargin?: number;
 		yMargin?: number;
 		open?: boolean;
-		onEmoji?: (emoji: Emoji) => void;
+		onEmoji?: EmojiEventHandler;
 		autoClose?: boolean;
+		value?: Emoji;
 	}
 
 	let {
@@ -26,6 +32,7 @@
 		open = $bindable(false),
 		onEmoji = () => {},
 		autoClose = false,
+		value,
 	}: Props = $props();
 
 	let listView = $state<HTMLElement>();
@@ -76,6 +83,20 @@
 	)}
 	style="top: {yFinal}px; left: {xFinal}px;"
 	use:twemoji>
+	{#if value}
+		<Tooltip text="선택을 취소하고 닫기">
+			<Button
+				size="icon"
+				variant="ghost"
+				class="text-2xl"
+				onclick={() => {
+					onEmoji(undefined);
+					onClose();
+				}}>
+				<Trash />
+			</Button>
+		</Tooltip>
+	{/if}
 	<Accordion.Root type="single" value={emojiList[0].name}>
 		{#each emojiList as category}
 			<Accordion.Item value={category.name}>
@@ -85,7 +106,7 @@
 						<Tooltip text={emoji.name}>
 							<Button
 								size="icon"
-								variant="ghost"
+								variant={emoji.emoji === value ? 'default' : 'ghost'}
 								class="text-2xl"
 								onclick={() => {
 									onEmoji(emoji.emoji as Emoji);

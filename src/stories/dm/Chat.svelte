@@ -8,7 +8,7 @@
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
 	import { ArticleCategory, ArticleType } from '@app';
-	import EmojiList from '$stories/components/EmojiList.svelte';
+	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 	import { onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
@@ -234,16 +234,17 @@
 		y: 0,
 		xMargin: 0,
 		yMargin: 0,
-		onEmoji: (_: Emoji) => {},
+		onEmoji: (_: Emoji | undefined) => {},
 		autoClose: false,
+		value: undefined as Emoji | undefined,
 	});
 
 	const onOpenEmojiList = (
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLElement;
 		},
-		onEmoji: (emoji: Emoji) => void,
-		autoClose = false,
+		onEmoji: EmojiEventHandler,
+		option?: { autoClose?: boolean; value?: Emoji },
 	) => {
 		event.stopPropagation(); // window.onclick 이벤트에 bubbling 되지 않도록 전파 방지 조치
 
@@ -255,7 +256,8 @@
 			xMargin: clientRects.width,
 			yMargin: clientRects.height,
 			onEmoji,
-			autoClose,
+			autoClose: !!option?.autoClose,
+			value: option?.value,
 		};
 		openEmojiList = true;
 	};
@@ -264,8 +266,8 @@
 		message: '',
 	});
 
-	const onEmoji = (emoji: string) => {
-		dmDraft.message += emoji;
+	const onEmoji: EmojiEventHandler = (emoji) => {
+		dmDraft.message += emoji || '';
 	};
 </script>
 

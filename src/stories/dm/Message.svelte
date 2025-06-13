@@ -12,6 +12,7 @@
 	import { ArticleTypeText } from '$lib/messages';
 	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
+	import type { EmojiEventHandler } from '$stories/components/EmojiList.svelte';
 	import emojiRegex from 'emoji-regex';
 	import type { Emoji } from 'emoji-type';
 	import { CornerDownRight, SmilePlus } from 'lucide-svelte';
@@ -25,8 +26,8 @@
 		onScrollToDM?: (id: string) => void;
 		onOpenEmojiList?: (
 			event: MouseEvent & { currentTarget: EventTarget & HTMLElement },
-			onEmoji: (emoji: Emoji) => void,
-			autoClose: boolean,
+			onEmoji: EmojiEventHandler,
+			option: { autoClose?: boolean; value?: Emoji },
 		) => void;
 		tabindex?: number;
 	}
@@ -95,7 +96,7 @@
 		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
 	});
 
-	const onEmoji = (emoji: Emoji) => {
+	const onEmoji: EmojiEventHandler = (emoji) => {
 		console.log(emoji); // TODO: 이모티콘 반응 등록
 	};
 </script>
@@ -255,7 +256,8 @@
 					size="icon"
 					variant="ghost"
 					class="size-8 border"
-					onclick={(event) => onOpenEmojiList(event, onEmoji, true)}>
+					onclick={(event) =>
+						onOpenEmojiList(event, onEmoji, { autoClose: true, value: dm.myReaction })}>
 					<!-- 이모티콘 반응 -->
 					<SmilePlus />
 				</Button>
