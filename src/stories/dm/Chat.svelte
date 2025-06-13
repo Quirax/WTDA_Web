@@ -10,13 +10,13 @@
 	import { ArticleCategory, ArticleType } from '@app';
 	import EmojiList from '$stories/components/EmojiList.svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
+	import { onNavigate } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {}
 
 	const {}: Props = $props();
 
 	let user = $state<App.User>(null);
-
 	userStore.subscribe((v) => (user = v));
 
 	const dms = $derived<App.DM[]>([
@@ -193,6 +193,19 @@
 	]);
 
 	let container = $state<HTMLElement>();
+
+	const scrollToBottom = () => {
+		if (!container) return;
+
+		const element = container.lastElementChild as HTMLElement;
+
+		if (!element) return;
+
+		container.scroll({ top: element.offsetTop });
+	};
+
+	onNavigate(scrollToBottom);
+	$effect(scrollToBottom);
 
 	const scrollToDM = (id: string) => {
 		if (!container) return;
