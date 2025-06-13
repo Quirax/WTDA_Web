@@ -205,7 +205,7 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
-	let openEmojiList = $state(true);
+	let openEmojiList = $state(false);
 	let emojiListProps = $state({
 		x: 0,
 		y: 0,
@@ -214,6 +214,8 @@
 	});
 
 	const onOpenEmojiList: MouseEventHandler<HTMLElement> = (event) => {
+		event.stopPropagation(); // window.onclick 이벤트에 bubbling 되지 않도록 전파 방지 조치
+
 		emojiListProps = {
 			x: event.currentTarget.offsetLeft,
 			y: event.currentTarget.offsetTop,

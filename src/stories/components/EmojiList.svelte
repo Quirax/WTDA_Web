@@ -4,6 +4,8 @@
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
 	import { cn, twemoji } from '$lib/utils';
+	import { untrack } from 'svelte';
+	import type { MouseEventHandler } from 'svelte/elements';
 
 	interface Props {
 		x: number;
@@ -15,24 +17,43 @@
 
 	let { x: xCoord, y: yCoord, xMargin = 0, yMargin = 0, open = $bindable(false) }: Props = $props();
 
-	const onClose = () => (open = false);
-
 	let listView = $state<HTMLElement>();
 	let xFinal = $state(0),
 		yFinal = $state(0);
 
+	const onClose = () => (open = false);
+
+	const onClickOuside = (event: MouseEvent) => {
+		if (!listView) return;
+
+		const clientRects = listView.getClientRects()[0];
+
+		if (
+			clientRects.left <= event.pageX &&
+			event.pageX <= clientRects.right &&
+			clientRects.top <= event.pageY &&
+			event.pageY <= clientRects.bottom
+		)
+			return;
+
+		onClose();
+	};
+
 	$effect(() => {
 		if (!listView) return;
-		if (!xCoord || !yCoord) return;
 
 		xFinal = xCoord + xMargin;
 		yFinal = yCoord + yMargin;
 
-		if (xFinal + listView.offsetWidth > screen.availWidth) xFinal = xCoord - listView.offsetWidth;
-		if (yFinal + listView.offsetHeight > screen.availHeight)
+		if (untrack(() => xFinal + listView!.offsetWidth) > screen.availWidth)
+			xFinal = xCoord - listView.offsetWidth;
+		if (untrack(() => yFinal + listView!.offsetHeight) > screen.availHeight)
 			yFinal = yCoord - listView.offsetHeight;
+	});
 
-		console.log(xFinal, yFinal);
+	$effect(() => {
+		if (!open) window.removeEventListener('click', onClickOuside);
+		else window.addEventListener('click', onClickOuside);
 	});
 </script>
 
@@ -40,7 +61,7 @@
 	bind:this={listView}
 	class={cn(
 		'bg-background absolute z-20 max-h-100 w-86 overflow-auto border p-2',
-		!open && 'hidden',
+		open ? 'block' : 'hidden',
 	)}
 	style="top: {yFinal}px; left: {xFinal}px;"
 	use:twemoji>
