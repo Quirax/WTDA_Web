@@ -8,6 +8,8 @@
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
 	import { ArticleCategory, ArticleType } from '@app';
+	import EmojiList from '$stories/components/EmojiList.svelte';
+	import type { EventHandler, MouseEventHandler } from 'svelte/elements';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -202,6 +204,26 @@
 
 		container.scroll({ top: element.offsetTop });
 	};
+
+	let openEmojiList = $state(false);
+	let emojiListProps = $state({
+		x: 0,
+		y: 0,
+		xMargin: 0,
+		yMargin: 0,
+	});
+
+	const onOpenEmojiList: MouseEventHandler<HTMLElement> = (event) => {
+		console.log(event.currentTarget.offsetLeft, event.currentTarget.offsetTop);
+
+		emojiListProps = {
+			x: event.currentTarget.offsetLeft,
+			y: event.currentTarget.offsetTop,
+			xMargin: event.currentTarget.offsetWidth,
+			yMargin: event.currentTarget.offsetHeight,
+		};
+		openEmojiList = true;
+	};
 </script>
 
 <Header title="뫄뫄 님과의 대화" />
@@ -228,7 +250,7 @@
 			<Paperclip />
 		</Button>
 		<Input name="chat" placeholder="메시지를 입력하세요..." />
-		<Button size="icon" variant="secondary">
+		<Button size="icon" variant="secondary" onclick={onOpenEmojiList}>
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />
 		</Button>
@@ -238,3 +260,5 @@
 		</Button>
 	</section>
 </Section>
+
+<EmojiList bind:open={openEmojiList} {...emojiListProps} />
