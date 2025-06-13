@@ -13,9 +13,17 @@
 		xMargin?: number;
 		yMargin?: number;
 		open?: boolean;
+		onEmoji?: (emoji: string) => void;
 	}
 
-	let { x: xCoord, y: yCoord, xMargin = 0, yMargin = 0, open = $bindable(false) }: Props = $props();
+	let {
+		x: xCoord,
+		y: yCoord,
+		xMargin = 0,
+		yMargin = 0,
+		open = $bindable(false),
+		onEmoji = () => {},
+	}: Props = $props();
 
 	let listView = $state<HTMLElement>();
 	let xFinal = $state(0),
@@ -72,7 +80,11 @@
 				<Accordion.Content class="grid grid-cols-6 gap-2">
 					{#each category.list as emoji}
 						<Tooltip text={emoji.name}>
-							<Button size="icon" variant="ghost" class="text-2xl">
+							<Button
+								size="icon"
+								variant="ghost"
+								class="text-2xl"
+								onclick={() => onEmoji(emoji.emoji)}>
 								{emoji.emoji}
 							</Button>
 						</Tooltip>

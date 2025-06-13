@@ -224,6 +224,14 @@
 		};
 		openEmojiList = true;
 	};
+
+	let dmDraft = $state<App.GeneralDM>({
+		message: '',
+	});
+
+	const onEmoji = (emoji: string) => {
+		dmDraft.message += emoji;
+	};
 </script>
 
 <Header title="뫄뫄 님과의 대화" />
@@ -249,7 +257,7 @@
 			<!-- 파일 첨부 -->
 			<Paperclip />
 		</Button>
-		<Input name="chat" placeholder="메시지를 입력하세요..." />
+		<Input name="chat" placeholder="메시지를 입력하세요..." bind:value={dmDraft.message} />
 		<Button size="icon" variant="secondary" onclick={onOpenEmojiList}>
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />
@@ -261,4 +269,4 @@
 	</section>
 </Section>
 
-<EmojiList bind:open={openEmojiList} {...emojiListProps} />
+<EmojiList bind:open={openEmojiList} {onEmoji} {...emojiListProps} />

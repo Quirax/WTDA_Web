@@ -70,21 +70,24 @@ declare global {
 		}
 
 		// DM
+		type GeneralDM = {
+			message?: string;
+			attachments?: string[];
+			relatedPost?: {
+				type: ArticleType;
+				article: Articles;
+			};
+			relatedMessage?: DM;
+		};
+
 		type DM = {
 			id: string;
 			sender: User; // TODO: NonNullable<User>
 			sentAt: Date;
 		} & (
-			| {
+			| ({
 					type: 'general';
-					message?: string;
-					attachments?: string[];
-					relatedPost?: {
-						type: ArticleType;
-						article: Articles;
-					};
-					relatedMessage?: DM;
-			  }
+			  } & GeneralDM)
 			| {
 					type: 'join' | 'leave';
 			  }
