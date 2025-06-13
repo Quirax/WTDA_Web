@@ -9,7 +9,7 @@
 	import { userStore } from '$lib/context';
 	import { ArticleCategory, ArticleType } from '@app';
 	import EmojiList from '$stories/components/EmojiList.svelte';
-	import type { EventHandler, MouseEventHandler } from 'svelte/elements';
+	import type { MouseEventHandler } from 'svelte/elements';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -205,7 +205,7 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
-	let openEmojiList = $state(false);
+	let openEmojiList = $state(true);
 	let emojiListProps = $state({
 		x: 0,
 		y: 0,
@@ -214,8 +214,6 @@
 	});
 
 	const onOpenEmojiList: MouseEventHandler<HTMLElement> = (event) => {
-		console.log(event.currentTarget.offsetLeft, event.currentTarget.offsetTop);
-
 		emojiListProps = {
 			x: event.currentTarget.offsetLeft,
 			y: event.currentTarget.offsetTop,

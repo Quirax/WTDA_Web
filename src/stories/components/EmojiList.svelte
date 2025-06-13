@@ -1,4 +1,6 @@
 <script lang="ts">
+	import emojiList from '$lib/assets/emoji.json';
+
 	interface Props {
 		x: number;
 		y: number;
@@ -16,6 +18,13 @@
 	<div
 		class="bg-background absolute z-20 border p-2"
 		style="top: {yCoord + yMargin}px; left: {xCoord + xMargin}px;">
-		짜잔
+		{#each emojiList as category}
+			<dl>
+				<dt>{category.name}</dt>
+				{#each category.list as emoji}
+					<dd>{emoji.emoji} = {emoji.name}</dd>
+				{/each}
+			</dl>
+		{/each}
 	</div>
 {/if}
