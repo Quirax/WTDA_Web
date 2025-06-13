@@ -1,5 +1,6 @@
 <script lang="ts">
 	import emojiList from '$lib/assets/emoji.json';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import * as Accordion from '$lib/components/ui/accordion';
 	import { Button } from '$lib/components/ui/button';
 	import { cn, twemoji } from '$lib/utils';
@@ -49,9 +50,11 @@
 				<Accordion.Trigger>{category.name}</Accordion.Trigger>
 				<Accordion.Content class="grid grid-cols-6 gap-2">
 					{#each category.list as emoji}
-						<Button size="icon" variant="ghost" class="text-2xl" title={emoji.name}>
-							{emoji.emoji}
-						</Button>
+						<Tooltip text={emoji.name}>
+							<Button size="icon" variant="ghost" class="text-2xl">
+								{emoji.emoji}
+							</Button>
+						</Tooltip>
 					{/each}
 				</Accordion.Content>
 			</Accordion.Item>
