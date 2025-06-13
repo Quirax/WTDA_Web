@@ -5,7 +5,6 @@ import type { Link } from '$lib/config';
 import type { CommissionRequest, Portfolio as PortfolioSchema } from '$lib/server/db/schema';
 import type { Union } from '$lib/utils';
 import type { Emoji } from 'emoji-type';
-import 'photoswipe/style.css';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N

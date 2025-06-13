@@ -24,6 +24,7 @@ import {
 	UserStatus,
 } from '../../../app';
 import { sql, type BuildExtraConfigColumns } from 'drizzle-orm';
+import type { Emoji } from 'emoji-type';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
@@ -199,6 +200,27 @@ export const dmReceived = pgTable(
 			foreignColumns: [dmContent.channelId, dmContent.messageId],
 			name: 'dm_received_foreign_key',
 		}).onDelete('cascade'),
+		primaryKey({ columns: [table.channelId, table.messageId, table.receiver] }),
+	],
+);
+
+export const dmReactions = pgTable(
+	'dm_reactions',
+	{
+		channelId: text('channel_id').notNull(),
+		messageId: text('message_id').notNull(),
+		setter: text('setter')
+			.notNull()
+			.references(() => user.id),
+		emoji: text('setter').$type<Emoji>().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.channelId, table.messageId],
+			foreignColumns: [dmContent.channelId, dmContent.messageId],
+			name: 'dm_reactions_foreign_key',
+		}).onDelete('cascade'),
+		primaryKey({ columns: [table.channelId, table.messageId, table.setter] }),
 	],
 );
 
