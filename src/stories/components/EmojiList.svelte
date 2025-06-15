@@ -6,6 +6,7 @@
 	import emojiList from '$lib/assets/emoji.json';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import * as Accordion from '$lib/components/ui/accordion';
+	import { Accordion as AccordionPrimitive } from 'bits-ui';
 	import { Button } from '$lib/components/ui/button';
 	import { cn, twemoji } from '$lib/utils';
 	import type { Emoji } from 'emoji-type';
@@ -78,49 +79,54 @@
 	});
 </script>
 
-<div
-	bind:this={listView}
-	class={cn(
-		'bg-background absolute z-20 max-h-100 w-86 overflow-auto border p-2',
-		open ? 'block' : 'hidden',
-	)}
-	style="top: {yFinal}px; left: {xFinal}px;"
-	use:twemoji>
-	{#if value}
-		<Tooltip text="선택을 취소하고 닫기">
-			<Button
-				size="icon"
-				variant="ghost"
-				class="text-2xl"
-				onclick={() => {
-					onEmoji(undefined);
-					onClose();
-				}}>
-				<Trash />
-			</Button>
-		</Tooltip>
-	{/if}
-	<Accordion.Root type="single" value={emojiList[0].name}>
-		{#each emojiList as category}
-			<Accordion.Item value={category.name}>
-				<Accordion.Trigger>{category.name}</Accordion.Trigger>
-				<Accordion.Content class="grid grid-cols-6 gap-2">
-					{#each category.list as emoji}
-						<Tooltip text={emoji.name}>
-							<Button
-								size="icon"
-								variant={emoji.emoji === value ? 'default' : 'ghost'}
-								class="text-2xl"
-								onclick={() => {
-									onEmoji(emoji.emoji as Emoji);
-									autoClose && onClose();
-								}}>
-								{emoji.emoji}
-							</Button>
-						</Tooltip>
-					{/each}
-				</Accordion.Content>
-			</Accordion.Item>
-		{/each}
-	</Accordion.Root>
-</div>
+{#if open}
+	<div
+		bind:this={listView}
+		class={cn('bg-background absolute z-20 max-h-100 w-86 overflow-auto border p-2')}
+		style="top: {yFinal}px; left: {xFinal}px;">
+		{#if value}
+			<Tooltip text="선택을 취소하고 닫기">
+				<Button
+					size="icon"
+					variant="ghost"
+					class="text-2xl"
+					onclick={() => {
+						onEmoji(undefined);
+						onClose();
+					}}>
+					<Trash />
+				</Button>
+			</Tooltip>
+		{/if}
+		<Accordion.Root type="single" value={emojiList[0].name}>
+			{#each emojiList as category}
+				<Accordion.Item value={category.name}>
+					<Accordion.Trigger>{category.name}</Accordion.Trigger>
+					<!-- ref: https://bits-ui.com/docs/components/accordion#svelte-transitions -->
+					<AccordionPrimitive.Content class="grid grid-cols-6 gap-2" forceMount={true}>
+						{#snippet child({ props, open })}
+							{#if open}
+								<div {...props} use:twemoji>
+									{#each category.list as emoji}
+										<Tooltip text={emoji.name}>
+											<Button
+												size="icon"
+												variant={emoji.emoji === value ? 'default' : 'ghost'}
+												class="text-2xl"
+												onclick={() => {
+													onEmoji(emoji.emoji as Emoji);
+													autoClose && onClose();
+												}}>
+												{emoji.emoji}
+											</Button>
+										</Tooltip>
+									{/each}
+								</div>
+							{/if}
+						{/snippet}
+					</AccordionPrimitive.Content>
+				</Accordion.Item>
+			{/each}
+		</Accordion.Root>
+	</div>
+{/if}
