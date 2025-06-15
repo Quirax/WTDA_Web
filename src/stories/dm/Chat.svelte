@@ -265,26 +265,8 @@
 		openEmojiList = true;
 	};
 
-	let dmDraft = $state<App.GeneralDM>({});
-
-	$effect(() => {
-		if (!user) return;
-
-		dmDraft = {
-			message: '',
-			attachments: [
-				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-			],
-		};
+	let dmDraft = $state<App.GeneralDM>({
+		message: '',
 	});
 
 	const onEmoji: EmojiEventHandler = (emoji) => {
