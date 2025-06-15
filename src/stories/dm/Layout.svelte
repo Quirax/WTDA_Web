@@ -14,11 +14,11 @@
 	userStore.subscribe((v) => (user = v));
 </script>
 
-<div class={cn('w-ful flex max-sm:flex-col', (!id && 'sm:h-[90vh]') || 'h-[90vh]')}>
+<div class={cn('w-ful flex max-md:flex-col', (!id && 'md:h-[90vh]') || 'h-[90vh]')}>
 	<nav
 		class={cn(
-			'bg-background mt-16 w-70 flex-none overflow-y-auto max-sm:w-full',
-			!!id && 'max-sm:hidden',
+			'bg-background mt-16 w-70 flex-none overflow-y-auto max-md:w-full',
+			!!id && 'max-md:hidden',
 		)}>
 		{#each Array(20) as a, i}
 			<a

@@ -11,7 +11,7 @@
 
 <Header title="메시지 대화 목록" />
 
-<Section class="flex size-full flex-col items-center justify-center max-sm:hidden">
+<Section class="flex size-full flex-col items-center justify-center max-md:hidden">
 	<div class="size-44 rounded-full border-2 border-white p-7">
 		<MessageSquare class="size-30" />
 	</div>

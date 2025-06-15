@@ -272,25 +272,6 @@
 
 		dmDraft = {
 			message: '',
-			// relatedMessage: {
-			// 	id: '5678',
-			// 	type: 'general',
-			// 	sender: null,
-			// 	sentAt: new Date(1200000),
-			// 	// message: '이미지 테스트',
-			// 	attachments: [
-			// 		'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-			// 		'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-			// 	],
-			// },
 			// attachments: [
 			// 	'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
 			// 	'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
@@ -373,7 +354,9 @@
 			class="bg-background flex w-full items-center justify-center space-x-2 border border-t-0 p-2">
 			<MediaListCarousel
 				media={dmDraft.attachments.map((v, idx) => ({ src: v, alt: `첨부 이미지 ${idx + 1}` }))}
-				opts={{ loop: false }}>
+				opts={{ loop: false }}
+				listClass="w-44 sm:w-88 md:w-132 lg:w-176 xl:w-220"
+				itemClass="h-40 sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
 				{#snippet child(medium)}
 					<Card.Root class="size-full">
 						<img class="size-full" src={medium.src} alt={medium.alt} />
