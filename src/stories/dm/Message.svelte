@@ -157,7 +157,7 @@
 								class="bg-secondary relative flex cursor-pointer border p-2 text-left"
 								{href}
 								target="_blank">
-								<div class="mr-2 aspect-video h-16">
+								<div class="mr-2 aspect-video h-16 max-sm:hidden">
 									{#if dm.relatedPost.article.thumbnail}
 										<img
 											src={dm.relatedPost.article.thumbnail}
@@ -209,7 +209,7 @@
 					</section>
 				{:else}
 					<section
-						class={cn('text-left', dir === Direction.SEND ? 'mr-3' : 'ml-2')}
+						class={cn(dir === Direction.SEND ? 'mr-3 text-right' : 'ml-2 text-left')}
 						use:twemoji={{ className: 'emoji large' }}>
 						{dm.message}
 					</section>
@@ -234,7 +234,7 @@
 								src={img.src}
 								alt={img.alt}
 								onload={onLoadMedia(idx)}
-								class="size-30 object-cover" />
+								class="size-30 object-cover max-sm:size-20" />
 						</a>
 					{/each}
 				</div>
@@ -245,7 +245,7 @@
 			{/if}
 			<aside
 				class={cn(
-					'bg-background absolute -bottom-10 z-1 border p-2',
+					'bg-background absolute -bottom-10 z-2 border p-2',
 					!(isFocused || isMouseHover) && 'hidden',
 					dir === Direction.SEND ? '-left-2' : '-right-2',
 				)}>

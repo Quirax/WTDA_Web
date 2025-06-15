@@ -253,6 +253,8 @@
 
 		const clientRects = event.currentTarget.getClientRects()[0];
 
+		console.log(clientRects);
+
 		emojiListProps = {
 			x: clientRects.x,
 			y: clientRects.y,
@@ -272,18 +274,37 @@
 
 		dmDraft = {
 			message: '',
-			attachments: [
-				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-			],
+			// relatedMessage: {
+			// 	id: '5678',
+			// 	type: 'general',
+			// 	sender: null,
+			// 	sentAt: new Date(1200000),
+			// 	// message: '이미지 테스트',
+			// 	attachments: [
+			// 		'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
+			// 		'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
+			// 	],
+			// },
+			// attachments: [
+			// 	'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
+			// 	'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
+			// ],
 		};
 	});
 
