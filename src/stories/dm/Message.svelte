@@ -116,8 +116,9 @@
 	{#if dm.type === 'general'}
 		{@const sentAtString = formatDatetimeString(dm.sentAt)}
 		<div class={cn('relative flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
-			{#if dm.message}
-				{#if dm.message.replace(emojiRegex(), '') !== ''}
+			{#if dm.message || !!dm.relatedPost}
+				{@const message = dm.message || ''}
+				{#if message.replace(emojiRegex(), '') !== '' || !!dm.relatedPost}
 					<section
 						class={cn(
 							'relative size-fit p-4 text-left',
@@ -153,7 +154,7 @@
 								? `/${getLinkPrefix(dm.relatedPost.type)}/${dm.relatedPost.article.id}`
 								: ''}
 							<a
-								class="bg-secondary relative mb-2 flex cursor-pointer border p-2 text-left"
+								class="bg-secondary relative flex cursor-pointer border p-2 text-left"
 								{href}
 								target="_blank">
 								<div class="mr-2 aspect-video h-16">
@@ -180,7 +181,7 @@
 								</div>
 							</a>
 						{/if}
-						{@html sanitizeHTML(dm.message.replace(/\n/g, '<br>'))}
+						{@html sanitizeHTML(message.replace(/\n/g, '<br>'))}
 						{#if dm.reactions}
 							{@const reactions = Object.entries(dm.reactions)}
 							{#if reactions.length > 0}

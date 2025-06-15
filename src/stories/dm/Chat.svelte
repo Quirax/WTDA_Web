@@ -32,7 +32,6 @@
 			type: 'general',
 			sender: user,
 			sentAt: new Date(1100000),
-			message: '텍스트 메시지 테스트',
 			relatedPost: {
 				type: ArticleType.REQUEST,
 				article: {
@@ -262,8 +261,45 @@
 		openEmojiList = true;
 	};
 
-	let dmDraft = $state<App.GeneralDM>({
-		message: '',
+	let dmDraft = $state<App.GeneralDM>({});
+
+	$effect(() => {
+		if (!user) return;
+
+		dmDraft = {
+			message: '',
+			relatedMessage: {
+				id: '5678',
+				type: 'general',
+				sender: user!,
+				sentAt: new Date(1200000),
+				message: '이미지 테스트',
+				attachments: [
+					'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
+					'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
+					'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
+					'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
+				],
+			},
+			attachments: [
+				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
+				'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
+				'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
+				'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
+			],
+		};
 	});
 
 	const onEmoji: EmojiEventHandler = (emoji) => {
