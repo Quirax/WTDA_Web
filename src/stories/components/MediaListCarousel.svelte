@@ -11,9 +11,18 @@
 		listClass?: ClassValue;
 		itemClass?: ClassValue;
 		child?: Snippet<[{ src: string; alt?: string }, number]>;
+		onClickItem?: (event: MouseEvent, idx: number) => void;
 	}
 
-	const { media, onclick, class: classList, listClass, itemClass, opts, child }: Props = $props();
+	const {
+		media,
+		onClickItem,
+		class: classList,
+		listClass,
+		itemClass,
+		opts,
+		child,
+	}: Props = $props();
 </script>
 
 <Carousel.Root class={cn('align-center', classList)} opts={{ loop: true, align: 'start', ...opts }}>
@@ -24,7 +33,7 @@
 					'relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5',
 					itemClass,
 				)}
-				{onclick}>
+				onclick={(event) => onClickItem && onClickItem(event, idx)}>
 				<div class="size-full p-1">
 					{#if child}
 						{@render child(medium, idx)}

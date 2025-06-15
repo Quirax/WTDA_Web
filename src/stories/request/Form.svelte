@@ -25,6 +25,7 @@
 	import { AdultContents } from '@app';
 	import { userStore } from '$lib/context';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
 
 	const df = new DateFormatter('ko-KR', {
 		dateStyle: 'long',
@@ -57,6 +58,7 @@
 
 	$effect(() => {
 		if (!$formData.thumbnail) return;
+		if (thumbnails.length === 0) return;
 		if (!thumbnails.includes($formData.thumbnail)) $formData.thumbnail = null;
 	});
 
@@ -263,28 +265,19 @@
 
 					{#if thumbnails.length > 0}
 						<div class="flex w-full justify-center">
-							<Carousel.Root class="align-center" opts={{ loop: true, align: 'start' }}>
-								<Carousel.Content class="w-44 md:w-88 lg:w-132 xl:w-176 2xl:w-220">
-									{#each thumbnails as thumbnail}
-										<Carousel.Item
-											class="relative aspect-square h-40 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
-											<div class="size-full p-1">
-												<Card.Root class="size-full">
-													<img class="size-full" src={thumbnail} alt="" />
-													<Checkbox
-														class="absolute top-2 right-2 bg-white"
-														bind:checked={
-															() => $formData.thumbnail === thumbnail,
-															(v) => ($formData.thumbnail = v ? thumbnail : null)
-														} />
-												</Card.Root>
-											</div>
-										</Carousel.Item>
-									{/each}
-								</Carousel.Content>
-								<Carousel.Previous />
-								<Carousel.Next />
-							</Carousel.Root>
+							<MediaListCarousel media={thumbnails.map((v) => ({ src: v, alt: '' }))}>
+								{#snippet child(medium)}
+									<Card.Root class="size-full">
+										<img class="size-full" src={medium.src} alt="" />
+										<Checkbox
+											class="absolute top-2 right-2 bg-white"
+											bind:checked={
+												() => $formData.thumbnail === medium.src,
+												(v) => ($formData.thumbnail = v ? medium.src : null)
+											} />
+									</Card.Root>
+								{/snippet}
+							</MediaListCarousel>
 						</div>
 					{/if}
 				{/snippet}
