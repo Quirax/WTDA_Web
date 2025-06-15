@@ -253,11 +253,9 @@
 
 		const clientRects = event.currentTarget.getClientRects()[0];
 
-		console.log(clientRects);
-
 		emojiListProps = {
-			x: clientRects.x,
-			y: clientRects.y,
+			x: clientRects.x + window.scrollX,
+			y: clientRects.y + window.scrollY,
 			xMargin: clientRects.width,
 			yMargin: clientRects.height,
 			onEmoji,

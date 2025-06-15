@@ -67,6 +67,9 @@
 			xFinal = xCoord - listView.offsetWidth;
 		if (untrack(() => yFinal + listView!.offsetHeight) > screen.availHeight)
 			yFinal = yCoord - listView.offsetHeight;
+
+		if (untrack(() => xFinal) < 0) xFinal = 0;
+		if (untrack(() => yFinal) < 0) yFinal = 0;
 	});
 
 	$effect(() => {
