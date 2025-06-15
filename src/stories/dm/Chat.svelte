@@ -14,6 +14,8 @@
 	import { formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
 	import Muted from '$lib/components/typo/muted.svelte';
 	import UserAvatar from '$stories/components/Avatar.svelte';
+	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
+	import * as Card from '$lib/components/ui/card';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -270,25 +272,6 @@
 
 		dmDraft = {
 			message: '',
-			relatedMessage: {
-				id: '5678',
-				type: 'general',
-				sender: user!,
-				sentAt: new Date(1200000),
-				message: '이미지 테스트',
-				attachments: [
-					'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-					'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-					'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-				],
-			},
 			attachments: [
 				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
 				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
@@ -364,6 +347,25 @@
 					<X />
 				</Button>
 			</a>
+		</section>
+	{/if}
+	{#if dmDraft.attachments && dmDraft.attachments.length > 0}
+		<section
+			class="bg-background flex w-full items-center justify-center space-x-2 border border-t-0 p-2">
+			<MediaListCarousel
+				media={dmDraft.attachments.map((v, idx) => ({ src: v, alt: `첨부 이미지 ${idx + 1}` }))}
+				opts={{ loop: false }}>
+				{#snippet child(medium)}
+					<Card.Root class="size-full">
+						<img class="size-full" src={medium.src} alt={medium.alt} />
+						<X
+							class="bg-destructive text-destructive-foreground absolute top-2 right-2 size-5"
+							onclick={() => {
+								dmDraft.attachments = dmDraft.attachments!.filter((v) => v !== medium.src);
+							}} />
+					</Card.Root>
+				{/snippet}
+			</MediaListCarousel>
 		</section>
 	{/if}
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
