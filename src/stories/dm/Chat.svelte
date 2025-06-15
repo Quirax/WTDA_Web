@@ -4,14 +4,16 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
-	import { Paperclip, SendHorizontal, SmilePlus } from 'lucide-svelte';
+	import { Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
 	import { ArticleCategory, ArticleType } from '@app';
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
-	import type { MouseEventHandler } from 'svelte/elements';
 	import { onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
+	import { formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
+	import Muted from '$lib/components/typo/muted.svelte';
+	import UserAvatar from '$stories/components/Avatar.svelte';
 
 	interface Props extends ReturnType<typeof $props> {}
 
@@ -326,6 +328,44 @@
 				tabindex={i + 1} />
 		{/each}
 	</section>
+	{#if dmDraft.relatedMessage}
+		<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
+			<a
+				class="bg-secondary relative block w-full cursor-pointer space-y-2 border p-2 text-left"
+				href="#dm-{dmDraft.relatedMessage.id}"
+				onclick={(event) => {
+					event.preventDefault(); // 화면 전체 스크롤을 차단
+					scrollToDM(dmDraft.relatedMessage!.id);
+				}}
+				use:twemoji>
+				<div class="flex items-center space-x-2 bg-inherit">
+					<UserAvatar class="size-[2em] flex-none" user={dmDraft.relatedMessage.sender} />
+					<strong>{dmDraft.relatedMessage.sender?.username}</strong>
+					<Muted class="">{formatDatetimeString(dmDraft.relatedMessage.sentAt)}</Muted>
+				</div>
+				<div class="bg-inherit">
+					{@html sanitizeHTML(
+						(
+							(dmDraft.relatedMessage.type === 'general' && dmDraft.relatedMessage.message) ||
+							'<i>내용 없음</i>'
+						).replace(/\n/g, '<br>'),
+					)}
+				</div>
+
+				<Button
+					size="icon"
+					variant="outline"
+					class="absolute top-2 right-2 cursor-pointer"
+					onclick={(event) => {
+						event.preventDefault();
+						event.stopPropagation();
+						delete dmDraft.relatedMessage;
+					}}>
+					<X />
+				</Button>
+			</a>
+		</section>
+	{/if}
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
 		<Button size="icon" variant="secondary">
 			<!-- 파일 첨부 -->
