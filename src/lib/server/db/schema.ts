@@ -13,21 +13,25 @@ import {
 	type PgColumnBuilderBase,
 	type PgTableExtraConfigValue,
 	primaryKey,
+	foreignKey,
 } from 'drizzle-orm/pg-core';
 import {
 	AdultContents,
 	ArticleCategory,
+	DMChannelType,
 	EmailConfirmFor,
 	UserRelationship,
 	UserStatus,
 } from '../../../app';
-import { sql, type BuildColumns, type BuildExtraConfigColumns } from 'drizzle-orm';
+import { sql, type BuildExtraConfigColumns } from 'drizzle-orm';
+import type { Emoji } from 'emoji-type';
 
 export const statusEnum = pgEnum('status', enumToPgEnum(UserStatus));
 export const emailConfirmFor = pgEnum('email_confirm_for', enumToPgEnum(EmailConfirmFor));
 export const articleCategory = pgEnum('article_category', enumToPgEnum(ArticleCategory));
 export const adultContents = pgEnum('adult_contents', enumToPgEnum(AdultContents));
 export const relationshipEnum = pgEnum('user_relationship_enum', enumToPgEnum(UserRelationship));
+export const dmChannelType = pgEnum('dm_channel_type', enumToPgEnum(DMChannelType));
 
 export const user = pgTable(
 	'user',
@@ -148,6 +152,78 @@ export const portfolio = articleTable('portfolio', {
 	publishDate: timestamp('publishDate', { withTimezone: true, mode: 'date' }), // null: 공개일 미상
 });
 
+export const dmChannel = pgTable('dm_channel', {
+	id: text('id').primaryKey(),
+	type: dmChannelType('type').notNull().default(DMChannelType.GENERAL),
+	relatedArticle: text('related_article'),
+	createdDate: timestamp('created_date', { withTimezone: true, mode: 'date' }).defaultNow(),
+	closedDate: timestamp('closed_date', { withTimezone: true, mode: 'date' }),
+});
+
+export const dmParticipant = pgTable('dm_participant', {
+	channelId: text('channel_id')
+		.notNull()
+		.references(() => dmChannel.id, { onDelete: 'cascade' }),
+	participantId: text('participant_id')
+		.notNull()
+		.references(() => user.id, { onDelete: 'cascade' }),
+});
+
+export const dmContent = pgTable(
+	'dm_content',
+	{
+		channelId: text('channel_id')
+			.notNull()
+			.references(() => dmChannel.id, { onDelete: 'cascade' }),
+		messageId: text('message_id').notNull(),
+		sender: text('sender')
+			.notNull()
+			.references(() => user.id),
+		content: json('content').notNull().default({}),
+		sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+	},
+	(table) => [primaryKey({ columns: [table.channelId, table.messageId] })],
+);
+
+export const dmReceived = pgTable(
+	'dm_received',
+	{
+		channelId: text('channel_id').notNull(),
+		messageId: text('message_id').notNull(),
+		receiver: text('receiver')
+			.notNull()
+			.references(() => user.id),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.channelId, table.messageId],
+			foreignColumns: [dmContent.channelId, dmContent.messageId],
+			name: 'dm_received_foreign_key',
+		}).onDelete('cascade'),
+		primaryKey({ columns: [table.channelId, table.messageId, table.receiver] }),
+	],
+);
+
+export const dmReactions = pgTable(
+	'dm_reactions',
+	{
+		channelId: text('channel_id').notNull(),
+		messageId: text('message_id').notNull(),
+		setter: text('setter')
+			.notNull()
+			.references(() => user.id),
+		emoji: text('setter').$type<Emoji>().notNull(),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.channelId, table.messageId],
+			foreignColumns: [dmContent.channelId, dmContent.messageId],
+			name: 'dm_reactions_foreign_key',
+		}).onDelete('cascade'),
+		primaryKey({ columns: [table.channelId, table.messageId, table.setter] }),
+	],
+);
+
 export const files = pgTable('files', {
 	path: text('path').primaryKey(),
 	owner: text('owner')
@@ -174,6 +250,25 @@ export const filesPerRequest = filesPerArticle('files_per_request', commissionRe
 
 export const filesPerPortfolio = filesPerArticle('files_per_portfolio', portfolio);
 
+export const filesPerDM = pgTable(
+	'files_per_dm',
+	{
+		channelId: text('channel_id').notNull(),
+		messageId: text('message_id').notNull(),
+		path: text('path')
+			.notNull()
+			.references(() => files.path, { onDelete: 'cascade' }),
+	},
+	(table) => [
+		foreignKey({
+			columns: [table.channelId, table.messageId],
+			foreignColumns: [dmContent.channelId, dmContent.messageId],
+			name: 'dm_received_foreign_key',
+		}).onDelete('cascade'),
+		unique().on(table.channelId, table.messageId, table.path),
+	],
+);
+
 export const filesPerProfile = pgTable(
 	'files_per_profile',
 	{
@@ -194,5 +289,11 @@ export type ProfileAnnouncements = typeof profileAnnouncements.$inferSelect;
 export type Article = ReturnType<typeof articleTable>['$inferSelect'];
 export type CommissionRequest = typeof commissionRequest.$inferSelect;
 export type Portfolio = typeof portfolio.$inferSelect;
-export type Files = typeof files.$inferInsert;
+export type Files = typeof files.$inferSelect;
 export type FilesPerArticle = ReturnType<typeof filesPerArticle>['$inferSelect'];
+export type filesPerProfile = typeof filesPerProfile.$inferSelect;
+export type DMChannel = typeof dmChannel.$inferSelect;
+export type DMParticipant = typeof dmParticipant.$inferSelect;
+export type DMContent = typeof dmContent.$inferSelect;
+export type DMReceived = typeof dmReceived.$inferSelect;
+export type FilesPerDM = typeof filesPerDM.$inferSelect;

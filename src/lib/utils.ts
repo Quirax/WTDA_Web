@@ -1,10 +1,12 @@
 import { type ClassValue, clsx } from 'clsx';
 import { MediaQuery } from 'svelte/reactivity';
 import { twMerge } from 'tailwind-merge';
-
 import DOMPurify from 'isomorphic-dompurify';
 import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'drizzle-orm';
-import { UserStatus } from '../app';
+import { ArticleType, UserStatus } from '../app';
+import { twemoji as originalTwemoji } from 'twemoji-svelte-action';
+
+export type { WithoutChild } from 'bits-ui';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -81,6 +83,12 @@ export function isDesktop() {
 }
 export const sanitizeHTML = DOMPurify?.sanitize || (() => {});
 
+export const twemoji = (node: HTMLElement, options?: any) =>
+	originalTwemoji(node, {
+		base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/', // ref: https://github.com/twitter/twemoji/issues/580
+		...options,
+	});
+
 export type Union<T extends readonly string[]> = T[number];
 
 export const isAdult = (user: App.User) => {
@@ -123,3 +131,12 @@ export const blobToFile = (blob: Blob, filename: string = 'undefined.ext') =>
 	new File([blob], filename, { type: blob.type });
 
 export const dataURLToFile = async (dataurl: string) => blobToFile(await dataURLtoBlob(dataurl));
+
+export const getLinkPrefix = (type: ArticleType) => {
+	switch (type) {
+		case ArticleType.REQUEST:
+			return 'r';
+		case ArticleType.PORTFOLIO:
+			return 'pf';
+	}
+};

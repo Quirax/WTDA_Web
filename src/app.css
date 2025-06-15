@@ -228,10 +228,28 @@
 .banner-pattern::before {
 	position: absolute;
 	left: 0;
+	top: 0;
 	content: '';
 	width: 100%;
 	height: 100%;
 	background-color: var(--pattern-color, #89531f);
 	mask-image: url('/background-pattern-banner.svg');
 	mask-repeat: repeat;
+}
+
+/* ref: https://github.com/twitter/twemoji?tab=readme-ov-file#inline-styles */
+img.emoji {
+	height: 1em;
+	width: 1em;
+	margin: 0 0.05em 0 0.1em;
+	vertical-align: -0.1em;
+	display: inline;
+}
+
+img.emoji.large {
+	height: 4em;
+	width: 4em;
+	margin: 0 0.05em 0 0.1em;
+	vertical-align: -0.1em;
+	display: inline;
 }

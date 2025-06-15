@@ -4,6 +4,7 @@
 import type { Link } from '$lib/config';
 import type { CommissionRequest, Portfolio as PortfolioSchema } from '$lib/server/db/schema';
 import type { Union } from '$lib/utils';
+import type { Emoji } from 'emoji-type';
 
 declare global {
 	type NumberEnumerate<N extends number, Acc extends number[] = []> = Acc['length'] extends N
@@ -67,6 +68,32 @@ declare global {
 			user: User;
 			session: Session;
 		}
+
+		// DM
+		type GeneralDM = {
+			message?: string;
+			attachments?: string[];
+			relatedPost?: {
+				type: ArticleType;
+				article: Articles;
+			};
+			relatedMessage?: DM;
+			reactions?: Partial<Record<Emoji, number>>;
+			myReaction?: Emoji;
+		};
+
+		type DM = {
+			id: string;
+			sender: User; // TODO: NonNullable<User>
+			sentAt: Date;
+		} & (
+			| ({
+					type: 'general';
+			  } & GeneralDM)
+			| {
+					type: 'join' | 'leave';
+			  }
+		);
 	}
 }
 
@@ -120,4 +147,10 @@ export enum ErrorCode {
 export enum UserRelationship {
 	BLOCKED = 'BLOCKED',
 	NONE = 'NONE',
+}
+
+export enum DMChannelType {
+	GENERAL = 'GENERAL', // 일반 DM
+	REQUEST = 'REQUEST', // 의뢰 관련 DM
+	COMMISSION = 'COMMISSION', // 커미션 신청 관련 DM
 }

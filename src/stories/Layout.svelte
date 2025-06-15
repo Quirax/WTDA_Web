@@ -2,6 +2,7 @@
 
 <script lang="ts">
 	import { fn } from '@storybook/test';
+	import 'photoswipe/style.css';
 
 	import './Layout.css';
 	import Footer from './components/Footer.svelte';
