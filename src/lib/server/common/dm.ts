@@ -57,12 +57,21 @@ export const getDMChannels = async (
 	toUser?: string,
 	additionalWhere?: (part: Subquery, ch: typeof table.dmChannel) => SQL,
 ) => {
-	let subquery = union(
-		db.select().from(table.dmParticipant).where(eq(table.dmParticipant.participantId, fromUser)),
-		db
-			.select()
-			.from(table.dmParticipant)
-			.where(toUser ? eq(table.dmParticipant.participantId, toUser) : undefined),
+	const fromUserQuery = db
+		.select()
+		.from(table.dmParticipant)
+		.where(eq(table.dmParticipant.participantId, fromUser));
+
+	let subquery = (
+		toUser
+			? union(
+					fromUserQuery,
+					db
+						.select()
+						.from(table.dmParticipant)
+						.where(toUser ? eq(table.dmParticipant.participantId, toUser) : undefined),
+				)
+			: fromUserQuery
 	).as('sq');
 
 	return await db
