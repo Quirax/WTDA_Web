@@ -444,13 +444,18 @@
 					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
 					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
 						relationshipToUser !== UserRelationship.BLOCKED}>
-					<Button
-						class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
-						disabled={relationshipFromUser === UserRelationship.BLOCKED ||
-							relationshipToUser === UserRelationship.BLOCKED}>
-						<MessageSquare />
-						메시지하기
-					</Button>
+					{#snippet child({ props })}
+						<div {...props} class="w-full">
+							<Button
+								class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
+								disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+									relationshipToUser === UserRelationship.BLOCKED ||
+									user.id === me?.id}>
+								<MessageSquare />
+								메시지하기
+							</Button>
+						</div>
+					{/snippet}
 				</Tooltip>
 				<Button size="icon" variant="outline" onclick={onCopyProfileLink}><Share2 /></Button>
 				<DropdownMenu.Root>
