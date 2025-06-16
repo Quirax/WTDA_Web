@@ -12,6 +12,7 @@ import * as auth from '$lib/server/auth.js';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { ArticleType, UserRelationship } from '@app';
 import { allArticles } from '$lib/server/db/shorthands';
+import * as relationship from '$lib/server/common/relationship';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -56,35 +57,13 @@ export const load = (async ({ params, locals }) => {
 		let relationshipToUser = UserRelationship.NONE;
 
 		if (locals.user) {
-			{
-				const result = (
-					await db
-						.select({ relationship: table.userRelationship.relationship })
-						.from(table.userRelationship)
-						.where(
-							and(
-								eq(table.userRelationship.from, locals.user.id),
-								eq(table.userRelationship.to, id),
-							),
-						)
-				).at(0);
+			try {
+				const result = await relationship.getRelationship(locals.user.id, id);
 
-				if (result) relationshipToUser = result.relationship;
-			}
-			{
-				const result = (
-					await db
-						.select({ relationship: table.userRelationship.relationship })
-						.from(table.userRelationship)
-						.where(
-							and(
-								eq(table.userRelationship.to, locals.user.id),
-								eq(table.userRelationship.from, id),
-							),
-						)
-				).at(0);
-
-				if (result) relationshipFromUser = result.relationship;
+				relationshipFromUser = result.fromUser;
+				relationshipToUser = result.toUser;
+			} catch (e) {
+				if (!(e instanceof Error) || e.cause !== 400) throw e;
 			}
 		}
 
@@ -325,25 +304,13 @@ export const actions: Actions = {
 	block: async ({ locals, params }) => {
 		if (!locals.user) return fail(403, { message: 'Not logined' });
 
-		const fromUser = locals.user.id;
-		const toUser = params.id;
-
-		if (fromUser === toUser) return fail(400, { message: 'Cannot block yourself' });
-
 		try {
-			await db
-				.insert(table.userRelationship)
-				.values({
-					from: fromUser,
-					to: toUser,
-					relationship: UserRelationship.BLOCKED,
-				})
-				// ref: https://orm.drizzle.team/docs/guides/upsert
-				.onConflictDoUpdate({
-					target: [table.userRelationship.from, table.userRelationship.to],
-					set: { relationship: UserRelationship.BLOCKED },
-				});
+			await relationship.blockUser(locals.user.id, params.id);
 		} catch (e) {
+			if (e instanceof Error) {
+				if (e.cause === 400) return fail(400, { message: e.message });
+			}
+
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
 		}
@@ -360,12 +327,12 @@ export const actions: Actions = {
 		if (fromUser === toUser) return fail(400, { message: 'Cannot unblock yourself' });
 
 		try {
-			await db
-				.delete(table.userRelationship)
-				.where(
-					and(eq(table.userRelationship.from, fromUser), eq(table.userRelationship.to, toUser)),
-				);
+			await relationship.unblockUser(locals.user.id, params.id);
 		} catch (e) {
+			if (e instanceof Error) {
+				if (e.cause === 400) return fail(400, { message: e.message });
+			}
+
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });
 		}
