@@ -189,3 +189,29 @@ export const beginDMProc = async (
 	// 해당 채널 ID를 반환
 	return channelId;
 };
+
+export const getDMChannelInfo = async (channelId: string) => {
+	const channelInfo = (
+		await db
+			.select({
+				type: table.dmChannel.type,
+				relatedArticle: table.dmChannel.relatedArticle,
+			})
+			.from(table.dmChannel)
+			.where(eq(table.dmChannel.id, channelId))
+	).at(0);
+
+	const participants = await db
+		.select({
+			participant: table.user,
+		})
+		.from(table.dmParticipant)
+		.where(eq(table.dmParticipant.channelId, channelId))
+		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
+
+	return { ...channelInfo, participants: participants.map((v) => v.participant) };
+};
+
+export type DMChannelInfo = Awaited<ReturnType<typeof getDMChannelInfo>>;
+
+export const getDMLists = async (before: Date) => {};

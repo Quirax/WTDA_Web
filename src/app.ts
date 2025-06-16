@@ -94,6 +94,8 @@ declare global {
 					type: 'join' | 'leave';
 			  }
 		);
+
+		type DMChannel = import('$lib/server/common/dm').DMChannelInfo;
 	}
 }
 

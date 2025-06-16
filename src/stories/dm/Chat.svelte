@@ -17,9 +17,11 @@
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
 	import * as Card from '$lib/components/ui/card';
 
-	interface Props extends ReturnType<typeof $props> {}
+	interface Props extends ReturnType<typeof $props> {
+		info?: App.DMChannel;
+	}
 
-	const {}: Props = $props();
+	const { info }: Props = $props();
 
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
@@ -272,12 +274,14 @@
 	const onEmoji: EmojiEventHandler = (emoji) => {
 		dmDraft.message += emoji || '';
 	};
+
+	const title = `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`;
 </script>
 
-<Header title="뫄뫄 님과의 대화" />
+<Header {title} />
 
 <Section class="flex size-full flex-col">
-	<H2 class="flex-none">뫄뫄 님과의 대화</H2>
+	<H2 class="flex-none">{title}</H2>
 	<section
 		bind:this={container}
 		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
