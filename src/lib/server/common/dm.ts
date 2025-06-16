@@ -2,7 +2,7 @@ import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
 import { and, desc, eq, max, SQL, Subquery } from 'drizzle-orm';
 import { getRelationship } from './relationship';
-import { union } from 'drizzle-orm/pg-core';
+import { intersect, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 import { message } from 'sveltekit-superforms';
 
@@ -72,20 +72,28 @@ export const getDMChannels = async (
 		db
 			.select({
 				channelId: table.dmParticipant.channelId,
-				sentAt: latestMessage.sentAt,
-				content: table.dmContent.content,
-				messageId: table.dmContent.messageId,
-				sender: table.user,
 			})
 			.from(table.dmParticipant)
-			.where(eq(table.dmParticipant.participantId, userId))
-			.innerJoin(latestMessage, eq(latestMessage.channelId, table.dmParticipant.channelId))
-			.innerJoin(table.dmContent, eq(table.dmContent.sentAt, latestMessage.sentAt))
-			.innerJoin(table.user, eq(table.dmContent.sender, table.user.id));
+			.where(eq(table.dmParticipant.participantId, userId));
 
-	const fromUserQuery = userQuery(fromUser);
+	const userWithLatestMessage = db
+		.select({
+			channelId: table.dmParticipant.channelId,
+			sentAt: latestMessage.sentAt,
+			content: table.dmContent.content,
+			messageId: table.dmContent.messageId,
+			sender: table.user,
+		})
+		.from(table.dmParticipant)
+		.where(eq(table.dmParticipant.participantId, fromUser))
+		.innerJoin(latestMessage, eq(latestMessage.channelId, table.dmParticipant.channelId))
+		.innerJoin(table.dmContent, eq(table.dmContent.sentAt, latestMessage.sentAt))
+		.innerJoin(table.user, eq(table.dmContent.sender, table.user.id))
+		.as('sq');
 
-	let subquery = (toUser ? union(fromUserQuery, userQuery(toUser)) : fromUserQuery).as('sq');
+	let subquery = toUser
+		? intersect(userQuery(fromUser), userQuery(toUser)).as('sq')
+		: userWithLatestMessage;
 
 	const rows = await db
 		.select({
@@ -96,16 +104,20 @@ export const getDMChannels = async (
 				createdDate: table.dmChannel.createdDate,
 				closedDate: table.dmChannel.closedDate,
 			},
-			latestMessage: {
-				sentAt: subquery.sentAt,
-				content: subquery.content,
-				messageId: subquery.messageId,
-			},
-			latestMessageSender: subquery.sender,
-			participant: {
-				...table.user,
-				id: table.dmParticipant.participantId,
-			},
+			...(!toUser
+				? {
+						latestMessage: {
+							sentAt: userWithLatestMessage.sentAt,
+							content: userWithLatestMessage.content,
+							messageId: userWithLatestMessage.messageId,
+						},
+						latestMessageSender: userWithLatestMessage.sender,
+						participant: {
+							...table.user,
+							id: table.dmParticipant.participantId,
+						},
+					}
+				: {}),
 		})
 		.from(subquery)
 		.where(additionalWhere?.(subquery, table.dmChannel))
@@ -114,7 +126,7 @@ export const getDMChannels = async (
 		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
 
 	const result = rows.reduce<
-		Record<DMChannel['id'], DMChannel & { participants: User[]; latestMessage: App.DM }>
+		Record<DMChannel['id'], DMChannel & { participants: User[]; latestMessage?: App.DM }>
 	>((acc, row) => {
 		const channel = row.channel;
 		const participant = row.participant;
@@ -123,10 +135,10 @@ export const getDMChannels = async (
 			acc[channel.id] = {
 				...channel,
 				participants: [],
-				latestMessage: {
+				latestMessage: row.latestMessage && {
 					id: row.latestMessage.messageId,
 					sentAt: row.latestMessage.sentAt || new Date(),
-					sender: row.latestMessageSender,
+					sender: row.latestMessageSender || null,
 					...row.latestMessage.content,
 				},
 			};
@@ -162,12 +174,7 @@ export const beginDMProc = async (
 	// 이미 채널이 있는 경우 해당 채널의 ID 반환
 	const result = (
 		await getDMChannels(fromUser, toUser, (_, ch) =>
-			type === DMChannelType.GENERAL
-				? eq(ch.type, type)
-				: and(
-						eq(ch.type, type),
-						relatedArticle ? eq(ch.relatedArticle, relatedArticle) : undefined,
-					),
+			and(eq(ch.type, type), relatedArticle ? eq(ch.relatedArticle, relatedArticle) : undefined),
 		)
 	).at(0);
 	if (result) return result.id;

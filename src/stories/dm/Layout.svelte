@@ -7,7 +7,7 @@
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
-		channels: (DMChannel & { participants?: App.User[]; latestMessage: App.DM })[];
+		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
 	}
 
 	const { children, id, channels }: Props = $props();
@@ -38,16 +38,16 @@
 					{/each}
 				</div>
 				<div class="flex flex-col overflow-hidden">
-					<strong>{ch.latestMessage.sender?.username}</strong>
+					<strong>{ch.latestMessage!.sender?.username}</strong>
 					<span
 						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
 						use:twemoji>
-						{#if ch.latestMessage.type === 'general'}
-							{ch.latestMessage.message}
-						{:else if ch.latestMessage.type === 'join'}
-							<i>{ch.latestMessage.sender?.username} 님이 대화방에 들어왔습니다.</i>
-						{:else if ch.latestMessage.type === 'leave'}
-							<i>{ch.latestMessage.sender?.username} 님이 대화방에서 나갔습니다.</i>
+						{#if ch.latestMessage!.type === 'general'}
+							{ch.latestMessage!.message}
+						{:else if ch.latestMessage!.type === 'join'}
+							<i>{ch.latestMessage!.sender?.username} 님이 대화방에 들어왔습니다.</i>
+						{:else if ch.latestMessage!.type === 'leave'}
+							<i>{ch.latestMessage!.sender?.username} 님이 대화방에서 나갔습니다.</i>
 						{/if}
 					</span>
 				</div>
