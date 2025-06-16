@@ -48,7 +48,7 @@
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { UserRelationship } from '@app';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -320,6 +320,22 @@
 			{ value: 580, name: '커미션 3' },
 		],
 	};
+
+	let openErrorOnBeginDM = $state(false);
+
+	const onBeginDM = async () => {
+		const result = await fetch('?/beginDM', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			const channelId = result.data?.channelId;
+
+			if (channelId) goto(`/dm/${channelId}`);
+		} else {
+			openErrorOnBeginDM = true;
+		}
+	};
 </script>
 
 <Header title={user.username} />
@@ -444,13 +460,19 @@
 					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
 					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
 						relationshipToUser !== UserRelationship.BLOCKED}>
-					<Button
-						class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
-						disabled={relationshipFromUser === UserRelationship.BLOCKED ||
-							relationshipToUser === UserRelationship.BLOCKED}>
-						<MessageSquare />
-						메시지하기
-					</Button>
+					{#snippet child({ props })}
+						<div {...props} class="w-full">
+							<Button
+								onclick={onBeginDM}
+								class="w-full flex-1 bg-(--primary-color) hover:bg-(--primary-color)/90"
+								disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+									relationshipToUser === UserRelationship.BLOCKED ||
+									user.id === me?.id}>
+								<MessageSquare />
+								메시지하기
+							</Button>
+						</div>
+					{/snippet}
 				</Tooltip>
 				<Button size="icon" variant="outline" onclick={onCopyProfileLink}><Share2 /></Button>
 				<DropdownMenu.Root>
@@ -905,6 +927,10 @@
 	title="사용자 차단 해제 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnUnblock} />
+<AlertDialog
+	title="사용자와의 메시지 채널 처리 도중 오류가 발생했습니다."
+	description="고객센터에 문의해주시기 바랍니다."
+	bind:open={openErrorOnBeginDM} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

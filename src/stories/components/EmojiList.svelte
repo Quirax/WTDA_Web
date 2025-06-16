@@ -86,16 +86,18 @@
 		style="top: {yFinal}px; left: {xFinal}px;">
 		{#if value}
 			<Tooltip text="선택을 취소하고 닫기">
-				<Button
-					size="icon"
-					variant="ghost"
-					class="text-2xl"
-					onclick={() => {
-						onEmoji(undefined);
-						onClose();
-					}}>
-					<Trash />
-				</Button>
+				{#snippet child({ props })}
+					<Button
+						size="icon"
+						variant="ghost"
+						class="text-2xl"
+						onclick={() => {
+							onEmoji(undefined);
+							onClose();
+						}}>
+						<Trash />
+					</Button>
+				{/snippet}
 			</Tooltip>
 		{/if}
 		<Accordion.Root type="single" value={emojiList[0].name}>
@@ -109,16 +111,19 @@
 								<div {...props} use:twemoji>
 									{#each category.list as emoji}
 										<Tooltip text={emoji.name}>
-											<Button
-												size="icon"
-												variant={emoji.emoji === value ? 'default' : 'ghost'}
-												class="text-2xl"
-												onclick={() => {
-													onEmoji(emoji.emoji as Emoji);
-													autoClose && onClose();
-												}}>
-												{emoji.emoji}
-											</Button>
+											{#snippet child({ props })}
+												<Button
+													{...props}
+													size="icon"
+													variant={emoji.emoji === value ? 'default' : 'ghost'}
+													class="text-2xl"
+													onclick={() => {
+														onEmoji(emoji.emoji as Emoji);
+														autoClose && onClose();
+													}}>
+													{emoji.emoji}
+												</Button>
+											{/snippet}
 										</Tooltip>
 									{/each}
 								</div>
