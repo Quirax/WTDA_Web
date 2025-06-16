@@ -13,6 +13,7 @@ import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { ArticleType, UserRelationship } from '@app';
 import { allArticles } from '$lib/server/db/shorthands';
 import * as relationship from '$lib/server/common/relationship';
+import { beginDMProc } from '$lib/server/common/dm';
 
 export const load = (async ({ params, locals }) => {
 	const id = params.id;
@@ -321,11 +322,6 @@ export const actions: Actions = {
 	unblock: async ({ locals, params }) => {
 		if (!locals.user) return fail(403, { message: 'Not logined' });
 
-		const fromUser = locals.user.id;
-		const toUser = params.id;
-
-		if (fromUser === toUser) return fail(400, { message: 'Cannot unblock yourself' });
-
 		try {
 			await relationship.unblockUser(locals.user.id, params.id);
 		} catch (e) {
@@ -338,6 +334,23 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Unblocked the user' };
+	},
+
+	beginDM: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		try {
+			const channelId = await beginDMProc(locals.user.id, params.id);
+
+			return { channelId };
+		} catch (e) {
+			if (e instanceof Error) {
+				if (typeof e.cause === 'number') return fail(e.cause, { message: e.message });
+			}
+
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
 	},
 };
 
