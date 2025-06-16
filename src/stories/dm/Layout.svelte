@@ -2,11 +2,11 @@
 	import { userStore } from '$lib/context';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import { cn } from '$lib/utils';
-	import type { DMChannel } from '$lib/server/db/schema';
+	import type { DMChannel, DMParticipant } from '$lib/server/db/schema';
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
-		channels: DMChannel[];
+		channels: (DMChannel & { participants?: App.User[] })[];
 	}
 
 	const { children, id, channels }: Props = $props();
@@ -29,12 +29,18 @@
 					(id === ch.id && 'bg-primary/60 text-primary-foreground') ||
 						'hover:bg-accent hover:text-accent-foreground',
 				)}>
-				<!-- TODO: 참가자 목록과 마지막 메시지 가져오기 -->
-				<UserAvatar class="size-9" {user} />
-				<div class="flex flex-col">
+				<!-- TODO: 마지막 메시지 가져오기 -->
+				<div class="flex -space-x-5">
+					{#each ch.participants || [] as participant}
+						{#if participant!.id !== user!.id}
+							<UserAvatar class="size-9" user={participant} />
+						{/if}
+					{/each}
+				</div>
+				<div class="flex flex-col overflow-hidden">
 					<strong>{user?.username}</strong>
 					<span
-						class="text-muted-foreground w-47 overflow-hidden text-sm text-ellipsis whitespace-nowrap">
+						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap">
 						고양이 고양이 고양이 고양이 고양이 고양이
 					</span>
 				</div>

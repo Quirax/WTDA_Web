@@ -3,6 +3,7 @@ import { db, generateID, table } from '../db';
 import { and, eq, SQL, Subquery } from 'drizzle-orm';
 import { getRelationship } from './relationship';
 import { union } from 'drizzle-orm/pg-core';
+import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 
 export const createDMChannel = async (type = DMChannelType.GENERAL, relatedArticle?: string) => {
 	const channelId = generateID();
@@ -74,17 +75,44 @@ export const getDMChannels = async (
 			: fromUserQuery
 	).as('sq');
 
-	return await db
+	const rows = await db
 		.select({
-			id: subquery.channelId,
-			type: table.dmChannel.type,
-			relatedArticle: table.dmChannel.relatedArticle,
-			createdDate: table.dmChannel.createdDate,
-			closedDate: table.dmChannel.closedDate,
+			channel: {
+				id: subquery.channelId,
+				type: table.dmChannel.type,
+				relatedArticle: table.dmChannel.relatedArticle,
+				createdDate: table.dmChannel.createdDate,
+				closedDate: table.dmChannel.closedDate,
+			},
+			participant: {
+				...table.user,
+				id: table.dmParticipant.participantId,
+			},
 		})
 		.from(subquery)
 		.where(additionalWhere?.(subquery, table.dmChannel))
-		.innerJoin(table.dmChannel, eq(table.dmChannel.id, subquery.channelId));
+		.innerJoin(table.dmChannel, eq(table.dmChannel.id, subquery.channelId))
+		.innerJoin(table.dmParticipant, eq(table.dmParticipant.channelId, subquery.channelId))
+		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
+
+	const result = rows.reduce<Record<DMChannel['id'], DMChannel & { participants: User[] }>>(
+		(acc, row) => {
+			const channel = row.channel;
+			const participant = row.participant;
+
+			if (!acc[channel.id]) {
+				acc[channel.id] = { ...channel, participants: [] };
+			}
+
+			if (participant) {
+				acc[channel.id].participants.push(participant);
+			}
+			return acc;
+		},
+		{},
+	);
+
+	return Object.values(result);
 };
 
 export const beginDMProc = async (
