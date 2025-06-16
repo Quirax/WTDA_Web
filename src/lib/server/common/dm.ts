@@ -1,9 +1,10 @@
 import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
-import { and, eq, SQL, Subquery } from 'drizzle-orm';
+import { and, desc, eq, max, SQL, Subquery } from 'drizzle-orm';
 import { getRelationship } from './relationship';
 import { union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
+import { message } from 'sveltekit-superforms';
 
 export const createDMChannel = async (type = DMChannelType.GENERAL, relatedArticle?: string) => {
 	const channelId = generateID();
@@ -58,22 +59,33 @@ export const getDMChannels = async (
 	toUser?: string,
 	additionalWhere?: (part: Subquery, ch: typeof table.dmChannel) => SQL,
 ) => {
-	const fromUserQuery = db
-		.select()
-		.from(table.dmParticipant)
-		.where(eq(table.dmParticipant.participantId, fromUser));
+	const latestMessage = db
+		.select({
+			channelId: table.dmContent.channelId,
+			sentAt: max(table.dmContent.sentAt).as('sentAt'),
+		})
+		.from(table.dmContent)
+		.groupBy((t) => t.channelId)
+		.as('lm');
 
-	let subquery = (
-		toUser
-			? union(
-					fromUserQuery,
-					db
-						.select()
-						.from(table.dmParticipant)
-						.where(toUser ? eq(table.dmParticipant.participantId, toUser) : undefined),
-				)
-			: fromUserQuery
-	).as('sq');
+	const userQuery = (userId: string) =>
+		db
+			.select({
+				channelId: table.dmParticipant.channelId,
+				sentAt: latestMessage.sentAt,
+				content: table.dmContent.content,
+				messageId: table.dmContent.messageId,
+				sender: table.user,
+			})
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.participantId, userId))
+			.innerJoin(latestMessage, eq(latestMessage.channelId, table.dmParticipant.channelId))
+			.innerJoin(table.dmContent, eq(table.dmContent.sentAt, latestMessage.sentAt))
+			.innerJoin(table.user, eq(table.dmContent.sender, table.user.id));
+
+	const fromUserQuery = userQuery(fromUser);
+
+	let subquery = (toUser ? union(fromUserQuery, userQuery(toUser)) : fromUserQuery).as('sq');
 
 	const rows = await db
 		.select({
@@ -84,6 +96,12 @@ export const getDMChannels = async (
 				createdDate: table.dmChannel.createdDate,
 				closedDate: table.dmChannel.closedDate,
 			},
+			latestMessage: {
+				sentAt: subquery.sentAt,
+				content: subquery.content,
+				messageId: subquery.messageId,
+			},
+			latestMessageSender: subquery.sender,
 			participant: {
 				...table.user,
 				id: table.dmParticipant.participantId,
@@ -95,22 +113,30 @@ export const getDMChannels = async (
 		.innerJoin(table.dmParticipant, eq(table.dmParticipant.channelId, subquery.channelId))
 		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
 
-	const result = rows.reduce<Record<DMChannel['id'], DMChannel & { participants: User[] }>>(
-		(acc, row) => {
-			const channel = row.channel;
-			const participant = row.participant;
+	const result = rows.reduce<
+		Record<DMChannel['id'], DMChannel & { participants: User[]; latestMessage: App.DM }>
+	>((acc, row) => {
+		const channel = row.channel;
+		const participant = row.participant;
 
-			if (!acc[channel.id]) {
-				acc[channel.id] = { ...channel, participants: [] };
-			}
+		if (!acc[channel.id]) {
+			acc[channel.id] = {
+				...channel,
+				participants: [],
+				latestMessage: {
+					id: row.latestMessage.messageId,
+					sentAt: row.latestMessage.sentAt || new Date(),
+					sender: row.latestMessageSender,
+					...row.latestMessage.content,
+				},
+			};
+		}
 
-			if (participant) {
-				acc[channel.id].participants.push(participant);
-			}
-			return acc;
-		},
-		{},
-	);
+		if (participant) {
+			acc[channel.id].participants.push(participant);
+		}
+		return acc;
+	}, {});
 
 	return Object.values(result);
 };

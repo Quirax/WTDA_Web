@@ -180,7 +180,7 @@ export const dmContent = pgTable(
 			.notNull()
 			.references(() => user.id),
 		content: json('content').$type<Omit<App.DM, 'id' | 'sender' | 'sentAt'>>().notNull(),
-		sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+		sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.channelId, table.messageId] })],
 );

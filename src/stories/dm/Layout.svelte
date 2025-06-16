@@ -2,11 +2,12 @@
 	import { userStore } from '$lib/context';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import { cn } from '$lib/utils';
-	import type { DMChannel, DMParticipant } from '$lib/server/db/schema';
+	import type { DMChannel } from '$lib/server/db/schema';
+	import { twemoji } from 'twemoji-svelte-action';
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
-		channels: (DMChannel & { participants?: App.User[] })[];
+		channels: (DMChannel & { participants?: App.User[]; latestMessage: App.DM })[];
 	}
 
 	const { children, id, channels }: Props = $props();
@@ -29,7 +30,6 @@
 					(id === ch.id && 'bg-primary/60 text-primary-foreground') ||
 						'hover:bg-accent hover:text-accent-foreground',
 				)}>
-				<!-- TODO: 마지막 메시지 가져오기 -->
 				<div class="flex -space-x-5">
 					{#each ch.participants || [] as participant}
 						{#if participant!.id !== user!.id}
@@ -38,13 +38,19 @@
 					{/each}
 				</div>
 				<div class="flex flex-col overflow-hidden">
-					<strong>{user?.username}</strong>
+					<strong>{ch.latestMessage.sender?.username}</strong>
 					<span
-						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap">
-						고양이 고양이 고양이 고양이 고양이 고양이
+						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
+						use:twemoji>
+						{#if ch.latestMessage.type === 'general'}
+							{ch.latestMessage.message}
+						{:else if ch.latestMessage.type === 'join'}
+							<i>{ch.latestMessage.sender?.username} 님이 대화방에 들어왔습니다.</i>
+						{:else if ch.latestMessage.type === 'leave'}
+							<i>{ch.latestMessage.sender?.username} 님이 대화방에서 나갔습니다.</i>
+						{/if}
 					</span>
 				</div>
-				<!-- 여기까지 -->
 			</a>
 		{/each}
 	</nav>
