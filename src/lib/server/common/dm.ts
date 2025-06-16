@@ -57,7 +57,7 @@ export const leaveFromChannel = async (userId: string, channelId: string) => {
 export const getDMChannels = async (
 	fromUser: string,
 	toUser?: string,
-	additionalWhere?: (part: Subquery, ch: typeof table.dmChannel) => SQL,
+	additionalWhere?: (part: Subquery, ch: typeof table.dmChannel) => SQL | undefined,
 ) => {
 	const latestMessage = db
 		.select({
@@ -160,7 +160,16 @@ export const beginDMProc = async (
 		throw new Error('Cannot chat with blocked user', { cause: 403 });
 
 	// 이미 채널이 있는 경우 해당 채널의 ID 반환
-	const result = (await getDMChannels(fromUser, toUser, (_, ch) => eq(ch.type, type))).at(0);
+	const result = (
+		await getDMChannels(fromUser, toUser, (_, ch) =>
+			type === DMChannelType.GENERAL
+				? eq(ch.type, type)
+				: and(
+						eq(ch.type, type),
+						relatedArticle ? eq(ch.relatedArticle, relatedArticle) : undefined,
+					),
+		)
+	).at(0);
 	if (result) return result.id;
 
 	// 채널 생성
