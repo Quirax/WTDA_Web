@@ -234,3 +234,29 @@ export const get = async (channelId: string, before: Date) => {
 		...v.content,
 	}));
 };
+
+export const send = async (
+	channelId: string,
+	sender: NonNullable<App.User>,
+	content: Omit<App.DM, 'id' | 'sentAt' | 'sender'>,
+) => {
+	const messageId = generateID();
+	const sentAt = new Date();
+
+	await db.insert(table.dmContent).values({
+		channelId,
+		messageId,
+		sender: sender.id,
+		content,
+		sentAt,
+	});
+
+	return [
+		{
+			id: messageId,
+			sender: sender,
+			sentAt: sentAt,
+			...content,
+		},
+	];
+};

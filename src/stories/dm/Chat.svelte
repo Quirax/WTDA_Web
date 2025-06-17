@@ -113,9 +113,32 @@
 		openEmojiList = true;
 	};
 
-	let dmDraft = $state<App.GeneralDM>({
+	const defaultDraft: App.GeneralDM = {
 		message: '',
-	});
+	};
+
+	let dmDraft = $state(defaultDraft);
+
+	const onSend = async () => {
+		if (JSON.stringify(dmDraft) === JSON.stringify(defaultDraft)) return;
+
+		const result = await fetch('?/send', {
+			method: 'post',
+			body: JSON.stringify(dmDraft),
+		})
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			const new_dms = result.data?.dms as App.DM[] | undefined;
+
+			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
+
+			dmDraft = defaultDraft;
+			// } else {
+			// 	openErrorOnBeginDM = true;
+		}
+	};
 
 	const onEmoji: EmojiEventHandler = (emoji) => {
 		dmDraft.message += emoji || '';
@@ -133,7 +156,7 @@
 		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
 		{#each dms as dm, i}
 			<Message
-				dir={dm.sender ? Direction.RECEIVE : Direction.SEND}
+				dir={dm.sender!.id === user!.id ? Direction.SEND : Direction.RECEIVE}
 				{dm}
 				prev={dms[i - 1]}
 				next={dms[i + 1]}
@@ -212,7 +235,7 @@
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />
 		</Button>
-		<Button size="icon">
+		<Button size="icon" onclick={onSend}>
 			<!-- 전송 -->
 			<SendHorizontal />
 		</Button>

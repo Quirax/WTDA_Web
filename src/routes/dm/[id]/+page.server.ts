@@ -15,12 +15,33 @@ export const load = (async ({ locals, params }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	get: async ({ params, request }) => {
+	get: async ({ params, request, locals }) => {
+		if (!locals.user) return {};
+
 		const before = new Date((await request.formData()).get('before') as string);
 		const channelId = params.id;
 
 		try {
 			const dms = await dm.get(channelId, before);
+			return { dms };
+		} catch (e) {
+			console.error(e);
+			throw error(500, { message: 'An error has occurred' });
+		}
+	},
+
+	send: async ({ params, request, locals }) => {
+		if (!locals.user) return {};
+
+		const content = (await request.json()) as App.GeneralDM;
+		const channelId = params.id;
+
+		try {
+			const dms = await dm.send(channelId, locals.user, {
+				type: 'general',
+				...content,
+			});
+
 			return { dms };
 		} catch (e) {
 			console.error(e);
