@@ -1,6 +1,6 @@
 import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
-import { and, desc, eq, max, SQL, Subquery } from 'drizzle-orm';
+import { and, desc, eq, lte, max, SQL, Subquery } from 'drizzle-orm';
 import { getRelationship } from './relationship';
 import { intersect, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
@@ -214,4 +214,23 @@ export const getDMChannelInfo = async (channelId: string) => {
 
 export type DMChannelInfo = Awaited<ReturnType<typeof getDMChannelInfo>>;
 
-export const getDMLists = async (before: Date) => {};
+export const get = async (channelId: string, before: Date) => {
+	const result = await db
+		.select({
+			id: table.dmContent.messageId,
+			sender: table.user,
+			content: table.dmContent.content,
+			sentAt: table.dmContent.sentAt,
+		})
+		.from(table.dmContent)
+		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
+		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender));
+	// TODO: 일정 범위 이내의 값만 가져오도록 변경
+
+	return result.map<App.DM>((v) => ({
+		id: v.id,
+		sender: v.sender,
+		sentAt: v.sentAt,
+		...v.content,
+	}));
+};

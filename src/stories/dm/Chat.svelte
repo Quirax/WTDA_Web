@@ -16,6 +16,8 @@
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
 	import * as Card from '$lib/components/ui/card';
+	import { onMount } from 'svelte';
+	import { deserialize } from '$app/forms';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -26,186 +28,28 @@
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
-	const dms = $derived<App.DM[]>([
-		{
-			id: 'asdf',
-			type: 'join',
-			sender: user,
-			sentAt: new Date(1000000),
-		},
-		{
-			id: '1234',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1100000),
-			relatedPost: {
-				type: ArticleType.REQUEST,
-				article: {
-					thumbnail:
-						'https://media.planet.moe/cache/media_attachments/files/114/667/992/480/752/949/original/482dbc6092f63524.jpeg',
-					title: '없는 게시물',
-					author: user!,
-					category: ArticleCategory.TEXT,
-					tags: [],
-					id: 'asdf',
-				},
-			},
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1100000),
-			message: '이모티콘 테스트: 😂👨‍🦳✨🎂✈️💓',
-			reactions: {
-				'🤪': 1,
-				'😵': 1,
-			},
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1100000),
-			message: '😂👨‍🦳✨🎂✈️💓',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1200000),
-			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1200000),
-			message: '장문의 기이이이이이이이다란\n텍스트 메시지를 테스트해봅니다',
-			reactions: {
-				'🤪': 1,
-				'😵': 1,
-			},
-			myReaction: '😵',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1200000),
-			// message: '이미지 테스트',
-			attachments: [
-				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-				// 'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-			],
-		},
-		{
-			id: '5678',
-			type: 'general',
-			sender: null,
-			sentAt: new Date(1200000),
-			message: '이미지 테스트',
-			attachments: [
-				'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-				'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-				'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-			],
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: null,
-			sentAt: new Date(1200000),
-			message: '텍스트 메시지 테스트',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: null,
-			sentAt: new Date(1200000),
-			relatedMessage: {
-				id: '1234',
-				type: 'general',
-				sender: user,
-				sentAt: new Date(1100000),
-				message: '텍스트 메시지 테스트',
-			},
-			message: '답장형 메시지 테스트',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: null,
-			sentAt: new Date(1200000),
-			message: '장문의 기이이이이이이이다란 텍스트 메시지를 테스트해봅니다',
-			relatedPost: {
-				type: ArticleType.REQUEST,
-				article: {
-					thumbnail:
-						'https://media.planet.moe/cache/media_attachments/files/114/667/992/480/752/949/original/482dbc6092f63524.jpeg',
-					title: '없는 게시물',
-					author: user!,
-					category: ArticleCategory.TEXT,
-					tags: [],
-					id: 'asdf',
-				},
-			},
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: null,
-			sentAt: new Date(1200000),
-			message: '😂👨‍🦳✨🎂✈️💓',
-		},
-		{
-			id: 'asdf',
-			type: 'general',
-			sender: user,
-			sentAt: new Date(1250000),
-			relatedMessage: {
-				id: '5678',
-				type: 'general',
-				sender: null,
-				sentAt: new Date(1200000),
-				// message: '이미지 테스트',
-				attachments: [
-					'https://pbs.twimg.com/media/Gs_3JaFaMAA8kCN.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtKU7MibMAMZzo5.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtLOOpLbMAMp2Mw.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtLQhrjbgAEz0HO.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtIqoRvbMAAOYSm.jpg?name=orig',
-					'https://pbs.twimg.com/media/Gs_CdezaQAAL7iT.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtA7WbyWIAAvEck.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtFI0ZlagAAT-2g.jpg?name=orig',
-					'https://pbs.twimg.com/media/GtEveCeaIAA20dI.jpg?name=orig',
-					'https://pbs.twimg.com/media/Gs9_GlkboAAqmgS.jpg?name=orig',
-				],
-			},
-			message: '답장형 메시지 테스트',
-		},
-		{
-			id: 'asdf',
-			type: 'leave',
-			sender: user,
-			sentAt: new Date(1300000),
-		},
-	]);
+	let dms = $state<App.DM[]>([]);
+
+	const getDM = async (before = new Date()) => {
+		const body = new FormData();
+		body.append('before', before.toString());
+
+		const result = await fetch('?/get', { method: 'post', body })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			const new_dms = result.data?.dms as App.DM[] | undefined;
+
+			if (new_dms && new_dms.length > 0) dms = [...new_dms, ...dms];
+			// } else {
+			// 	openErrorOnBeginDM = true;
+		}
+	};
+
+	onMount(() => {
+		getDM();
+	});
 
 	let container = $state<HTMLElement>();
 
@@ -232,6 +76,8 @@
 
 		container.scroll({ top: element.offsetTop });
 	};
+
+	// TODO: 스크롤 위치가 일정 범위 내일 때 마지막 DM 날짜 이전의 DM 불러오기. 만약에 없는 경우 이벤트 연결 끊기
 
 	let openEmojiList = $state(false);
 	let emojiListProps = $state({
