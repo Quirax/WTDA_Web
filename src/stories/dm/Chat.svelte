@@ -16,7 +16,7 @@
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { deserialize } from '$app/forms';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -48,7 +48,7 @@
 	};
 
 	onMount(() => {
-		getDM();
+		getDM().then(scrollToBottom);
 	});
 
 	let container = $state<HTMLElement>();
@@ -63,7 +63,7 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
-	onNavigate(scrollToBottom);
+	onNavigate(() => getDM().then(scrollToBottom));
 	$effect(scrollToBottom);
 
 	const scrollToDM = (id: string) => {
@@ -135,6 +135,7 @@
 			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
 
 			dmDraft = defaultDraft;
+			tick().then(() => scrollToBottom());
 			// } else {
 			// 	openErrorOnBeginDM = true;
 		}
@@ -146,6 +147,11 @@
 
 	const onEmoji: EmojiEventHandler = (emoji) => {
 		dmDraft.message += emoji || '';
+	};
+
+	const onReply = (message: App.DM) => {
+		dmDraft.relatedMessage = undefined;
+		tick().then(() => (dmDraft.relatedMessage = message));
 	};
 
 	const title = `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`;
@@ -167,6 +173,7 @@
 				id="dm-{dm.id}"
 				onScrollToDM={scrollToDM}
 				{onOpenEmojiList}
+				{onReply}
 				tabindex={i + 1} />
 		{/each}
 	</section>

@@ -33,14 +33,19 @@ export const actions: Actions = {
 	send: async ({ params, request, locals }) => {
 		if (!locals.user) return {};
 
-		const content = (await request.json()) as App.GeneralDM;
+		const { relatedMessage, ...content } = (await request.json()) as App.GeneralDM;
 		const channelId = params.id;
 
 		try {
-			const dms = await dm.send(channelId, locals.user, {
-				type: 'general',
-				...content,
-			});
+			const dms = await dm.send(
+				channelId,
+				locals.user,
+				{
+					type: 'general',
+					...content,
+				} as App.DM & App.GeneralDM,
+				relatedMessage?.id,
+			);
 
 			return { dms };
 		} catch (e) {

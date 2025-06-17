@@ -5,6 +5,7 @@ import { getRelationship } from './relationship';
 import { alias, intersect, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 import { message } from 'sveltekit-superforms';
+import { string } from 'zod';
 
 export const createDMChannel = async (type = DMChannelType.GENERAL, relatedArticle?: string) => {
 	const channelId = generateID();
@@ -217,16 +218,33 @@ export const getDMChannelInfo = async (channelId: string) => {
 export type DMChannelInfo = Awaited<ReturnType<typeof getDMChannelInfo>>;
 
 export const get = async (channelId: string, before: Date) => {
+	const rmContent = alias(table.dmContent, 'rm_content');
+	const rmSender = alias(table.user, 'rm_sender');
+
 	const result = await db
 		.select({
 			id: table.dmContent.messageId,
 			sender: table.user,
 			content: table.dmContent.content,
 			sentAt: table.dmContent.sentAt,
+			relatedMessage: {
+				id: rmContent.messageId,
+				content: rmContent.content,
+				sentAt: rmContent.sentAt,
+			},
+			relatedMessageSender: rmSender,
 		})
 		.from(table.dmContent)
 		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
-		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender));
+		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
+		.leftJoin(
+			rmContent,
+			and(
+				eq(rmContent.channelId, table.dmContent.channelId),
+				eq(rmContent.messageId, table.dmContent.relatedMessage),
+			),
+		)
+		.leftJoin(rmSender, eq(rmSender.id, rmContent.sender));
 	// TODO: 일정 범위 이내의 값만 가져오도록 변경
 
 	return result.map<App.DM>((v) => ({
@@ -234,6 +252,14 @@ export const get = async (channelId: string, before: Date) => {
 		sender: v.sender,
 		sentAt: v.sentAt,
 		...v.content,
+		relatedMessage:
+			(v.relatedMessage && {
+				id: v.relatedMessage.id,
+				sender: v.relatedMessageSender,
+				sentAt: v.relatedMessage.sentAt,
+				...v.relatedMessage.content,
+			}) ||
+			undefined,
 	}));
 };
 
@@ -241,6 +267,7 @@ export const send = async (
 	channelId: string,
 	sender: NonNullable<App.User>,
 	content: Omit<App.DM, 'id' | 'sentAt' | 'sender'>,
+	relatedMessage?: string,
 ) => {
 	const messageId = generateID();
 	const sentAt = new Date();
@@ -251,14 +278,42 @@ export const send = async (
 		sender: sender.id,
 		content,
 		sentAt,
+		relatedMessage,
 	});
+
+	const _relatedMessage =
+		(relatedMessage &&
+			(
+				await db
+					.select({
+						id: table.dmContent.messageId,
+						sender: table.user,
+						content: table.dmContent.content,
+						sentAt: table.dmContent.sentAt,
+					})
+					.from(table.dmContent)
+					.where(
+						and(
+							eq(table.dmContent.channelId, channelId),
+							eq(table.dmContent.messageId, relatedMessage),
+						),
+					)
+					.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
+			).at(0)) ||
+		undefined;
 
 	return [
 		{
 			id: messageId,
 			sender: sender,
-			sentAt: sentAt,
+			sentAt,
 			...content,
+			relatedMessage: _relatedMessage && {
+				id: _relatedMessage.id,
+				sender: _relatedMessage.sender,
+				sentAt: _relatedMessage.sentAt,
+				..._relatedMessage.content,
+			},
 		},
 	];
 };

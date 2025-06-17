@@ -30,6 +30,7 @@
 			option: { autoClose?: boolean; value?: Emoji },
 		) => void;
 		tabindex?: number;
+		onReply?: (message: App.DM) => void;
 	}
 
 	const {
@@ -41,6 +42,7 @@
 		tabindex = 0,
 		onScrollToDM = () => {},
 		onOpenEmojiList = () => {},
+		onReply = () => {},
 	}: Props = $props();
 
 	const sameSenderAsPrev =
@@ -249,7 +251,7 @@
 					!(isFocused || isMouseHover) && 'hidden',
 					dir === Direction.SEND ? '-left-2' : '-right-2',
 				)}>
-				<Button size="icon" variant="ghost" class="size-8 border">
+				<Button size="icon" variant="ghost" class="size-8 border" onclick={() => onReply(dm)}>
 					<!-- 답글 -->
 					<CornerDownRight />
 				</Button>
