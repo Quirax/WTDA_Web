@@ -23,6 +23,7 @@
 			!!id && 'max-md:hidden',
 		)}>
 		{#each channels as ch}
+			{@const participants = (ch.participants || []).filter((v) => v!.id !== user!.id)}
 			<a
 				href="/dm/{ch.id}"
 				class={cn(
@@ -31,19 +32,17 @@
 						'hover:bg-accent hover:text-accent-foreground',
 				)}>
 				<div class="flex -space-x-5">
-					{#each ch.participants || [] as participant}
-						{#if participant!.id !== user!.id}
-							<UserAvatar class="size-9" user={participant} />
-						{/if}
+					{#each participants || [] as participant}
+						<UserAvatar class="size-9" user={participant} />
 					{/each}
 				</div>
 				<div class="flex flex-col overflow-hidden">
-					<strong>{ch.latestMessage!.sender?.username}</strong>
+					<strong>{participants.map((v) => v!.username).join(', ')}</strong>
 					<span
 						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
 						use:twemoji>
 						{#if ch.latestMessage!.type === 'general'}
-							{ch.latestMessage!.message}
+							{ch.latestMessage!.sender!.username}: {ch.latestMessage!.message}
 						{:else if ch.latestMessage!.type === 'join'}
 							<i>{ch.latestMessage!.sender?.username} 님이 대화방에 들어왔습니다.</i>
 						{:else if ch.latestMessage!.type === 'leave'}

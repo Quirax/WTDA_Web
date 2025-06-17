@@ -2,7 +2,7 @@ import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
 import { and, desc, eq, lte, max, SQL, Subquery } from 'drizzle-orm';
 import { getRelationship } from './relationship';
-import { intersect, union } from 'drizzle-orm/pg-core';
+import { alias, intersect, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 import { message } from 'sveltekit-superforms';
 
@@ -82,18 +82,20 @@ export const getDMChannels = async (
 			sentAt: latestMessage.sentAt,
 			content: table.dmContent.content,
 			messageId: table.dmContent.messageId,
-			sender: table.user,
+			sender: { ...table.user },
 		})
 		.from(table.dmParticipant)
 		.where(eq(table.dmParticipant.participantId, fromUser))
 		.innerJoin(latestMessage, eq(latestMessage.channelId, table.dmParticipant.channelId))
 		.innerJoin(table.dmContent, eq(table.dmContent.sentAt, latestMessage.sentAt))
-		.innerJoin(table.user, eq(table.dmContent.sender, table.user.id))
+		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
 		.as('sq');
 
 	let subquery = toUser
 		? intersect(userQuery(fromUser), userQuery(toUser)).as('sq')
 		: userWithLatestMessage;
+
+	const participant = alias(table.user, 'participant');
 
 	const rows = await db
 		.select({
@@ -113,7 +115,7 @@ export const getDMChannels = async (
 						},
 						latestMessageSender: userWithLatestMessage.sender,
 						participant: {
-							...table.user,
+							...participant,
 							id: table.dmParticipant.participantId,
 						},
 					}
@@ -123,7 +125,7 @@ export const getDMChannels = async (
 		.where(additionalWhere?.(subquery, table.dmChannel))
 		.innerJoin(table.dmChannel, eq(table.dmChannel.id, subquery.channelId))
 		.innerJoin(table.dmParticipant, eq(table.dmParticipant.channelId, subquery.channelId))
-		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
+		.innerJoin(participant, eq(participant.id, table.dmParticipant.participantId));
 
 	const result = rows.reduce<
 		Record<DMChannel['id'], DMChannel & { participants: User[]; latestMessage?: App.DM }>
