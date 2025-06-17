@@ -42,7 +42,9 @@
 						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
 						use:twemoji>
 						{#if ch.latestMessage!.type === 'general'}
-							{ch.latestMessage!.sender!.username}: {ch.latestMessage!.message}
+							{ch.latestMessage!.sender!.id === user!.id
+								? '나'
+								: ch.latestMessage!.sender!.username}: {ch.latestMessage!.message}
 						{:else if ch.latestMessage!.type === 'join'}
 							<i>{ch.latestMessage!.sender?.username} 님이 대화방에 들어왔습니다.</i>
 						{:else if ch.latestMessage!.type === 'leave'}
