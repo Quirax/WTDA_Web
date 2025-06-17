@@ -140,6 +140,10 @@
 		}
 	};
 
+	const onKeyUp = (event: KeyboardEvent) => {
+		if (event.key === 'Enter') return onSend();
+	};
+
 	const onEmoji: EmojiEventHandler = (emoji) => {
 		dmDraft.message += emoji || '';
 	};
@@ -230,7 +234,11 @@
 			<!-- 파일 첨부 -->
 			<Paperclip />
 		</Button>
-		<Input name="chat" placeholder="메시지를 입력하세요..." bind:value={dmDraft.message} />
+		<Input
+			name="chat"
+			placeholder="메시지를 입력하세요..."
+			bind:value={dmDraft.message}
+			onkeyup={onKeyUp} />
 		<Button size="icon" variant="secondary" onclick={(event) => onOpenEmojiList(event, onEmoji)}>
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />
