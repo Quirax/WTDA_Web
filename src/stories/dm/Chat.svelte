@@ -65,7 +65,9 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
-	onNavigate(() => getDM().then(scrollToBottom));
+	onNavigate((nav) => {
+		nav.to?.route.id === '/dm/[id]' && getDM().then(scrollToBottom);
+	});
 	$effect(scrollToBottom);
 
 	const scrollToDM = (id: string) => {
