@@ -1,6 +1,6 @@
 <script lang="ts">
 	import H2 from '$lib/components/typo/h2.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
@@ -11,13 +11,15 @@
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
 	import { onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
-	import { formatDatetimeString, sanitizeHTML, twemoji } from '$lib/utils';
+	import { cn, formatDatetimeString, sanitizeHTML, twemoji, uploadImage } from '$lib/utils';
 	import Muted from '$lib/components/typo/muted.svelte';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import { onMount, tick } from 'svelte';
 	import { deserialize } from '$app/forms';
+	import Dropzone from 'svelte-file-dropzone';
+	import { imageFormat } from '$lib/config';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -154,6 +156,22 @@
 		tick().then(() => (dmDraft.relatedMessage = message));
 	};
 
+	const onDropMedia = async ({ detail }: any) => {
+		const { acceptedFiles } = detail;
+
+		let imageFile = acceptedFiles[0];
+
+		if (!imageFile) return;
+
+		try {
+			const path = await uploadImage(imageFile);
+
+			dmDraft.attachments = [...(dmDraft.attachments || []), path];
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	const title = `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`;
 </script>
 
@@ -237,10 +255,21 @@
 		</section>
 	{/if}
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
-		<Button size="icon" variant="secondary">
+		<Dropzone
+			accept={imageFormat}
+			on:drop={onDropMedia}
+			multiple={false}
+			class={cn(
+				buttonVariants({
+					variant: 'secondary',
+					size: 'icon',
+				}),
+			)}>
+			<!-- <Button size="icon" variant="secondary"> -->
 			<!-- 파일 첨부 -->
 			<Paperclip />
-		</Button>
+			<!-- </Button> -->
+		</Dropzone>
 		<Input
 			name="chat"
 			placeholder="메시지를 입력하세요..."

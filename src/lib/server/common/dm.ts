@@ -281,6 +281,20 @@ export const send = async (
 		relatedMessage,
 	});
 
+	const attachments =
+		(content.type === 'general' && (content as App.GeneralDM).attachments) || undefined;
+
+	if (attachments)
+		await db.insert(table.filesPerDM).values(
+			attachments
+				.flatMap((v) => [...v.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)])
+				.map((path) => ({
+					channelId,
+					messageId,
+					path: path[1],
+				})),
+		);
+
 	const _relatedMessage =
 		(relatedMessage &&
 			(
