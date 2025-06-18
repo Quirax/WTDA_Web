@@ -1,16 +1,38 @@
 import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
-import { and, desc, eq, lte, max, SQL, Subquery } from 'drizzle-orm';
+import {
+	and,
+	desc,
+	eq,
+	lte,
+	max,
+	SQL,
+	Subquery,
+	type ExtractTablesWithRelations,
+} from 'drizzle-orm';
 import { getRelationship } from './relationship';
-import { alias, intersect, union } from 'drizzle-orm/pg-core';
+import { alias, intersect, PgTransaction, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 import { message } from 'sveltekit-superforms';
 import { string } from 'zod';
+import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 
-export const createDMChannel = async (type = DMChannelType.GENERAL, relatedArticle?: string) => {
+type Transaction =
+	| PgTransaction<
+			PostgresJsQueryResultHKT,
+			Record<string, never>,
+			ExtractTablesWithRelations<Record<string, never>>
+	  >
+	| typeof db;
+
+export const createDMChannel = async (
+	mainTx: Transaction,
+	type = DMChannelType.GENERAL,
+	relatedArticle?: string,
+) => {
 	const channelId = generateID();
 
-	await db.insert(table.dmChannel).values({
+	await mainTx.insert(table.dmChannel).values({
 		id: channelId,
 		type,
 		relatedArticle,
@@ -19,39 +41,43 @@ export const createDMChannel = async (type = DMChannelType.GENERAL, relatedArtic
 	return channelId;
 };
 
-export const joinToChannel = async (userId: string, channelId: string) => {
-	await db.insert(table.dmParticipant).values({
-		channelId,
-		participantId: userId,
-	});
+export const joinToChannel = async (mainTx: Transaction, userId: string, channelId: string) => {
+	await mainTx.transaction(async (tx) => {
+		await tx.insert(table.dmParticipant).values({
+			channelId,
+			participantId: userId,
+		});
 
-	await db.insert(table.dmContent).values({
-		channelId,
-		messageId: generateID(),
-		sender: userId,
-		content: {
-			type: 'join',
-		},
+		await tx.insert(table.dmContent).values({
+			channelId,
+			messageId: generateID(),
+			sender: userId,
+			content: {
+				type: 'join',
+			},
+		});
 	});
 };
 
-export const leaveFromChannel = async (userId: string, channelId: string) => {
-	await db
-		.delete(table.dmParticipant)
-		.where(
-			and(
-				eq(table.dmParticipant.channelId, channelId),
-				eq(table.dmParticipant.participantId, userId),
-			),
-		);
+export const leaveFromChannel = async (mainTx: Transaction, userId: string, channelId: string) => {
+	await mainTx.transaction(async (tx) => {
+		await tx
+			.delete(table.dmParticipant)
+			.where(
+				and(
+					eq(table.dmParticipant.channelId, channelId),
+					eq(table.dmParticipant.participantId, userId),
+				),
+			);
 
-	await db.insert(table.dmContent).values({
-		channelId,
-		messageId: generateID(),
-		sender: userId,
-		content: {
-			type: 'leave',
-		},
+		await tx.insert(table.dmContent).values({
+			channelId,
+			messageId: generateID(),
+			sender: userId,
+			content: {
+				type: 'leave',
+			},
+		});
 	});
 };
 
@@ -182,15 +208,17 @@ export const beginDMProc = async (
 	).at(0);
 	if (result) return result.id;
 
-	// 채널 생성
-	const channelId = await createDMChannel(type, relatedArticle);
+	return await db.transaction(async (tx) => {
+		// 채널 생성
+		const channelId = await createDMChannel(tx, type, relatedArticle);
 
-	// 해당 채널에 가입
-	await joinToChannel(fromUser, channelId);
-	await joinToChannel(toUser, channelId);
+		// 해당 채널에 가입
+		await joinToChannel(tx, fromUser, channelId);
+		await joinToChannel(tx, toUser, channelId);
 
-	// 해당 채널 ID를 반환
-	return channelId;
+		// 해당 채널 ID를 반환
+		return channelId;
+	});
 };
 
 export const getDMChannelInfo = async (channelId: string) => {
@@ -272,49 +300,52 @@ export const send = async (
 	const messageId = generateID();
 	const sentAt = new Date();
 
-	await db.insert(table.dmContent).values({
-		channelId,
-		messageId,
-		sender: sender.id,
-		content,
-		sentAt,
-		relatedMessage,
-	});
+	const _relatedMessage = await db.transaction(async (tx) => {
+		await tx.insert(table.dmContent).values({
+			channelId,
+			messageId,
+			sender: sender.id,
+			content,
+			sentAt,
+			relatedMessage,
+		});
 
-	const attachments =
-		(content.type === 'general' && (content as App.GeneralDM).attachments) || undefined;
+		const attachments =
+			(content.type === 'general' && (content as App.GeneralDM).attachments) || undefined;
 
-	if (attachments)
-		await db.insert(table.filesPerDM).values(
-			attachments
-				.flatMap((v) => [...v.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)])
-				.map((path) => ({
-					channelId,
-					messageId,
-					path: path[1],
-				})),
+		if (attachments)
+			await tx.insert(table.filesPerDM).values(
+				attachments
+					.flatMap((v) => [...v.matchAll(/api\/file\/([A-Za-z0-9-\/]+)/g)])
+					.map((path) => ({
+						channelId,
+						messageId,
+						path: path[1],
+					})),
+			);
+
+		return (
+			(relatedMessage &&
+				(
+					await tx
+						.select({
+							id: table.dmContent.messageId,
+							sender: table.user,
+							content: table.dmContent.content,
+							sentAt: table.dmContent.sentAt,
+						})
+						.from(table.dmContent)
+						.where(
+							and(
+								eq(table.dmContent.channelId, channelId),
+								eq(table.dmContent.messageId, relatedMessage),
+							),
+						)
+						.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
+				).at(0)) ||
+			undefined
 		);
-
-	const _relatedMessage =
-		(relatedMessage &&
-			(
-				await db
-					.select({
-						id: table.dmContent.messageId,
-						sender: table.user,
-						content: table.dmContent.content,
-						sentAt: table.dmContent.sentAt,
-					})
-					.from(table.dmContent)
-					.where(
-						and(
-							eq(table.dmContent.channelId, channelId),
-							eq(table.dmContent.messageId, relatedMessage),
-						),
-					)
-					.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
-			).at(0)) ||
-		undefined;
+	});
 
 	return [
 		{
