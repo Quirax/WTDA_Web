@@ -4,13 +4,20 @@
 	import { cn } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
 	import { twemoji } from 'twemoji-svelte-action';
+	import { beforeNavigate } from '$app/navigation';
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
 	}
 
-	const { children, id, channels }: Props = $props();
+	const { children, channels }: Props = $props();
+
+	let id = $state<Optional<string>>(undefined);
+
+	beforeNavigate((nav) => {
+		id = nav.to?.route.id?.startsWith('/dm') ? nav.to.params?.id : undefined;
+	});
 
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
