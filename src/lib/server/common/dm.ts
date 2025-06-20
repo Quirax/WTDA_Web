@@ -274,6 +274,7 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 		.leftJoin(reactions, eq(reactions.messageId, table.dmContent.messageId))
 		.groupBy((t) => t.id)
 		.as('metadata');
+	// TODO: 일정 범위 이내의 값만 가져오도록 변경
 
 	const result = await db
 		.select({
@@ -312,7 +313,18 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 				eq(table.dmReactions.setter, me.id),
 			),
 		);
-	// TODO: 일정 범위 이내의 값만 가져오도록 변경
+
+	// 읽음 확인
+	await db
+		.insert(table.dmReceived)
+		.values(
+			result.map((message) => ({
+				channelId,
+				messageId: message.id,
+				receiver: me.id,
+			})),
+		)
+		.onConflictDoNothing();
 
 	return result.map<App.DM>((v) => ({
 		id: v.id,
@@ -367,6 +379,13 @@ export const send = async (
 						path: path[1],
 					})),
 			);
+
+		// 읽음 확인
+		await tx.insert(table.dmReceived).values({
+			channelId,
+			messageId,
+			receiver: sender.id,
+		});
 
 		return (
 			(relatedMessage &&
