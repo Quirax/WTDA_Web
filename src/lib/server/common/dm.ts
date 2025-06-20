@@ -20,6 +20,7 @@ import { message } from 'sveltekit-superforms';
 import { string } from 'zod';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { Emoji } from 'emoji-type';
+import { dmsPerPage } from '$lib/config';
 
 type Transaction =
 	| PgTransaction<
@@ -267,22 +268,24 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 	const metadata = db
 		.select({
 			id: table.dmContent.messageId,
+			sentAt: table.dmContent.sentAt,
 			reactions: sql<(typeof reactions)[]>`json_agg(reactions)`.as('reactions'),
 		})
 		.from(table.dmContent)
 		// 참고: sql.placeholder는 Date 형식에 대해 사용 불가하여 현행 유지
 		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
 		.leftJoin(reactions, eq(reactions.messageId, table.dmContent.messageId))
-		.groupBy((t) => t.id)
+		.groupBy((t) => [t.id, t.sentAt])
+		.orderBy((t) => desc(t.sentAt))
+		.limit(dmsPerPage)
 		.as('metadata');
-	// TODO: 일정 범위 이내의 값만 가져오도록 변경
 
 	const result = await db
 		.select({
 			id: metadata.id,
 			sender: table.user,
 			content: table.dmContent.content,
-			sentAt: table.dmContent.sentAt,
+			sentAt: metadata.sentAt,
 			relatedMessage: {
 				id: rmContent.messageId,
 				content: rmContent.content,
@@ -317,16 +320,18 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 		.orderBy((t) => asc(t.sentAt));
 
 	// 읽음 확인
-	await db
-		.insert(table.dmReceived)
-		.values(
-			result.map((message) => ({
-				channelId,
-				messageId: message.id,
-				receiver: me.id,
-			})),
-		)
-		.onConflictDoNothing();
+	if (result.length > 0) {
+		await db
+			.insert(table.dmReceived)
+			.values(
+				result.map((message) => ({
+					channelId,
+					messageId: message.id,
+					receiver: me.id,
+				})),
+			)
+			.onConflictDoNothing();
+	}
 
 	return result.map<App.DM>((v) => ({
 		id: v.id,

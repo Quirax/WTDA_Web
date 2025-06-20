@@ -20,7 +20,7 @@ export const actions: Actions = {
 	get: async ({ params, request, locals }) => {
 		if (!locals.user) return {};
 
-		const before = new Date((await request.formData()).get('before') as string);
+		const before = new Date(parseInt((await request.formData()).get('before') as string));
 		const channelId = params.id;
 
 		try {

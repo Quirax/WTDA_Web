@@ -32,11 +32,12 @@
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
+	let enableScrollEvent = $state(false);
 	let dms = $state<App.DM[]>([]);
 
 	const getDM = async (before = new Date()) => {
 		const body = new FormData();
-		body.append('before', before.toString());
+		body.append('before', before.getTime().toString());
 
 		const result = await fetch('?/get', { method: 'post', body })
 			.then((r) => r.text())
@@ -45,7 +46,19 @@
 		if (result.type === 'success') {
 			const new_dms = result.data?.dms as App.DM[] | undefined;
 
-			if (new_dms && new_dms.length > 0) dms = [...new_dms, ...dms];
+			if (new_dms && new_dms.length > 0) {
+				dms = Object.values(
+					[...new_dms, ...dms].reduce<Record<string, App.DM>>(
+						(acc, dm) => (acc[dm.id] = dm) && acc,
+						{},
+					),
+				);
+				enableScrollEvent = true;
+				await tick();
+				scrollToDM(new_dms[new_dms.length - 1].id);
+			} else {
+				enableScrollEvent = false;
+			}
 			// } else {
 			// 	openErrorOnBeginDM = true;
 		}
@@ -67,8 +80,21 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
+	const onScrollContainer = () => {
+		if (!container) return;
+
+		if (enableScrollEvent && container.scrollTop < 100) {
+			enableScrollEvent = false;
+			getDM(dms[0].sentAt);
+		}
+	};
+
 	onNavigate((nav) => {
-		nav.to?.route.id === '/dm/[id]' && getDM().then(scrollToBottom);
+		if (nav.to?.route.id === '/dm/[id]') {
+			dms = [];
+			enableScrollEvent = false;
+			getDM().then(scrollToBottom);
+		}
 	});
 	$effect(scrollToBottom);
 
@@ -216,6 +242,9 @@
 			goto('/dm');
 		}
 	};
+
+	const sameSender = (dest: App.DM, dm: App.DM) =>
+		!['join', 'leave'].includes(dest?.type || '') && dest?.sender?.id === dm.sender?.id;
 </script>
 
 <Header {title} />
@@ -243,13 +272,15 @@
 	</H2>
 	<section
 		bind:this={container}
+		onscroll={onScrollContainer}
 		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
 		{#each dms as dm, i}
 			<Message
 				dir={dm.sender!.id === user!.id ? Direction.SEND : Direction.RECEIVE}
 				{dm}
-				prev={dms[i - 1]}
-				next={dms[i + 1]}
+				sameSenderAsPrev={sameSender(dms[i - 1], dm)}
+				sameSenderAsNext={sameSender(dms[i + 1], dm)}
+				sentAtOfNext={dms[i + 1]?.sentAt}
 				id="dm-{dm.id}"
 				onScrollToDM={scrollToDM}
 				{onOpenEmojiList}
