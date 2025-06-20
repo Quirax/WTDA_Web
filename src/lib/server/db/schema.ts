@@ -220,7 +220,7 @@ export const dmReactions = pgTable(
 		setter: text('setter')
 			.notNull()
 			.references(() => user.id),
-		emoji: text('setter').$type<Emoji>().notNull(),
+		emoji: text('emoji').$type<Emoji>().notNull(),
 	},
 	(table) => [
 		foreignKey({

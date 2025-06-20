@@ -2,10 +2,12 @@ import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
 import {
 	and,
+	count,
 	desc,
 	eq,
 	lte,
 	max,
+	sql,
 	SQL,
 	Subquery,
 	type ExtractTablesWithRelations,
@@ -16,6 +18,7 @@ import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
 import { message } from 'sveltekit-superforms';
 import { string } from 'zod';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
+import type { Emoji } from 'emoji-type';
 
 type Transaction =
 	| PgTransaction<
@@ -245,13 +248,35 @@ export const getDMChannelInfo = async (channelId: string) => {
 
 export type DMChannelInfo = Awaited<ReturnType<typeof getDMChannelInfo>>;
 
-export const get = async (channelId: string, before: Date) => {
+export const get = async (channelId: string, before: Date, me: NonNullable<App.User>) => {
 	const rmContent = alias(table.dmContent, 'rm_content');
 	const rmSender = alias(table.user, 'rm_sender');
 
-	const result = await db
+	const reactions = db
+		.select({
+			messageId: table.dmReactions.messageId,
+			emoji: table.dmReactions.emoji,
+			count: count(table.dmReactions.setter),
+		})
+		.from(table.dmReactions)
+		.where(eq(table.dmReactions.channelId, channelId))
+		.groupBy((t) => [t.messageId, t.emoji])
+		.as('reactions');
+
+	const metadata = db
 		.select({
 			id: table.dmContent.messageId,
+			reactions: sql<(typeof reactions)[]>`json_agg(reactions)`.as('reactions'),
+		})
+		.from(table.dmContent)
+		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
+		.leftJoin(reactions, eq(reactions.messageId, table.dmContent.messageId))
+		.groupBy((t) => t.id)
+		.as('metadata');
+
+	const result = await db
+		.select({
+			id: metadata.id,
 			sender: table.user,
 			content: table.dmContent.content,
 			sentAt: table.dmContent.sentAt,
@@ -261,9 +286,14 @@ export const get = async (channelId: string, before: Date) => {
 				sentAt: rmContent.sentAt,
 			},
 			relatedMessageSender: rmSender,
+			reactions: metadata.reactions,
+			myReaction: table.dmReactions.emoji,
 		})
-		.from(table.dmContent)
-		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
+		.from(metadata)
+		.innerJoin(
+			table.dmContent,
+			and(eq(table.dmContent.channelId, channelId), eq(table.dmContent.messageId, metadata.id)),
+		)
 		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
 		.leftJoin(
 			rmContent,
@@ -272,13 +302,26 @@ export const get = async (channelId: string, before: Date) => {
 				eq(rmContent.messageId, table.dmContent.relatedMessage),
 			),
 		)
-		.leftJoin(rmSender, eq(rmSender.id, rmContent.sender));
+		.leftJoin(rmSender, eq(rmSender.id, rmContent.sender))
+		.leftJoin(
+			table.dmReactions,
+			and(
+				eq(table.dmReactions.channelId, channelId),
+				eq(table.dmReactions.messageId, metadata.id),
+				eq(table.dmReactions.setter, me.id),
+			),
+		);
 	// TODO: 일정 범위 이내의 값만 가져오도록 변경
 
 	return result.map<App.DM>((v) => ({
 		id: v.id,
 		sender: v.sender,
 		sentAt: v.sentAt,
+		reactions:
+			v.reactions[0] === null
+				? undefined
+				: Object.fromEntries(v.reactions.map((r) => [r.emoji, r.count])),
+		myReaction: v.myReaction || undefined,
 		...v.content,
 		relatedMessage:
 			(v.relatedMessage && {
@@ -361,4 +404,55 @@ export const send = async (
 			},
 		},
 	];
+};
+
+// ref: https://orm.drizzle.team/docs/perf-queries#placeholder
+const deleteReact = db
+	.delete(table.dmReactions)
+	.where(
+		and(
+			eq(table.dmReactions.channelId, sql.placeholder('channelId')),
+			eq(table.dmReactions.messageId, sql.placeholder('messageId')),
+			eq(table.dmReactions.setter, sql.placeholder('setter')),
+		),
+	);
+
+const upsertReact = db.insert(table.dmReactions).values({
+	channelId: sql.placeholder('channelId'),
+	messageId: sql.placeholder('messageId'),
+	setter: sql.placeholder('setter'),
+	emoji: sql.placeholder('emoji'),
+});
+
+export const react = async (
+	channelId: string,
+	messageId: string,
+	setter: NonNullable<App.User>,
+	emoji: Nullable<Emoji>,
+) => {
+	if (!emoji) {
+		await deleteReact.execute({
+			channelId,
+			messageId,
+			setter: setter.id,
+		});
+	} else {
+		await upsertReact
+			.onConflictDoUpdate({
+				target: [
+					table.dmReactions.channelId,
+					table.dmReactions.messageId,
+					table.dmReactions.setter,
+				],
+				set: {
+					emoji,
+				},
+			})
+			.execute({
+				channelId,
+				messageId,
+				emoji,
+				setter: setter.id,
+			});
+	}
 };

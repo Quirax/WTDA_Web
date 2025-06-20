@@ -153,6 +153,29 @@
 		dmDraft.message += emoji || '';
 	};
 
+	const onReact = (messageId: string, emoji?: Emoji) => {
+		const target = dms.findIndex((dm) => dm.id === messageId);
+		const reactions = (dms[target] as App.GeneralDM).reactions || {};
+		let myReaction = (dms[target] as App.GeneralDM).myReaction;
+
+		if (myReaction) {
+			reactions[myReaction]! -= 1;
+			if (reactions[myReaction] === 0) delete reactions[myReaction];
+		}
+
+		if (emoji) {
+			if (!reactions[emoji]) reactions[emoji] = 1;
+			else reactions[emoji] += 1;
+		}
+		myReaction = emoji || undefined;
+
+		dms[target] = {
+			...dms[target],
+			reactions,
+			myReaction,
+		} as App.DM & App.GeneralDM;
+	};
+
 	const onReply = (message: App.DM) => {
 		dmDraft.relatedMessage = undefined;
 		tick().then(() => (dmDraft.relatedMessage = message));
@@ -194,6 +217,7 @@
 				onScrollToDM={scrollToDM}
 				{onOpenEmojiList}
 				{onReply}
+				{onReact}
 				tabindex={i + 1} />
 		{/each}
 	</section>

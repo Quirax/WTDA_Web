@@ -6,6 +6,8 @@
 </script>
 
 <script lang="ts">
+	import { deserialize } from '$app/forms';
+
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -31,6 +33,7 @@
 		) => void;
 		tabindex?: number;
 		onReply?: (message: App.DM) => void;
+		onReact?: (messageId: string, emoji: Emoji | undefined) => void;
 	}
 
 	const {
@@ -43,6 +46,7 @@
 		onScrollToDM = () => {},
 		onOpenEmojiList = () => {},
 		onReply = () => {},
+		onReact = () => {},
 	}: Props = $props();
 
 	const sameSenderAsPrev =
@@ -98,8 +102,20 @@
 		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
 	});
 
-	const onEmoji: EmojiEventHandler = (emoji) => {
-		console.log(emoji); // TODO: 이모티콘 반응 등록
+	const onEmoji: EmojiEventHandler = async (emoji) => {
+		const body = new FormData();
+		body.append('messageId', dm.id);
+		if (emoji) body.append('emoji', emoji);
+
+		const result = await fetch('?/react', { method: 'post', body })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			onReact(dm.id, emoji);
+			// } else {
+			// 	openErrorOnBeginDM = true;
+		}
 	};
 </script>
 
@@ -190,8 +206,8 @@
 								<div class="mt-2 space-x-2 text-right">
 									{#each reactions as [emoji, num]}
 										<Badge
-											variant={emoji === dm.myReaction ? 'default' : 'outline'}
-											class="space-x-1">
+											variant={emoji === dm.myReaction ? 'default' : 'secondary'}
+											class="border-secondary space-x-1 border">
 											<span>{emoji}</span>
 											<span>{num}</span>
 										</Badge>

@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import * as dm from '$lib/server/common/dm';
+import type { Emoji } from 'emoji-type';
 
 export const load = (async ({ locals, params }) => {
 	if (!locals.user) return {};
@@ -22,7 +23,7 @@ export const actions: Actions = {
 		const channelId = params.id;
 
 		try {
-			const dms = await dm.get(channelId, before);
+			const dms = await dm.get(channelId, before, locals.user);
 			return { dms };
 		} catch (e) {
 			console.error(e);
@@ -48,6 +49,25 @@ export const actions: Actions = {
 			);
 
 			return { dms };
+		} catch (e) {
+			console.error(e);
+			throw error(500, { message: 'An error has occurred' });
+		}
+	},
+
+	react: async ({ params, request, locals }) => {
+		if (!locals.user) return {};
+
+		const body = await request.formData();
+
+		const emoji = body.get('emoji') as Emoji | null;
+		const messageId = body.get('messageId') as string;
+		const channelId = params.id;
+
+		try {
+			await dm.react(channelId, messageId, locals.user, emoji);
+
+			return { message: 'React completed' };
 		} catch (e) {
 			console.error(e);
 			throw error(500, { message: 'An error has occurred' });
