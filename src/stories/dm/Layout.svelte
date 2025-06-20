@@ -5,6 +5,7 @@
 	import type { DMChannel } from '$lib/server/db/schema';
 	import { twemoji } from 'twemoji-svelte-action';
 	import { beforeNavigate } from '$app/navigation';
+	import { User } from 'lucide-svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
@@ -39,12 +40,20 @@
 						'hover:bg-accent hover:text-accent-foreground',
 				)}>
 				<div class="flex -space-x-5">
-					{#each participants || [] as participant}
-						<UserAvatar class="size-9" user={participant} />
-					{/each}
+					{#if participants && participants.length > 0}
+						{#each participants as participant}
+							<UserAvatar class="size-9" user={participant} />
+						{/each}
+					{:else}
+						<User class="size-9" />
+					{/if}
 				</div>
 				<div class="flex flex-col overflow-hidden">
-					<strong>{participants.map((v) => v!.username).join(', ')}</strong>
+					<strong>
+						{participants && participants.length > 0
+							? participants.map((v) => v!.username).join(', ')
+							: '다른 참여자 없음'}
+					</strong>
 					<span
 						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
 						use:twemoji>

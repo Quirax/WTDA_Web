@@ -199,7 +199,12 @@
 		}
 	};
 
-	const title = `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`;
+	const participants = info?.participants.filter((v) => v.id !== user!.id) || [];
+
+	const title =
+		participants.length > 0
+			? `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`
+			: '종료된 대화';
 
 	let openBeforeLeaveAlert = $state(false);
 	const onLeave = async () => {
