@@ -4,12 +4,12 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
-	import { Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
+	import { EllipsisVertical, Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
 	import { ArticleCategory, ArticleType } from '@app';
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
-	import { onNavigate } from '$app/navigation';
+	import { goto, onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji, uploadImage } from '$lib/utils';
 	import Muted from '$lib/components/typo/muted.svelte';
@@ -20,6 +20,8 @@
 	import { deserialize } from '$app/forms';
 	import Dropzone from 'svelte-file-dropzone';
 	import { imageFormat } from '$lib/config';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -198,12 +200,42 @@
 	};
 
 	const title = `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`;
+
+	let openBeforeLeaveAlert = $state(false);
+	const onLeave = async () => {
+		const result = await fetch('?/leave', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			goto('/dm');
+		}
+	};
 </script>
 
 <Header {title} />
 
 <Section class="flex size-full flex-col">
-	<H2 class="flex-none">{title}</H2>
+	<H2 class="flex flex-none justify-between">
+		<span>{title}</span>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger class="m-0 p-0">
+				{#snippet child({ props })}
+					<Button {...props} variant="ghost" size="icon"><EllipsisVertical /></Button>
+				{/snippet}
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content class="w-56" align="end">
+				<DropdownMenu.Group>
+					<DropdownMenu.Item onclick={() => (openBeforeLeaveAlert = true)}>
+						나가기
+					</DropdownMenu.Item>
+					<!-- TODO 구현 완료 시 재활성화
+					<DropdownMenu.Item onclick={() => {}}>신고하고 나가기</DropdownMenu.Item>
+					-->
+				</DropdownMenu.Group>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</H2>
 	<section
 		bind:this={container}
 		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
@@ -313,3 +345,10 @@
 </Section>
 
 <EmojiList bind:open={openEmojiList} {...emojiListProps} />
+
+<AlertDialog
+	title="정말로 나가시겠습니까?"
+	description="나간 이후에도 새로운 대화방에서 대화를 진행할 수 있습니다. 이를 원하지 않는 경우 상대방을 차단하시기 바랍니다."
+	cancel={true}
+	onAction={onLeave}
+	bind:open={openBeforeLeaveAlert} />

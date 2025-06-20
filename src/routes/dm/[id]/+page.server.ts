@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import * as dm from '$lib/server/common/dm';
 import type { Emoji } from 'emoji-type';
+import { db } from '$lib/server/db';
 
 export const load = (async ({ locals, params }) => {
 	if (!locals.user) return {};
@@ -68,6 +69,20 @@ export const actions: Actions = {
 			await dm.react(channelId, messageId, locals.user, emoji);
 
 			return { message: 'React completed' };
+		} catch (e) {
+			console.error(e);
+			throw error(500, { message: 'An error has occurred' });
+		}
+	},
+
+	leave: async ({ params, locals }) => {
+		if (!locals.user) return {};
+
+		const channelId = params.id;
+
+		try {
+			await dm.leaveFromChannel(db, locals.user.id, channelId);
+			return { message: 'Leave completed' };
 		} catch (e) {
 			console.error(e);
 			throw error(500, { message: 'An error has occurred' });

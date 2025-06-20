@@ -269,6 +269,7 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 			reactions: sql<(typeof reactions)[]>`json_agg(reactions)`.as('reactions'),
 		})
 		.from(table.dmContent)
+		// 참고: sql.placeholder는 Date 형식에 대해 사용 불가하여 현행 유지
 		.where(and(eq(table.dmContent.channelId, channelId), lte(table.dmContent.sentAt, before)))
 		.leftJoin(reactions, eq(reactions.messageId, table.dmContent.messageId))
 		.groupBy((t) => t.id)
