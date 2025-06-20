@@ -2,6 +2,7 @@ import { DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
 import {
 	and,
+	asc,
 	count,
 	desc,
 	eq,
@@ -312,7 +313,8 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 				eq(table.dmReactions.messageId, metadata.id),
 				eq(table.dmReactions.setter, me.id),
 			),
-		);
+		)
+		.orderBy((t) => asc(t.sentAt));
 
 	// 읽음 확인
 	await db
