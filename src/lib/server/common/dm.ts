@@ -160,8 +160,13 @@ export const getDMChannels = async (
 		.innerJoin(table.dmParticipant, eq(table.dmParticipant.channelId, subquery.channelId))
 		.innerJoin(participant, eq(participant.id, table.dmParticipant.participantId));
 
+	console.log(rows);
+
 	const result = rows.reduce<
-		Record<DMChannel['id'], DMChannel & { participants: User[]; latestMessage?: App.DM }>
+		Record<
+			DMChannel['id'],
+			DMChannel & { participants: Record<User['id'], User>; latestMessage?: App.DM }
+		>
 	>((acc, row) => {
 		const channel = row.channel;
 		const participant = row.participant;
@@ -169,7 +174,7 @@ export const getDMChannels = async (
 		if (!acc[channel.id]) {
 			acc[channel.id] = {
 				...channel,
-				participants: [],
+				participants: {},
 				latestMessage: row.latestMessage && {
 					id: row.latestMessage.messageId,
 					sentAt: row.latestMessage.sentAt || new Date(),
@@ -180,12 +185,15 @@ export const getDMChannels = async (
 		}
 
 		if (participant) {
-			acc[channel.id].participants.push(participant);
+			acc[channel.id].participants[participant.id] = participant;
 		}
 		return acc;
 	}, {});
 
-	return Object.values(result);
+	return Object.values(result).map((acc) => ({
+		...acc,
+		participants: Object.values(acc.participants),
+	}));
 };
 
 export const beginDMProc = async (
