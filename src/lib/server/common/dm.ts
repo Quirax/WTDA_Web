@@ -6,9 +6,11 @@ import {
 	count,
 	desc,
 	eq,
+	isNull,
 	lte,
 	max,
 	ne,
+	or,
 	sql,
 	SQL,
 	Subquery,
@@ -159,8 +161,6 @@ export const getDMChannels = async (
 		.innerJoin(table.dmChannel, eq(table.dmChannel.id, subquery.channelId))
 		.innerJoin(table.dmParticipant, eq(table.dmParticipant.channelId, subquery.channelId))
 		.innerJoin(participant, eq(participant.id, table.dmParticipant.participantId));
-
-	console.log(rows);
 
 	const result = rows.reduce<
 		Record<
@@ -404,8 +404,14 @@ const ableToSendQuery = db
 	.from(ableToSendSubquery)
 	.where(
 		and(
-			ne(ableToSendSubquery.relationshipFromUser, UserRelationship.BLOCKED),
-			ne(ableToSendSubquery.relationshipToUser, UserRelationship.BLOCKED),
+			or(
+				isNull(ableToSendSubquery.relationshipFromUser),
+				ne(ableToSendSubquery.relationshipFromUser, UserRelationship.BLOCKED),
+			),
+			or(
+				isNull(ableToSendSubquery.relationshipToUser),
+				ne(ableToSendSubquery.relationshipToUser, UserRelationship.BLOCKED),
+			),
 		),
 	);
 
