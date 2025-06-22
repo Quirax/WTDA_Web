@@ -79,7 +79,7 @@
 									variant="ghost"
 									class="size-9 rounded-full p-0"
 									aria-label="User Menu">
-									<UserAvatar class="size-9" {user} />
+									<UserAvatar class="size-9" {user} withoutLink />
 								</Button>
 							{/snippet}
 						</DropdownMenu.Trigger>
