@@ -7,6 +7,7 @@
 
 	interface Props extends HTMLSlotAttributes {
 		user: Pick<NonNullable<App.User>, 'id' | 'profileImage' | 'username'> | null;
+		withoutLink?: boolean;
 	}
 
 	const {
@@ -16,12 +17,21 @@
 			username: '',
 			profileImage: null,
 		},
+		withoutLink = false,
 	}: Props = $props();
 </script>
 
-<a href="/user/{user?.id}">
+{#snippet content()}
 	<Avatar.Root class={className}>
 		<Avatar.Image src={user?.profileImage} alt={user?.username} />
 		<Avatar.Fallback><User /></Avatar.Fallback>
 	</Avatar.Root>
-</a>
+{/snippet}
+
+{#if withoutLink}
+	{@render content()}
+{:else}
+	<a href="/user/{user?.id}">
+		{@render content()}
+	</a>
+{/if}

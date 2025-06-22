@@ -42,7 +42,7 @@
 				<div class="flex -space-x-5">
 					{#if participants && participants.length > 0}
 						{#each participants as participant}
-							<UserAvatar class="size-9" user={participant} />
+							<UserAvatar class="size-9" user={participant} withoutLink />
 						{/each}
 					{:else}
 						<User class="size-9" />
