@@ -374,9 +374,10 @@
 		</Dropzone>
 		<Input
 			name="chat"
-			placeholder="메시지를 입력하세요..."
+			placeholder={info?.isAbleToSend ? '메시지를 입력하세요...' : '대화할 수 없는 대화방입니다.'}
 			bind:value={dmDraft.message}
-			onkeyup={onKeyUp} />
+			onkeyup={onKeyUp}
+			disabled={!info?.isAbleToSend} />
 		<Button size="icon" variant="secondary" onclick={(event) => onOpenEmojiList(event, onEmoji)}>
 			<!-- 이모티콘 추가 -->
 			<SmilePlus />

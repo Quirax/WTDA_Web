@@ -227,7 +227,7 @@ export const beginDMProc = async (
 	});
 };
 
-export const getDMChannelInfo = async (channelId: string) => {
+export const getDMChannelInfo = async (channelId: string, sender: NonNullable<App.User>) => {
 	const channelInfo = (
 		await db
 			.select({
@@ -246,7 +246,11 @@ export const getDMChannelInfo = async (channelId: string) => {
 		.where(eq(table.dmParticipant.channelId, channelId))
 		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
 
-	return { ...channelInfo, participants: participants.map((v) => v.participant) };
+	return {
+		...channelInfo,
+		participants: participants.map((v) => v.participant),
+		isAbleToSend: await isAbleToSend(channelId, sender),
+	};
 };
 
 export type DMChannelInfo = Awaited<ReturnType<typeof getDMChannelInfo>>;

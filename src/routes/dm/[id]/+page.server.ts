@@ -8,7 +8,7 @@ export const load = (async ({ locals, params }) => {
 	if (!locals.user) return {};
 
 	try {
-		const info = await dm.getDMChannelInfo(params.id);
+		const info = await dm.getDMChannelInfo(params.id, locals.user);
 		return { info };
 	} catch (e) {
 		console.error(e);
