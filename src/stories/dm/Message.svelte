@@ -130,7 +130,6 @@
 	{/if}
 	{#if dm.type === 'general'}
 		{@const sentAtString = formatDatetimeString(dm.sentAt)}
-		{@const v = console.log(formatDatetimeString(sentAtOfNext), sentAtString)}
 		<div class={cn('relative flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 			{#if dm.message || !!dm.relatedPost}
 				{@const message = dm.message || ''}

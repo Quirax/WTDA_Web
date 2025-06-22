@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import * as dm from '$lib/server/common/dm';
 import type { Emoji } from 'emoji-type';
@@ -28,7 +28,7 @@ export const actions: Actions = {
 			return { dms };
 		} catch (e) {
 			console.error(e);
-			throw error(500, { message: 'An error has occurred' });
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
@@ -51,8 +51,12 @@ export const actions: Actions = {
 
 			return { dms };
 		} catch (e) {
+			if (e instanceof Error && typeof e.cause === 'number') {
+				return fail(e.cause, { message: e.message });
+			}
+
 			console.error(e);
-			throw error(500, { message: 'An error has occurred' });
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
@@ -71,7 +75,7 @@ export const actions: Actions = {
 			return { message: 'React completed' };
 		} catch (e) {
 			console.error(e);
-			throw error(500, { message: 'An error has occurred' });
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
@@ -85,7 +89,7 @@ export const actions: Actions = {
 			return { message: 'Leave completed' };
 		} catch (e) {
 			console.error(e);
-			throw error(500, { message: 'An error has occurred' });
+			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 };

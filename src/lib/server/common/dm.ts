@@ -8,6 +8,7 @@ import {
 	eq,
 	lte,
 	max,
+	ne,
 	sql,
 	SQL,
 	Subquery,
@@ -354,6 +355,57 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 	}));
 };
 
+const relationshipToUser = alias(table.userRelationship, 'relationshipToUser');
+const relationshipFromUser = alias(table.userRelationship, 'relationshipFromUser');
+
+const ableToSendSubquery = db
+	.select({
+		participant: table.dmParticipant.participantId,
+		relationshipToUser: relationshipToUser.to,
+		relationshipFromUser: relationshipFromUser.from,
+	})
+	.from(table.dmParticipant)
+	.where(
+		and(
+			eq(table.dmParticipant.channelId, sql.placeholder('channelId')),
+			ne(table.dmParticipant.participantId, sql.placeholder('senderId')),
+		),
+	)
+	.leftJoin(
+		relationshipToUser,
+		and(
+			eq(relationshipToUser.from, sql.placeholder('senderId')),
+			eq(relationshipToUser.to, table.dmParticipant.participantId),
+		),
+	)
+	.leftJoin(
+		relationshipFromUser,
+		and(
+			eq(relationshipFromUser.to, sql.placeholder('senderId')),
+			eq(relationshipFromUser.from, table.dmParticipant.participantId),
+		),
+	)
+	.as('sq');
+
+const ableToSendQuery = db
+	.select()
+	.from(ableToSendSubquery)
+	.where(
+		and(
+			ne(ableToSendSubquery.relationshipFromUser, UserRelationship.BLOCKED),
+			ne(ableToSendSubquery.relationshipToUser, UserRelationship.BLOCKED),
+		),
+	);
+
+export const isAbleToSend = async (channelId: string, sender: NonNullable<App.User>) => {
+	const result = await ableToSendQuery.execute({
+		channelId,
+		senderId: sender.id,
+	});
+
+	return result.length > 0;
+};
+
 export const send = async (
 	channelId: string,
 	sender: NonNullable<App.User>,
@@ -362,6 +414,8 @@ export const send = async (
 ) => {
 	const messageId = generateID();
 	const sentAt = new Date();
+
+	if (!(await isAbleToSend(channelId, sender))) throw Error('Not able to send', { cause: 406 });
 
 	const _relatedMessage = await db.transaction(async (tx) => {
 		await tx.insert(table.dmContent).values({

@@ -22,6 +22,7 @@
 	import { imageFormat } from '$lib/config';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -168,8 +169,15 @@
 
 			dmDraft = defaultDraft;
 			tick().then(() => scrollToBottom());
-			// } else {
-			// 	openErrorOnBeginDM = true;
+		} else {
+			console.log(result);
+
+			if (result.status === 406)
+				toast.error(
+					'이 대화방에서 메시지를 수신할 대상이 없습니다. 대화가 종료되었거나 상대방이 차단했을 수 있습니다.',
+				);
+			else
+				toast.error('메시지를 보내는 도중 오류가 발생하였습니다. 고객센터에 문의하시기 바랍니다.');
 		}
 	};
 
