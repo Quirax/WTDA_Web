@@ -49,43 +49,91 @@ export const createDMChannel = async (
 	return channelId;
 };
 
-export const joinToChannel = async (mainTx: Transaction, userId: string, channelId: string) => {
-	await mainTx.transaction(async (tx) => {
+export const joinToChannel = async (
+	mainTx: Transaction,
+	user: NonNullable<App.User>,
+	channelId: string,
+) => {
+	const dm = await mainTx.transaction(async (tx) => {
 		await tx.insert(table.dmParticipant).values({
 			channelId,
-			participantId: userId,
+			participantId: user.id,
 		});
+
+		const dm: App.DM = {
+			id: generateID(),
+			type: 'leave',
+			sentAt: new Date(),
+			sender: user,
+		};
 
 		await tx.insert(table.dmContent).values({
 			channelId,
-			messageId: generateID(),
-			sender: userId,
+			messageId: dm.id,
+			sender: user.id,
 			content: {
 				type: 'join',
 			},
 		});
+
+		return dm;
+	});
+
+	(
+		await db
+			.select({ uid: table.dmParticipant.participantId })
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.channelId, channelId))
+	).forEach(({ uid }) => {
+		telecom.notify(uid, { event: 'join', channelId, userId: user.id });
+		telecom.notify(uid, { event: 'dmSent', channelId, dms: [dm] });
 	});
 };
 
-export const leaveFromChannel = async (mainTx: Transaction, userId: string, channelId: string) => {
-	await mainTx.transaction(async (tx) => {
+export const leaveFromChannel = async (
+	mainTx: Transaction,
+	user: NonNullable<App.User>,
+	channelId: string,
+) => {
+	const dm = await mainTx.transaction(async (tx) => {
 		await tx
 			.delete(table.dmParticipant)
 			.where(
 				and(
 					eq(table.dmParticipant.channelId, channelId),
-					eq(table.dmParticipant.participantId, userId),
+					eq(table.dmParticipant.participantId, user.id),
 				),
 			);
 
+		const dm: App.DM = {
+			id: generateID(),
+			type: 'leave',
+			sentAt: new Date(),
+			sender: user,
+		};
+
 		await tx.insert(table.dmContent).values({
 			channelId,
-			messageId: generateID(),
-			sender: userId,
+			messageId: dm.id,
+			sender: user.id,
 			content: {
 				type: 'leave',
 			},
 		});
+
+		return dm;
+	});
+
+	telecom.notify(user.id, { event: 'leave', channelId, userId: user.id });
+
+	(
+		await db
+			.select({ uid: table.dmParticipant.participantId })
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.channelId, channelId))
+	).forEach(({ uid }) => {
+		telecom.notify(uid, { event: 'leave', channelId, userId: user.id });
+		telecom.notify(uid, { event: 'dmSent', channelId, dms: [dm] });
 	});
 };
 
@@ -197,16 +245,16 @@ export const getDMChannels = async (
 };
 
 export const beginDMProc = async (
-	fromUser: string,
-	toUser: string,
+	fromUser: NonNullable<App.User>,
+	toUser: NonNullable<App.User>,
 	type = DMChannelType.GENERAL,
 	relatedArticle?: string,
 ) => {
 	// 자기 자신과 DM할 수 없음
-	if (fromUser === toUser) throw new Error('Cannot chat with yourself', { cause: 400 });
+	if (fromUser.id === toUser.id) throw new Error('Cannot chat with yourself', { cause: 400 });
 
 	// 어느 한 쪽이 차단한 경우 DM할 수 없음
-	const relationship = await getRelationship(fromUser, toUser);
+	const relationship = await getRelationship(fromUser.id, toUser.id);
 
 	if (
 		relationship.fromUser === UserRelationship.BLOCKED ||
@@ -216,7 +264,7 @@ export const beginDMProc = async (
 
 	// 이미 채널이 있는 경우 해당 채널의 ID 반환
 	const result = (
-		await getDMChannels(fromUser, toUser, (_, ch) =>
+		await getDMChannels(fromUser.id, toUser.id, (_, ch) =>
 			and(eq(ch.type, type), relatedArticle ? eq(ch.relatedArticle, relatedArticle) : undefined),
 		)
 	).at(0);
@@ -229,6 +277,9 @@ export const beginDMProc = async (
 		// 해당 채널에 가입
 		await joinToChannel(tx, fromUser, channelId);
 		await joinToChannel(tx, toUser, channelId);
+
+		telecom.notify(fromUser.id, { event: 'join', channelId, userId: fromUser.id });
+		telecom.notify(toUser.id, { event: 'join', channelId, userId: toUser.id });
 
 		// 해당 채널 ID를 반환
 		return channelId;

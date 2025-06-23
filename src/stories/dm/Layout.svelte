@@ -4,27 +4,22 @@
 	import { cn } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
 	import { twemoji } from 'twemoji-svelte-action';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, invalidateAll } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
+	import { page } from '$app/state';
+	import { tick } from 'svelte';
 
 	interface Props extends ReturnType<typeof $props> {
-		id?: string;
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
 	}
 
-	const { children, channels: prefetchChannels }: Props = $props();
+	const { children, channels }: Props = $props();
 
-	let id = $state<Optional<string>>(undefined);
-
-	beforeNavigate((nav) => {
-		id = nav.to?.route.id?.startsWith('/dm') ? nav.to.params?.id : undefined;
-	});
+	const id = page.params.id;
 
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
-
-	let channels = $state(prefetchChannels);
 
 	source('/sse')
 		.select('dmSent')
@@ -35,7 +30,23 @@
 			const channel = channels.find((ch) => ch.id === parsed.channelId);
 			if (!channel) return;
 
-			channel.latestMessage = parsed.dms[0];
+			invalidateAll();
+		});
+
+	source('/sse')
+		.select('join')
+		.subscribe((message) => {
+			if (!message) return;
+			console.log(message);
+			invalidateAll();
+		});
+
+	source('/sse')
+		.select('leave')
+		.subscribe((message) => {
+			if (!message) return;
+			console.log(message);
+			invalidateAll();
 		});
 </script>
 

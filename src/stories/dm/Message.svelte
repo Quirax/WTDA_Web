@@ -114,6 +114,8 @@
 			// 	openErrorOnBeginDM = true;
 		}
 	};
+
+	const sentAtString = formatDatetimeString(dm.sentAt);
 </script>
 
 <article
@@ -129,7 +131,6 @@
 		{/if}
 	{/if}
 	{#if dm.type === 'general'}
-		{@const sentAtString = formatDatetimeString(dm.sentAt)}
 		<div class={cn('relative flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 			{#if dm.message || !!dm.relatedPost}
 				{@const message = dm.message || ''}

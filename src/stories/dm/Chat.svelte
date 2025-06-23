@@ -285,9 +285,29 @@
 			if (!message) return;
 			const parsed = JSON.parse(message);
 
-			console.log(parsed);
-
 			if (!participants.find((p) => p.id === parsed.fromUser || p.id === parsed.toUser)) return;
+
+			invalidateAll();
+		});
+
+	source('/sse')
+		.select('join')
+		.subscribe(async (message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			if (parsed.channelId !== page.params.id) return;
+
+			invalidateAll();
+		});
+
+	source('/sse')
+		.select('leave')
+		.subscribe(async (message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			if (parsed.channelId !== page.params.id) return;
 
 			invalidateAll();
 		});
