@@ -85,7 +85,7 @@ export const actions: Actions = {
 		const channelId = params.id;
 
 		try {
-			await dm.leaveFromChannel(db, locals.user.id, channelId);
+			await dm.leaveFromChannel(db, locals.user, channelId);
 			return { message: 'Leave completed' };
 		} catch (e) {
 			console.error(e);

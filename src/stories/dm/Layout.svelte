@@ -16,8 +16,6 @@
 
 	const { children, channels }: Props = $props();
 
-	const id = page.params.id;
-
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
@@ -50,11 +48,11 @@
 		});
 </script>
 
-<div class={cn('w-ful flex max-md:flex-col', (!id && 'md:h-[90vh]') || 'h-[90vh]')}>
+<div class={cn('w-ful flex max-md:flex-col', (!page.params.id && 'md:h-[90vh]') || 'h-[90vh]')}>
 	<nav
 		class={cn(
 			'bg-background mt-16 w-70 flex-none overflow-y-auto max-md:w-full',
-			!!id && 'max-md:hidden',
+			!!page.params.id && 'max-md:hidden',
 		)}>
 		{#each channels as ch}
 			{@const participants = (ch.participants || []).filter((v) => v!.id !== user!.id)}
@@ -62,7 +60,7 @@
 				href="/dm/{ch.id}"
 				class={cn(
 					'm-2 flex items-center space-x-2 border p-2',
-					(id === ch.id && 'bg-primary/60 text-primary-foreground') ||
+					(page.params.id === ch.id && 'bg-primary/60 text-primary-foreground') ||
 						'hover:bg-accent hover:text-accent-foreground',
 				)}>
 				<div class="flex -space-x-5">

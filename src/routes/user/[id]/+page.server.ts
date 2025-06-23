@@ -340,7 +340,24 @@ export const actions: Actions = {
 		if (!locals.user) return fail(403, { message: 'Not logined' });
 
 		try {
-			const channelId = await beginDMProc(locals.user.id, params.id);
+			const user = (
+				await db
+					.select({
+						username: table.user.username,
+						profileImage: table.user.profileImage,
+						email: table.user.email,
+						preferences: table.user.preferences,
+						profile: table.user.profile,
+						id: table.user.id,
+						birthday: table.user.birthday,
+						authExpiresAt: table.user.authExpiresAt,
+						status: table.user.status,
+					})
+					.from(table.user)
+					.where(eq(table.user.id, params.id))
+			).at(0);
+
+			const channelId = await beginDMProc(locals.user, user!);
 
 			return { channelId };
 		} catch (e) {
