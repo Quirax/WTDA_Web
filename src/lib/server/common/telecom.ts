@@ -17,8 +17,6 @@ export const listen = async (userId: string, key: string, cb: Callback) => {
 		})
 	).unlisten;
 
-	console.log(listening);
-
 	return listening[name];
 };
 

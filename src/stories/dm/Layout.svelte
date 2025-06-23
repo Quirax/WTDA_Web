@@ -13,7 +13,7 @@
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
 	}
 
-	const { children, channels }: Props = $props();
+	const { children, channels: prefetchChannels }: Props = $props();
 
 	let id = $state<Optional<string>>(undefined);
 
@@ -24,10 +24,20 @@
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
+	let channels = $state(prefetchChannels);
+
 	source('/dm/sse')
 		.select('message')
 		.subscribe((message) => {
-			if (message) console.log(JSON.parse(message));
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			const channel = channels.find((ch) => ch.id === parsed.channelId);
+			if (!channel) return;
+
+			channel.latestMessage = parsed.dms[0];
+
+			console.log(channel, JSON.parse(message));
 		});
 </script>
 
