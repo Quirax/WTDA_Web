@@ -7,9 +7,9 @@
 	import { EllipsisVertical, Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
-	import { ArticleCategory, ArticleType } from '@app';
+	import { ArticleCategory, ArticleType, UserRelationship } from '@app';
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
-	import { goto, onNavigate } from '$app/navigation';
+	import { goto, invalidate, invalidateAll, onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
 	import { cn, formatDatetimeString, sanitizeHTML, twemoji, uploadImage } from '$lib/utils';
 	import Muted from '$lib/components/typo/muted.svelte';
@@ -183,28 +183,6 @@
 		}
 	};
 
-	source('/sse')
-		.select('dmSent')
-		.subscribe((message) => {
-			if (!message) return;
-			const parsed = JSON.parse(message);
-
-			if (parsed.channelId !== page.params.id) return;
-
-			const new_dms = parsed.dms.map((dm: App.DM) => ({ ...dm, sentAt: new Date(dm.sentAt) })) as
-				| App.DM[]
-				| undefined;
-
-			console.log(new_dms);
-
-			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
-
-			if (container) {
-				if (container.scrollTop >= container.scrollHeight - container.clientHeight - 100)
-					tick().then(() => scrollToBottom());
-			}
-		});
-
 	const onKeyUp = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') return onSend();
 	};
@@ -278,6 +256,41 @@
 
 	const sameSender = (dest: App.DM, dm: App.DM) =>
 		!['join', 'leave'].includes(dest?.type || '') && dest?.sender?.id === dm.sender?.id;
+
+	source('/sse')
+		.select('dmSent')
+		.subscribe((message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			if (parsed.channelId !== page.params.id) return;
+
+			const new_dms = parsed.dms.map((dm: App.DM) => ({ ...dm, sentAt: new Date(dm.sentAt) })) as
+				| App.DM[]
+				| undefined;
+
+			console.log(new_dms);
+
+			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
+
+			if (container) {
+				if (container.scrollTop >= container.scrollHeight - container.clientHeight - 100)
+					tick().then(() => scrollToBottom());
+			}
+		});
+
+	source('/sse')
+		.select('relationshipChanged')
+		.subscribe(async (message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			console.log(parsed);
+
+			if (!participants.find((p) => p.id === parsed.fromUser || p.id === parsed.toUser)) return;
+
+			invalidateAll();
+		});
 </script>
 
 <Header {title} />
