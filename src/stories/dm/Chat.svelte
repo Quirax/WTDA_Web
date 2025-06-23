@@ -250,7 +250,7 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			goto('/dm');
+			await invalidateAll();
 		}
 	};
 
