@@ -26,8 +26,8 @@
 
 	let channels = $state(prefetchChannels);
 
-	source('/dm/sse')
-		.select('message')
+	source('/sse')
+		.select('dmSent')
 		.subscribe((message) => {
 			if (!message) return;
 			const parsed = JSON.parse(message);

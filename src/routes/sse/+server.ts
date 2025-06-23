@@ -9,8 +9,8 @@ export const POST = ({ locals }) => {
 		async ({ emit, lock }) => {
 			if (!locals.user) throw error(401);
 
-			unlisten = await listen(locals.user.id, 'dm-sse', (message) => {
-				const { error } = emit('message', JSON.stringify(message));
+			unlisten = await listen(locals.user.id, 'sse', (message) => {
+				const { error } = emit(message.event || 'message', JSON.stringify(message));
 
 				if (error) {
 					console.error(error);

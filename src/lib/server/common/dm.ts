@@ -509,8 +509,7 @@ export const send = async (
 			.from(table.dmParticipant)
 			.where(eq(table.dmParticipant.channelId, channelId))
 	).forEach(({ uid }) => {
-		console.log(`>> notify to ${uid}`);
-		telecom.notify(uid, { channelId, dms });
+		telecom.notify(uid, { event: 'dmSent', channelId, dms });
 	});
 
 	return dms;
