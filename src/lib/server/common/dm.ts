@@ -23,6 +23,7 @@ import * as telecom from './telecom';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { Emoji } from 'emoji-type';
 import { dmsPerPage } from '$lib/config';
+import { aliasedColumn } from '../db/shorthands';
 
 type Transaction =
 	| PgTransaction<
@@ -372,8 +373,8 @@ const relationshipFromUser = alias(table.userRelationship, 'relationshipFromUser
 const ableToSendSubquery = db
 	.select({
 		participant: table.dmParticipant.participantId,
-		relationshipToUser: relationshipToUser.to,
-		relationshipFromUser: relationshipFromUser.from,
+		relationshipToUser: aliasedColumn(relationshipToUser.relationship, 'relationshipToUser'),
+		relationshipFromUser: aliasedColumn(relationshipFromUser.relationship, 'relationshipFromUser'),
 	})
 	.from(table.dmParticipant)
 	.where(
