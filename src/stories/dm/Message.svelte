@@ -6,6 +6,8 @@
 </script>
 
 <script lang="ts">
+	import { deserialize } from '$app/forms';
+
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
@@ -21,8 +23,6 @@
 	interface Props extends ReturnType<typeof $props> {
 		dir: Direction;
 		dm: App.DM;
-		prev?: App.DM;
-		next?: App.DM;
 		onScrollToDM?: (id: string) => void;
 		onOpenEmojiList?: (
 			event: MouseEvent & { currentTarget: EventTarget & HTMLElement },
@@ -30,23 +30,26 @@
 			option: { autoClose?: boolean; value?: Emoji },
 		) => void;
 		tabindex?: number;
+		onReply?: (message: App.DM) => void;
+		onReact?: (messageId: string, emoji: Emoji | undefined) => void;
+		sameSenderAsPrev?: boolean;
+		sameSenderAsNext?: boolean;
+		sentAtOfNext?: Date;
 	}
 
 	const {
 		dir,
 		dm,
-		prev,
-		next,
 		id,
 		tabindex = 0,
 		onScrollToDM = () => {},
 		onOpenEmojiList = () => {},
+		onReply = () => {},
+		onReact = () => {},
+		sameSenderAsNext = false,
+		sameSenderAsPrev = false,
+		sentAtOfNext = new Date(0),
 	}: Props = $props();
-
-	const sameSenderAsPrev =
-		!['join', 'leave'].includes(prev?.type || '') && prev?.sender?.id === dm.sender?.id;
-	const sameSenderAsNext =
-		!['join', 'leave'].includes(next?.type || '') && next?.sender?.id === dm.sender?.id;
 
 	const dataSource = $state(
 		(dm.type === 'general' &&
@@ -96,9 +99,23 @@
 		articleElement.addEventListener('mouseleave', () => (isMouseHover = false));
 	});
 
-	const onEmoji: EmojiEventHandler = (emoji) => {
-		console.log(emoji); // TODO: 이모티콘 반응 등록
+	const onEmoji: EmojiEventHandler = async (emoji) => {
+		const body = new FormData();
+		body.append('messageId', dm.id);
+		if (emoji) body.append('emoji', emoji);
+
+		const result = await fetch('?/react', { method: 'post', body })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			onReact(dm.id, emoji);
+			// } else {
+			// 	openErrorOnBeginDM = true;
+		}
 	};
+
+	const sentAtString = formatDatetimeString(dm.sentAt);
 </script>
 
 <article
@@ -114,7 +131,6 @@
 		{/if}
 	{/if}
 	{#if dm.type === 'general'}
-		{@const sentAtString = formatDatetimeString(dm.sentAt)}
 		<div class={cn('relative flex flex-col', dir === Direction.SEND ? 'items-end' : 'items-start')}>
 			{#if dm.message || !!dm.relatedPost}
 				{@const message = dm.message || ''}
@@ -188,8 +204,8 @@
 								<div class="mt-2 space-x-2 text-right">
 									{#each reactions as [emoji, num]}
 										<Badge
-											variant={emoji === dm.myReaction ? 'default' : 'outline'}
-											class="space-x-1">
+											variant={emoji === dm.myReaction ? 'default' : 'secondary'}
+											class="border-secondary space-x-1 border">
 											<span>{emoji}</span>
 											<span>{num}</span>
 										</Badge>
@@ -239,7 +255,7 @@
 					{/each}
 				</div>
 			{/if}
-			{#if !sameSenderAsNext || formatDatetimeString(next?.sentAt || new Date(0)) !== sentAtString}
+			{#if !sameSenderAsNext || formatDatetimeString(sentAtOfNext) !== sentAtString}
 				<!-- 다음 사용자와 같은 경우 보낸 시간 미표시 -->
 				<Muted class="mx-3 flex-none">{sentAtString}</Muted>
 			{/if}
@@ -249,7 +265,7 @@
 					!(isFocused || isMouseHover) && 'hidden',
 					dir === Direction.SEND ? '-left-2' : '-right-2',
 				)}>
-				<Button size="icon" variant="ghost" class="size-8 border">
+				<Button size="icon" variant="ghost" class="size-8 border" onclick={() => onReply(dm)}>
 					<!-- 답글 -->
 					<CornerDownRight />
 				</Button>

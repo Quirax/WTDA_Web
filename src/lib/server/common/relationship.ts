@@ -1,6 +1,7 @@
 import { UserRelationship } from '@app';
 import { db, table } from '../db';
 import { and, eq } from 'drizzle-orm';
+import { notify } from './telecom';
 
 export const blockUser = async (fromUser: string, toUser: string) => {
 	if (fromUser === toUser) throw new Error('Cannot block yourself', { cause: 400 });
@@ -17,6 +18,18 @@ export const blockUser = async (fromUser: string, toUser: string) => {
 			target: [table.userRelationship.from, table.userRelationship.to],
 			set: { relationship: UserRelationship.BLOCKED },
 		});
+
+	notify(toUser, {
+		event: 'relationshipChanged',
+		fromUser,
+		relationship: UserRelationship.BLOCKED,
+	});
+
+	notify(fromUser, {
+		event: 'relationshipChanged',
+		toUser,
+		relationship: UserRelationship.BLOCKED,
+	});
 };
 
 export const unblockUser = async (fromUser: string, toUser: string) => {
@@ -25,6 +38,14 @@ export const unblockUser = async (fromUser: string, toUser: string) => {
 	await db
 		.delete(table.userRelationship)
 		.where(and(eq(table.userRelationship.from, fromUser), eq(table.userRelationship.to, toUser)));
+
+	notify(toUser, { event: 'relationshipChanged', fromUser, relationship: UserRelationship.NONE });
+
+	notify(fromUser, {
+		event: 'relationshipChanged',
+		toUser,
+		relationship: UserRelationship.NONE,
+	});
 };
 
 export const getRelationship = async (fromUser: string, toUser: string) => {

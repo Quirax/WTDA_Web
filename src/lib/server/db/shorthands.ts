@@ -1,7 +1,19 @@
 import { AdultContents, ArticleType, UserRelationship, UserStatus } from '@app';
 import { db } from '.';
 import * as table from './schema';
-import { and, desc, eq, exists, ne, notExists, or, SQL, sql } from 'drizzle-orm';
+import {
+	and,
+	desc,
+	eq,
+	exists,
+	ne,
+	notExists,
+	or,
+	SQL,
+	sql,
+	type AnyColumn,
+	type GetColumnData,
+} from 'drizzle-orm';
 import { unionAll } from 'drizzle-orm/pg-core';
 import { isAdult } from '$lib/utils';
 
@@ -133,4 +145,11 @@ export const allArticles = (
 	}
 
 	return undefined;
+};
+
+export const aliasedColumn = <T extends AnyColumn>(
+	column: T,
+	alias: string,
+): SQL.Aliased<GetColumnData<T>> => {
+	return column.getSQL().mapWith(column.mapFromDriverValue).as(alias);
 };

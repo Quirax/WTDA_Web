@@ -87,7 +87,10 @@
 					<Card.Description class="flex items-center justify-end space-x-2">
 						<span>by</span>
 						<Button variant="link" class="text-inherit" href="/user/{article?.author.id}">
-							<Avatar class="inline-block h-6 w-6 align-middle" user={article?.author} />
+							<Avatar
+								class="inline-block h-6 w-6 align-middle"
+								user={article?.author}
+								withoutLink />
 							{article?.author.username}
 						</Button>
 					</Card.Description>

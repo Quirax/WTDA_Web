@@ -16,6 +16,10 @@ declare global {
 		NumberEnumerate<F>
 	>;
 
+	type Nullish<T> = T | undefined | null;
+	type Nullable<T> = T | null;
+	type Optional<T> = T | undefined;
+
 	namespace App {
 		interface Error {
 			code?: ErrorCode;
@@ -94,6 +98,8 @@ declare global {
 					type: 'join' | 'leave';
 			  }
 		);
+
+		type DMChannel = import('$lib/server/common/dm').DMChannelInfo;
 	}
 }
 

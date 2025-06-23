@@ -180,9 +180,17 @@ export const dmContent = pgTable(
 			.notNull()
 			.references(() => user.id),
 		content: json('content').$type<Omit<App.DM, 'id' | 'sender' | 'sentAt'>>().notNull(),
-		sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }).defaultNow(),
+		sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
+		relatedMessage: text('related_message'),
 	},
-	(table) => [primaryKey({ columns: [table.channelId, table.messageId] })],
+	(table) => [
+		primaryKey({ columns: [table.channelId, table.messageId] }),
+		foreignKey({
+			columns: [table.channelId, table.relatedMessage],
+			foreignColumns: [table.channelId, table.messageId],
+			name: 'dm_content_related_message_dm_content_message_id_fk',
+		}),
+	],
 );
 
 export const dmReceived = pgTable(
@@ -212,7 +220,7 @@ export const dmReactions = pgTable(
 		setter: text('setter')
 			.notNull()
 			.references(() => user.id),
-		emoji: text('setter').$type<Emoji>().notNull(),
+		emoji: text('emoji').$type<Emoji>().notNull(),
 	},
 	(table) => [
 		foreignKey({
