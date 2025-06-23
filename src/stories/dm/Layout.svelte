@@ -6,6 +6,7 @@
 	import { twemoji } from 'twemoji-svelte-action';
 	import { beforeNavigate } from '$app/navigation';
 	import { User } from 'lucide-svelte';
+	import { source } from 'sveltekit-sse';
 
 	interface Props extends ReturnType<typeof $props> {
 		id?: string;
@@ -22,6 +23,12 @@
 
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
+
+	source('/dm/sse')
+		.select('message')
+		.subscribe((message) => {
+			if (message) console.log(JSON.parse(message));
+		});
 </script>
 
 <div class={cn('w-ful flex max-md:flex-col', (!id && 'md:h-[90vh]') || 'h-[90vh]')}>

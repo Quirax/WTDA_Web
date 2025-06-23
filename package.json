@@ -1,7 +1,7 @@
 {
 	"name": "wtda",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.1.5",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev --host",
@@ -89,6 +89,7 @@
 		"@aws-sdk/client-s3": "^3.808.0",
 		"@aws-sdk/client-sesv2": "^3.817.0",
 		"@internationalized/date": "^3.8.1",
+		"@microsoft/fetch-event-source": "^2.0.1",
 		"@node-rs/argon2": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
@@ -109,6 +110,7 @@
 		"svelte-awesome-color-picker": "^4.0.1",
 		"svelte-crop-window": "^0.1.1",
 		"svelte-file-dropzone": "^2.0.9",
+		"sveltekit-sse": "^0.13.19",
 		"tinycolor2": "^1.6.0",
 		"twemoji-svelte-action": "^1.0.5"
 	},

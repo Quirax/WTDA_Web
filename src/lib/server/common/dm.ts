@@ -19,8 +19,7 @@ import {
 import { getRelationship } from './relationship';
 import { alias, intersect, PgTransaction, union } from 'drizzle-orm/pg-core';
 import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
-import { message } from 'sveltekit-superforms';
-import { string } from 'zod';
+import * as telecom from './telecom';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { Emoji } from 'emoji-type';
 import { dmsPerPage } from '$lib/config';
@@ -489,7 +488,7 @@ export const send = async (
 		);
 	});
 
-	return [
+	const dms = [
 		{
 			id: messageId,
 			sender: sender,
@@ -503,6 +502,18 @@ export const send = async (
 			},
 		},
 	];
+
+	(
+		await db
+			.select({ uid: table.dmParticipant.participantId })
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.channelId, channelId))
+	).forEach(({ uid }) => {
+		console.log(`>> notify to ${uid}`);
+		telecom.notify(uid, dms);
+	});
+
+	return dms;
 };
 
 // ref: https://orm.drizzle.team/docs/perf-queries#placeholder
