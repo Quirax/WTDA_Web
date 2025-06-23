@@ -1,4 +1,4 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import * as dm from '$lib/server/common/dm';
 import type { Emoji } from 'emoji-type';
@@ -11,6 +11,10 @@ export const load = (async ({ locals, params }) => {
 		const info = await dm.getDMChannelInfo(params.id, locals.user);
 		return { info };
 	} catch (e) {
+		if (e instanceof Error && typeof e.cause === 'number') {
+			if (e.cause === 403) throw redirect(308, '/dm');
+		}
+
 		console.error(e);
 		throw error(500, { message: 'An error has occurred' });
 	}

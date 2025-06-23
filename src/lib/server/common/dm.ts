@@ -297,17 +297,22 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 			.where(eq(table.dmChannel.id, channelId))
 	).at(0);
 
-	const participants = await db
-		.select({
-			participant: table.user,
-		})
-		.from(table.dmParticipant)
-		.where(eq(table.dmParticipant.channelId, channelId))
-		.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId));
+	const participants = (
+		await db
+			.select({
+				participant: table.user,
+			})
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.channelId, channelId))
+			.innerJoin(table.user, eq(table.user.id, table.dmParticipant.participantId))
+	).map((v) => v.participant);
+
+	if (participants.map((u) => u.id).indexOf(sender.id) === -1)
+		throw Error('You are not participated', { cause: 403 });
 
 	return {
 		...channelInfo,
-		participants: participants.map((v) => v.participant),
+		participants: participants,
 		isAbleToSend: await isAbleToSend(channelId, sender),
 	};
 };

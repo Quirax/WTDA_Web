@@ -292,7 +292,7 @@
 
 	source('/sse')
 		.select('join')
-		.subscribe(async (message) => {
+		.subscribe((message) => {
 			if (!message) return;
 			const parsed = JSON.parse(message);
 
@@ -303,13 +303,14 @@
 
 	source('/sse')
 		.select('leave')
-		.subscribe(async (message) => {
+		.subscribe((message) => {
 			if (!message) return;
 			const parsed = JSON.parse(message);
 
 			if (parsed.channelId !== page.params.id) return;
 
-			invalidateAll();
+			if (parsed.userId === user!.id) goto('/dm', { invalidateAll: true });
+			else invalidateAll();
 		});
 </script>
 
