@@ -36,8 +36,6 @@
 			if (!channel) return;
 
 			channel.latestMessage = parsed.dms[0];
-
-			console.log(channel, JSON.parse(message));
 		});
 </script>
 

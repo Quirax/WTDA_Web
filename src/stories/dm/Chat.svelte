@@ -23,6 +23,8 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { toast } from 'svelte-sonner';
+	import { source } from 'sveltekit-sse';
+	import { page } from '$app/state';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -163,12 +165,12 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			const new_dms = result.data?.dms as App.DM[] | undefined;
+			// const new_dms = result.data?.dms as App.DM[] | undefined;
 
-			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
+			// if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
 
 			dmDraft = defaultDraft;
-			tick().then(() => scrollToBottom());
+			scrollToBottom();
 		} else {
 			console.log(result);
 
@@ -180,6 +182,28 @@
 				toast.error('메시지를 보내는 도중 오류가 발생하였습니다. 고객센터에 문의하시기 바랍니다.');
 		}
 	};
+
+	source('/dm/sse')
+		.select('message')
+		.subscribe((message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			if (parsed.channelId !== page.params.id) return;
+
+			const new_dms = parsed.dms.map((dm: App.DM) => ({ ...dm, sentAt: new Date(dm.sentAt) })) as
+				| App.DM[]
+				| undefined;
+
+			console.log(new_dms);
+
+			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
+
+			if (container) {
+				if (container.scrollTop >= container.scrollHeight - container.clientHeight - 100)
+					tick().then(() => scrollToBottom());
+			}
+		});
 
 	const onKeyUp = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') return onSend();
