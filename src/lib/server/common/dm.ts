@@ -669,12 +669,5 @@ export const setRead = async (
 		)
 		.onConflictDoNothing();
 
-	(
-		await db
-			.select({ uid: table.dmParticipant.participantId })
-			.from(table.dmParticipant)
-			.where(eq(table.dmParticipant.channelId, channelId))
-	).forEach(({ uid }) => {
-		telecom.notify(uid, { event: 'dmRead', channelId });
-	});
+	telecom.notify(user.id, { event: 'dmRead', channelId });
 };

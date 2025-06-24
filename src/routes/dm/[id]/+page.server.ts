@@ -4,7 +4,9 @@ import * as dm from '$lib/server/common/dm';
 import type { Emoji } from 'emoji-type';
 import { db } from '$lib/server/db';
 
-export const load = (async ({ locals, params }) => {
+export const load = (async ({ locals, params, depends }) => {
+	depends('dm:info');
+
 	if (!locals.user) return {};
 
 	try {

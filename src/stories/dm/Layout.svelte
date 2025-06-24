@@ -4,11 +4,12 @@
 	import { cn } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
 	import { twemoji } from 'twemoji-svelte-action';
-	import { beforeNavigate, invalidateAll } from '$app/navigation';
+	import { beforeNavigate, invalidate, invalidateAll } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';
 	import { tick } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 
 	interface Props extends ReturnType<typeof $props> {
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM; read: boolean })[];
@@ -20,36 +21,31 @@
 	userStore.subscribe((v) => (user = v));
 
 	source('/sse')
-		.select('dmSent')
-		.subscribe((message) => {
-			if (!message) return;
-			const parsed = JSON.parse(message);
-
-			const channel = channels.find((ch) => ch.id === parsed.channelId);
-			if (!channel) return;
-
-			invalidateAll();
-		});
-
-	source('/sse')
 		.select('join')
 		.subscribe((message) => {
 			if (!message) return;
-			invalidateAll();
+			invalidate('dm:channels');
 		});
 
 	source('/sse')
 		.select('leave')
 		.subscribe((message) => {
 			if (!message) return;
-			invalidateAll();
+			invalidate('dm:channels');
+		});
+
+	source('/sse')
+		.select('dmSent')
+		.subscribe(async (message) => {
+			if (!message) return;
+			invalidate('dm:channels');
 		});
 
 	source('/sse')
 		.select('dmRead')
-		.subscribe((message) => {
+		.subscribe(async (message) => {
 			if (!message) return;
-			invalidateAll();
+			invalidate('dm:channels');
 		});
 </script>
 
@@ -61,7 +57,6 @@
 		)}>
 		{#each channels as ch}
 			{@const participants = (ch.participants || []).filter((v) => v!.id !== user!.id)}
-			{@const v = console.log(ch)}
 			<a
 				href="/dm/{ch.id}"
 				class={cn(

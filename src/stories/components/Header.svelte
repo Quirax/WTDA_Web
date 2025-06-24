@@ -37,7 +37,7 @@
 	let unreadCount = $state(0);
 
 	const getUnreadCount = async () => {
-		const result = await fetch('/dm/?/getUnreadCount', { method: 'post', body: new FormData() })
+		const result = await fetch('/dm?/getUnreadCount', { method: 'post', body: new FormData() })
 			.then((r) => r.text())
 			.then((r) => deserialize(r));
 
