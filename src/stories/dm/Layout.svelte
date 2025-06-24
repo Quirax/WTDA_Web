@@ -11,7 +11,7 @@
 	import { tick } from 'svelte';
 
 	interface Props extends ReturnType<typeof $props> {
-		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
+		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM; read: boolean })[];
 	}
 
 	const { children, channels }: Props = $props();
@@ -35,7 +35,6 @@
 		.select('join')
 		.subscribe((message) => {
 			if (!message) return;
-			console.log(message);
 			invalidateAll();
 		});
 
@@ -43,7 +42,13 @@
 		.select('leave')
 		.subscribe((message) => {
 			if (!message) return;
-			console.log(message);
+			invalidateAll();
+		});
+
+	source('/sse')
+		.select('dmRead')
+		.subscribe((message) => {
+			if (!message) return;
 			invalidateAll();
 		});
 </script>
@@ -56,12 +61,14 @@
 		)}>
 		{#each channels as ch}
 			{@const participants = (ch.participants || []).filter((v) => v!.id !== user!.id)}
+			{@const v = console.log(ch)}
 			<a
 				href="/dm/{ch.id}"
 				class={cn(
 					'm-2 flex items-center space-x-2 border p-2',
 					(page.params.id === ch.id && 'bg-primary/60 text-primary-foreground') ||
 						'hover:bg-accent hover:text-accent-foreground',
+					!ch.read && 'border-primary border-2 font-bold',
 				)}>
 				<div class="flex -space-x-5">
 					{#if participants && participants.length > 0}

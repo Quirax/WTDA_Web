@@ -166,12 +166,21 @@ export const getDMChannels = async (
 			content: table.dmContent.content,
 			messageId: table.dmContent.messageId,
 			sender: { ...table.user },
+			read: table.dmReceived.receiver,
 		})
 		.from(table.dmParticipant)
 		.where(eq(table.dmParticipant.participantId, fromUser))
 		.innerJoin(latestMessage, eq(latestMessage.channelId, table.dmParticipant.channelId))
 		.innerJoin(table.dmContent, eq(table.dmContent.sentAt, latestMessage.sentAt))
 		.innerJoin(table.user, eq(table.user.id, table.dmContent.sender))
+		.leftJoin(
+			table.dmReceived,
+			and(
+				eq(table.dmReceived.channelId, table.dmParticipant.channelId),
+				eq(table.dmReceived.messageId, table.dmContent.messageId),
+				eq(table.dmReceived.receiver, fromUser),
+			),
+		)
 		.as('sq');
 
 	let subquery = toUser
@@ -195,6 +204,7 @@ export const getDMChannels = async (
 							sentAt: userWithLatestMessage.sentAt,
 							content: userWithLatestMessage.content,
 							messageId: userWithLatestMessage.messageId,
+							read: userWithLatestMessage.read,
 						},
 						latestMessageSender: userWithLatestMessage.sender,
 						participant: {
@@ -213,7 +223,7 @@ export const getDMChannels = async (
 	const result = rows.reduce<
 		Record<
 			DMChannel['id'],
-			DMChannel & { participants: Record<User['id'], User>; latestMessage?: App.DM }
+			DMChannel & { participants: Record<User['id'], User>; latestMessage?: App.DM; read: boolean }
 		>
 	>((acc, row) => {
 		const channel = row.channel;
@@ -229,6 +239,7 @@ export const getDMChannels = async (
 					sender: row.latestMessageSender || null,
 					...row.latestMessage.content,
 				},
+				read: !!row.latestMessage?.read,
 			};
 		}
 
@@ -390,25 +401,11 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 
 	// 읽음 확인
 	if (result.length > 0) {
-		await db
-			.insert(table.dmReceived)
-			.values(
-				result.map((message) => ({
-					channelId,
-					messageId: message.id,
-					receiver: me.id,
-				})),
-			)
-			.onConflictDoNothing();
-
-		(
-			await db
-				.select({ uid: table.dmParticipant.participantId })
-				.from(table.dmParticipant)
-				.where(eq(table.dmParticipant.channelId, channelId))
-		).forEach(({ uid }) => {
-			telecom.notify(uid, { event: 'dmRead', channelId });
-		});
+		await setRead(
+			me,
+			channelId,
+			result.map((msg) => msg.id),
+		);
 	}
 
 	return result.map<App.DM>((v) => ({
@@ -654,4 +651,30 @@ export const getUnreadCount = async (user: NonNullable<App.User>) => {
 	const count = await db.$count(unreads);
 
 	return count;
+};
+
+export const setRead = async (
+	user: NonNullable<App.User>,
+	channelId: string,
+	messageIds: string[],
+) => {
+	await db
+		.insert(table.dmReceived)
+		.values(
+			messageIds.map((messageId) => ({
+				channelId,
+				messageId,
+				receiver: user.id,
+			})),
+		)
+		.onConflictDoNothing();
+
+	(
+		await db
+			.select({ uid: table.dmParticipant.participantId })
+			.from(table.dmParticipant)
+			.where(eq(table.dmParticipant.channelId, channelId))
+	).forEach(({ uid }) => {
+		telecom.notify(uid, { event: 'dmRead', channelId });
+	});
 };

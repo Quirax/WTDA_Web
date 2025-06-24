@@ -96,4 +96,19 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred' });
 		}
 	},
+
+	setRead: async ({ params, locals, request }) => {
+		if (!locals.user) return {};
+
+		const channelId = params.id;
+		const { messageIds } = (await request.json()) as { messageIds: string[] };
+
+		try {
+			await dm.setRead(locals.user, channelId, messageIds);
+			return { message: 'Set as read' };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
 };
