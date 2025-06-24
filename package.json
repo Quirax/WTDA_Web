@@ -99,6 +99,7 @@
 		"echarts": "^5.6.0",
 		"emoji-regex": "^10.4.0",
 		"emoji-type": "^1.0.4",
+		"firebase": "^11.9.1",
 		"highlight.js": "^11.11.1",
 		"isomorphic-dompurify": "^2.23.0",
 		"nodemailer": "^7.0.3",
