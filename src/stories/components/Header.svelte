@@ -8,8 +8,12 @@
 
 	import './header.css';
 	import { userStore } from '$lib/context';
-	import { goto } from '$app/navigation';
+	import { goto, onNavigate } from '$app/navigation';
 	import { MessageSquare } from 'lucide-svelte';
+	import { deserialize } from '$app/forms';
+	import { onMount } from 'svelte';
+	import { source } from 'sveltekit-sse';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 
 	interface Props {
 		title?: string;
@@ -29,6 +33,34 @@
 	const onLogout = () => {
 		goto('/logout');
 	};
+
+	let unreadCount = $state(0);
+
+	const getUnreadCount = async () => {
+		const result = await fetch('/dm/?/getUnreadCount', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			unreadCount = (result.data?.value as number | undefined) || 0;
+		}
+	};
+
+	onMount(getUnreadCount);
+
+	source('/sse')
+		.select('dmSent')
+		.subscribe((message) => {
+			if (!message) return;
+			getUnreadCount();
+		});
+
+	source('/sse')
+		.select('dmRead')
+		.subscribe((message) => {
+			if (!message) return;
+			getUnreadCount();
+		});
 </script>
 
 <svelte:head>
@@ -66,8 +98,14 @@
 			{/if}{#if showUserPanel}
 				{#if user}
 					<!-- 메시지 목록 버튼 -->
-					<Button variant="ghost" class="size-9 rounded-full p-0" href="/dm">
+					<Button variant="ghost" class="relative size-9 rounded-full p-0" href="/dm">
 						<MessageSquare class="size-9" />
+						{#if unreadCount > 0}
+							<Badge
+								class="absolute top-0 right-0 h-4 min-w-4 items-center justify-center rounded-full p-0">
+								<span>{unreadCount}</span>
+							</Badge>
+						{/if}
 					</Button>
 
 					<!-- 사용자 드롭다운 메뉴 -->

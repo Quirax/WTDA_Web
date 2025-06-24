@@ -400,6 +400,15 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 				})),
 			)
 			.onConflictDoNothing();
+
+		(
+			await db
+				.select({ uid: table.dmParticipant.participantId })
+				.from(table.dmParticipant)
+				.where(eq(table.dmParticipant.channelId, channelId))
+		).forEach(({ uid }) => {
+			telecom.notify(uid, { event: 'dmRead', channelId });
+		});
 	}
 
 	return result.map<App.DM>((v) => ({
@@ -643,8 +652,6 @@ export const getUnreadCount = async (user: NonNullable<App.User>) => {
 		);
 
 	const count = await db.$count(unreads);
-
-	console.log(count);
 
 	return count;
 };
