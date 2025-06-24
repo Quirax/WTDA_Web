@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { userStore } from '$lib/context';
 	import UserAvatar from '$stories/components/Avatar.svelte';
-	import { cn } from '$lib/utils';
+	import { cn, twemoji } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
-	import { twemoji } from 'twemoji-svelte-action';
 	import { beforeNavigate, invalidate, invalidateAll } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
