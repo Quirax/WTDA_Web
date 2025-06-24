@@ -61,13 +61,15 @@
 	$effect(() => {
 		if (!listView) return;
 
+		const clientRects = listView.getClientRects()[0];
+
 		xFinal = xCoord + xMargin;
 		yFinal = yCoord + yMargin;
 
-		if (untrack(() => xFinal + listView!.offsetWidth) > screen.availWidth)
-			xFinal = xCoord - listView.offsetWidth;
-		if (untrack(() => yFinal + listView!.offsetHeight) > screen.availHeight)
-			yFinal = yCoord - listView.offsetHeight;
+		if (untrack(() => xFinal + clientRects.width) > document.body.scrollWidth)
+			xFinal = xCoord - clientRects.width;
+		if (untrack(() => yFinal + clientRects.height) > document.body.scrollHeight)
+			yFinal = yCoord - clientRects.height;
 
 		if (untrack(() => xFinal) < 0) xFinal = 0;
 		if (untrack(() => yFinal) < 0) yFinal = 0;
