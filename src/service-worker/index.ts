@@ -42,6 +42,8 @@ self.addEventListener('activate', (event) => {
 		.subscribe((message) => {
 			console.log(message);
 		});
+
+	console.log('Service Worker');
 });
 
 // self.addEventListener('fetch', (event) => {
