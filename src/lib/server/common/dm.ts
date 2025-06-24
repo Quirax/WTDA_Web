@@ -622,3 +622,29 @@ export const react = async (
 			});
 	}
 };
+
+export const getUnreadCount = async (user: NonNullable<App.User>) => {
+	const unreads = db
+		.select({
+			channelId: table.dmParticipant.channelId,
+			messageId: table.dmContent.messageId,
+		})
+		.from(table.dmParticipant)
+		.where(eq(table.dmParticipant.participantId, user.id))
+		.innerJoin(table.dmContent, eq(table.dmContent.channelId, table.dmParticipant.channelId))
+		.except(
+			db
+				.select({
+					channelId: table.dmReceived.channelId,
+					messageId: table.dmReceived.messageId,
+				})
+				.from(table.dmReceived)
+				.where(eq(table.dmReceived.receiver, user.id)),
+		);
+
+	const count = await db.$count(unreads);
+
+	console.log(count);
+
+	return count;
+};
