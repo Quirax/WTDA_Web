@@ -24,6 +24,7 @@ import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { Emoji } from 'emoji-type';
 import { dmsPerPage } from '$lib/config';
 import { aliasedColumn } from '../db/shorthands';
+import { sendMessage } from '../firebase';
 
 type Transaction =
 	| PgTransaction<
@@ -573,6 +574,14 @@ export const send = async (
 			.where(eq(table.dmParticipant.channelId, channelId))
 	).forEach(({ uid }) => {
 		telecom.notify(uid, { event: 'dmSent', channelId, dms });
+
+		if (uid !== sender.id && content.type === 'general')
+			sendMessage(
+				uid,
+				`${sender.username} 님으로부터의 메시지`,
+				(content as App.GeneralDM).message,
+				`/dm/${channelId}`,
+			);
 	});
 
 	return dms;

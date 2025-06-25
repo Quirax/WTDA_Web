@@ -11,6 +11,7 @@
 	import { browser, dev } from '$app/environment';
 	import { getFirebaseApp, getMessaging, getToken } from '$lib/firebase';
 	import { env } from '$env/dynamic/public';
+	import { deserialize } from '$app/forms';
 
 	interface Props extends ReturnType<typeof $props> {
 		data: LayoutServerData;
@@ -28,7 +29,7 @@
 		});
 	});
 
-	if (browser) {
+	if (browser && data.user) {
 		const firebase = getFirebaseApp();
 		const messaging = getMessaging(firebase);
 
@@ -51,7 +52,17 @@
 								}),
 							)
 							.then((token) => {
-								/* noop */
+								const body = new FormData();
+								body.append('token', token);
+
+								return fetch('/?/registerNotificationToken', { method: 'post', body });
+							})
+							.then((r) => r.text())
+							.then((r) => deserialize(r))
+							.then((result) => {
+								if (result.type === 'success') {
+									/* noop */
+								} else throw Error(JSON.stringify(result));
 							})
 							.catch((err) => {
 								console.error(err);
