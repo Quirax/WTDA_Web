@@ -19,33 +19,18 @@
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
-	source('/sse')
-		.select('join')
-		.subscribe((message) => {
-			if (!message) return;
-			invalidate('dm:channels');
-		});
+	const onMessage = (message: string) => {
+		if (!message) return;
+		invalidate('dm:channels');
+	};
 
-	source('/sse')
-		.select('leave')
-		.subscribe((message) => {
-			if (!message) return;
-			invalidate('dm:channels');
-		});
+	source('/sse').select('join').subscribe(onMessage);
 
-	source('/sse')
-		.select('dmSent')
-		.subscribe(async (message) => {
-			if (!message) return;
-			invalidate('dm:channels');
-		});
+	source('/sse').select('leave').subscribe(onMessage);
 
-	source('/sse')
-		.select('dmRead')
-		.subscribe(async (message) => {
-			if (!message) return;
-			invalidate('dm:channels');
-		});
+	source('/sse').select('dmSent').subscribe(onMessage);
+
+	source('/sse').select('dmRead').subscribe(onMessage);
 </script>
 
 <div class={cn('w-ful flex max-md:flex-col', (!page.params.id && 'md:h-[90vh]') || 'h-[90vh]')}>
