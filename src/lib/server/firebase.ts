@@ -28,7 +28,7 @@ export const sendMessage = async (userId: string, title?: string, body?: string,
 				.where(eq(table.user.id, userId))
 		).at(0)?.tokens || [];
 
-	link && baseURL && console.log(new URL(link, baseURL).href);
+	if (tokens.length === 0) return;
 
 	return await firebaseAdmin.messaging().sendEachForMulticast({
 		tokens,
