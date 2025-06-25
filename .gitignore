@@ -32,3 +32,4 @@ package-lock.json
 yarn.lock
 
 .fuse_hidden*
+.firebase-admin-credential.json

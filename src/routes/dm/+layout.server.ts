@@ -2,8 +2,10 @@ import { error, redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import * as dm from '$lib/server/common/dm';
 
-export const load = (async ({ locals }) => {
+export const load = (async ({ locals, depends }) => {
 	if (!locals.user) throw redirect(300, '/');
+
+	depends('dm:channels');
 
 	try {
 		return {

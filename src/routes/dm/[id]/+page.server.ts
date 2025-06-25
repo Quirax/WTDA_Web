@@ -4,7 +4,9 @@ import * as dm from '$lib/server/common/dm';
 import type { Emoji } from 'emoji-type';
 import { db } from '$lib/server/db';
 
-export const load = (async ({ locals, params }) => {
+export const load = (async ({ locals, params, depends }) => {
+	depends('dm:info');
+
 	if (!locals.user) return {};
 
 	try {
@@ -91,6 +93,21 @@ export const actions: Actions = {
 		try {
 			await dm.leaveFromChannel(db, locals.user, channelId);
 			return { message: 'Leave completed' };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
+
+	setRead: async ({ params, locals, request }) => {
+		if (!locals.user) return {};
+
+		const channelId = params.id;
+		const { messageIds } = (await request.json()) as { messageIds: string[] };
+
+		try {
+			await dm.setRead(locals.user, channelId, messageIds);
+			return { message: 'Set as read' };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

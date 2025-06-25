@@ -5,7 +5,7 @@ export type Callback = (message: any) => void;
 const listening: Record<string, () => Promise<void>> = {};
 
 export const listen = async (userId: string, key: string, cb: Callback) => {
-	const name = `${userId}_${key}`;
+	const name = `${userId}_${key}_${Date.now()}`;
 
 	if (listening[name] !== undefined) listening[name]();
 

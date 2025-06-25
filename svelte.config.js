@@ -10,6 +10,9 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: { $stories: 'src/stories', '@app': 'src/app.ts' },
+		serviceWorker: {
+			register: false,
+		},
 	},
 
 	vitePlugin: {

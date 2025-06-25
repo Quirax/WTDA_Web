@@ -46,6 +46,7 @@ export const user = pgTable(
 		profile: json('profile').$type<Partial<App.Profile>>().notNull().default({}),
 		birthday: timestamp('birthday', { withTimezone: true, mode: 'date' }),
 		authExpiresAt: timestamp('auth_expires_at', { withTimezone: true, mode: 'date' }),
+		notificationToken: text('notification_token').array().notNull().default([]),
 	},
 	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
 );

@@ -56,6 +56,7 @@
 						{},
 					),
 				);
+
 				enableScrollEvent = true;
 				await tick();
 				scrollToDM(new_dms[new_dms.length - 1].id);
@@ -269,9 +270,14 @@
 				| App.DM[]
 				| undefined;
 
-			console.log(new_dms);
+			if (new_dms && new_dms.length > 0) {
+				dms = [...dms, ...new_dms];
 
-			if (new_dms && new_dms.length > 0) dms = [...dms, ...new_dms];
+				fetch('?/setRead', {
+					method: 'post',
+					body: JSON.stringify({ messageIds: new_dms.map((dm) => dm.id) }),
+				});
+			}
 
 			if (container) {
 				if (container.scrollTop >= container.scrollHeight - container.clientHeight - 100)
@@ -287,7 +293,7 @@
 
 			if (!participants.find((p) => p.id === parsed.fromUser || p.id === parsed.toUser)) return;
 
-			invalidateAll();
+			invalidate('dm:info');
 		});
 
 	source('/sse')
@@ -298,7 +304,7 @@
 
 			if (parsed.channelId !== page.params.id) return;
 
-			invalidateAll();
+			invalidate('dm:info');
 		});
 
 	source('/sse')
@@ -310,7 +316,7 @@
 			if (parsed.channelId !== page.params.id) return;
 
 			if (parsed.userId === user!.id) goto('/dm', { invalidateAll: true });
-			else invalidateAll();
+			else invalidate('dm:info');
 		});
 </script>
 

@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { userStore } from '$lib/context';
 	import UserAvatar from '$stories/components/Avatar.svelte';
-	import { cn } from '$lib/utils';
+	import { cn, twemoji } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
-	import { twemoji } from 'twemoji-svelte-action';
-	import { beforeNavigate, invalidateAll } from '$app/navigation';
+	import { beforeNavigate, invalidate, invalidateAll } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';
 	import { tick } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 
 	interface Props extends ReturnType<typeof $props> {
-		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM })[];
+		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM; read: boolean })[];
 	}
 
 	const { children, channels }: Props = $props();
@@ -19,33 +19,18 @@
 	let user = $state<App.User>(null);
 	userStore.subscribe((v) => (user = v));
 
-	source('/sse')
-		.select('dmSent')
-		.subscribe((message) => {
-			if (!message) return;
-			const parsed = JSON.parse(message);
+	const onMessage = (message: string) => {
+		if (!message) return;
+		invalidate('dm:channels');
+	};
 
-			const channel = channels.find((ch) => ch.id === parsed.channelId);
-			if (!channel) return;
+	source('/sse').select('join').subscribe(onMessage);
 
-			invalidateAll();
-		});
+	source('/sse').select('leave').subscribe(onMessage);
 
-	source('/sse')
-		.select('join')
-		.subscribe((message) => {
-			if (!message) return;
-			console.log(message);
-			invalidateAll();
-		});
+	source('/sse').select('dmSent').subscribe(onMessage);
 
-	source('/sse')
-		.select('leave')
-		.subscribe((message) => {
-			if (!message) return;
-			console.log(message);
-			invalidateAll();
-		});
+	source('/sse').select('dmRead').subscribe(onMessage);
 </script>
 
 <div class={cn('w-ful flex max-md:flex-col', (!page.params.id && 'md:h-[90vh]') || 'h-[90vh]')}>
@@ -62,6 +47,7 @@
 					'm-2 flex items-center space-x-2 border p-2',
 					(page.params.id === ch.id && 'bg-primary/60 text-primary-foreground') ||
 						'hover:bg-accent hover:text-accent-foreground',
+					!ch.read && 'border-primary border-2 font-bold',
 				)}>
 				<div class="flex -space-x-5">
 					{#if participants && participants.length > 0}

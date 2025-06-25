@@ -288,6 +288,32 @@
 				</Form.Field>
 			</div>
 		{/if}
+		{#if userInfoFor !== UserInfoFor.REGISTRATION}
+			<Form.Field {form} name="agree_notification">
+				<div class="flex flex-row items-center space-y-0 space-x-3">
+					<Form.Control>
+						{#snippet children({ props })}
+							<!-- prettier-ignore -->
+							<Checkbox
+									{...props}
+									bind:checked={($formData as Infer<UserSchema>).agree_notification} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
+							<div class="space-y-1 leading-none">
+								<Form.Label>알림을 받겠습니다.</Form.Label>
+							</div>
+							<input
+								name={props.name}
+								value={($formData as Infer<UserSchema>).agree_notification}
+								hidden />
+						{/snippet}
+					</Form.Control>
+					<Form.Description>
+						이 설정은 귀하가 뭐하지공방에 접속할 때 사용하는 모든 기기에 적용됩니다. 기기별로
+						설정하고자 하는 경우 앱 또는 브라우저의 설정을 확인하시기 바랍니다.
+					</Form.Description>
+				</div>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
 		<div class="my-4 space-y-4 border-2 p-4">
 			{#if userInfoFor === UserInfoFor.REGISTRATION}
 				<Form.Field {form} name="agree_eula">
