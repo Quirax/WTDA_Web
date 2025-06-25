@@ -20,15 +20,17 @@ export const firebaseAdmin =
 // ref: https://yoohyeon.tistory.com/156
 // ref: https://firebase.google.com/docs/cloud-messaging/send-message?hl=ko#send-messages-to-multiple-devices
 export const sendMessage = async (userId: string, title?: string, body?: string, link?: string) => {
-	const tokens =
-		(
-			await db
-				.select({ tokens: table.user.notificationToken })
-				.from(table.user)
-				.where(eq(table.user.id, userId))
-		).at(0)?.tokens || [];
+	const result = (
+		await db
+			.select({ tokens: table.user.notificationToken, preferences: table.user.preferences })
+			.from(table.user)
+			.where(eq(table.user.id, userId))
+	).at(0);
 
-	if (tokens.length === 0) return;
+	const tokens = result?.tokens || [];
+	const agree_notification = result?.preferences.agree_notification || false;
+
+	if (!agree_notification || tokens.length === 0) return;
 
 	return await firebaseAdmin.messaging().sendEachForMulticast({
 		tokens,
