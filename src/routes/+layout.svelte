@@ -35,6 +35,7 @@
 		const requestNotificationPermission = (
 			reject?: (_: 'permission_rejected' | 'token_failed') => void,
 		) => {
+			// ref: https://yoohyeon.tistory.com/156
 			Notification.requestPermission()
 				.then((permission) => {
 					if (permission === 'granted') {
@@ -80,6 +81,7 @@
 						case 'token_failed':
 							toast.error('데스크톱 알림 활성화를 위한 토큰을 얻지 못했습니다.', {
 								description:
+									// ref: https://stackoverflow.com/a/69624651/21742011
 									'Brave 브라우저를 사용하는 경우 설정에서 "푸시 메시지에 Google 서비스 사용"를 활성화해주세요.',
 							});
 							break;
