@@ -29,6 +29,7 @@ export const _getPreferences = async (userId: string) => {
 			agree_marketing: preferences.agree_marketing || false,
 			display_adult_contents: preferences.display_adult_contents || false,
 			display_grotesque_contents: preferences.display_grotesque_contents || false,
+			agree_notification: preferences.agree_notification || false,
 		},
 		auth: {
 			status: results.status,

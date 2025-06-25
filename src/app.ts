@@ -34,6 +34,7 @@ declare global {
 			agree_marketing: boolean;
 			display_adult_contents?: boolean;
 			display_grotesque_contents?: boolean;
+			agree_notification?: boolean;
 		}
 
 		interface Profile {

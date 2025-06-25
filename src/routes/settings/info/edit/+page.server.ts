@@ -42,8 +42,13 @@ export const actions: Actions = {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
 
-		const { password, agree_marketing, display_adult_contents, display_grotesque_contents } =
-			form.data;
+		const {
+			password,
+			agree_marketing,
+			display_adult_contents,
+			display_grotesque_contents,
+			agree_notification,
+		} = form.data;
 
 		let set: Partial<{
 			preferences: App.Preferences;
@@ -53,6 +58,7 @@ export const actions: Actions = {
 				agree_marketing,
 				display_adult_contents,
 				display_grotesque_contents,
+				agree_notification,
 			},
 		};
 

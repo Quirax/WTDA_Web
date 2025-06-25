@@ -81,6 +81,7 @@ export const actions: Actions = {
 				status: UserStatus.REQUIRED_EMAIL_CONFIRM,
 				preferences: {
 					agree_marketing,
+					agree_notification: true,
 				},
 			});
 
