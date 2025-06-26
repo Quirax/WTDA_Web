@@ -245,11 +245,11 @@
 	let profileEditMode = $state(false);
 
 	// Profile link copy
-	let openLinkCopyAlert = $state(false);
-
 	const onCopyProfileLink = () => {
 		navigator.clipboard.writeText(location.href).then(() => {
-			openLinkCopyAlert = true;
+			toast.success('프로필 링크가 복사되었습니다.', {
+				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			});
 		});
 	};
 
@@ -891,10 +891,6 @@
 	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnProfileUpdateAlert} />
-<AlertDialog
-	title="프로필 링크가 복사되었습니다."
-	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
-	bind:open={openLinkCopyAlert} />
 
 {#snippet blockDescription()}
 	<Ul>
