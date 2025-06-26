@@ -14,6 +14,9 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { AdultContents } from '@app';
 	import { page } from '$app/state';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -129,6 +132,40 @@
 				</Table.Body>
 			</Table.Root>
 		</section>
+		{#if me && article.author.id !== me.id}
+			<section class="flex">
+				<Tooltip class="w-full" text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다">
+					<!-- disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
+						relationshipToUser !== UserRelationship.BLOCKED} -->
+					{#snippet child({ props })}
+						<div {...props} class="w-full">
+							<Button class="w-full flex-1">
+								<!-- onclick={onBeginDM} -->
+								<!-- disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+									relationshipToUser === UserRelationship.BLOCKED ||
+									user.id === me?.id} -->
+								<MessageSquare />
+								이 의뢰에 관해 메시지하기
+							</Button>
+						</div>
+					{/snippet}
+				</Tooltip>
+				<Button size="icon" variant="outline"><Share2 /></Button>
+				<!--  onclick={onCopyProfileLink} -->
+				<!-- TODO 구현 완료 시 재활성화
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class="m-0 p-0">
+						{#snippet child({ props })}
+							<Button {...props} variant="outline" size="icon"><EllipsisVertical /></Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content class="w-56" align="end">
+						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+						-->
+			</section>
+		{/if}
 		<section>
 			<H3>기타 정보</H3>
 			<Table.Root>
