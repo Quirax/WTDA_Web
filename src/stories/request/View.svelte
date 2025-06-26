@@ -17,6 +17,7 @@
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { toast } from 'svelte-sonner';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -45,6 +46,15 @@
 		}
 
 		openAfterDeletionAlert = true;
+	};
+
+	// Article link copy
+	const onCopyArticleLink = () => {
+		navigator.clipboard.writeText(location.href).then(() => {
+			toast.success('게시물 링크가 복사되었습니다.', {
+				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			});
+		});
 	};
 </script>
 
@@ -150,8 +160,7 @@
 						</div>
 					{/snippet}
 				</Tooltip>
-				<Button size="icon" variant="outline"><Share2 /></Button>
-				<!--  onclick={onCopyProfileLink} -->
+				<Button size="icon" variant="outline" onclick={onCopyArticleLink}><Share2 /></Button>
 				<!-- TODO 구현 완료 시 재활성화
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class="m-0 p-0">
