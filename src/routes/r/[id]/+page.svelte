@@ -5,4 +5,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<View article={data.article} />
+<View
+	article={data.article}
+	relationshipToUser={data.relationshipToUser}
+	relationshipFromUser={data.relationshipFromUser} />

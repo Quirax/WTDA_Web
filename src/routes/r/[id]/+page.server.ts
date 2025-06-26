@@ -4,11 +4,14 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
-import { AdultContents, ErrorCode, DMChannelType } from '@app';
+import { AdultContents, ErrorCode, DMChannelType, UserRelationship } from '@app';
 import { isAdult } from '$lib/utils';
 import { beginDMProc } from '$lib/server/common/dm';
+import * as relationship from '$lib/server/common/relationship';
 
-export const load = (async ({ params, locals }) => {
+export const load = (async ({ params, locals, depends }) => {
+	depends('r:info');
+
 	const id = params.id;
 
 	const article = (
@@ -59,8 +62,24 @@ export const load = (async ({ params, locals }) => {
 		}
 	}
 
+	let relationshipFromUser = UserRelationship.NONE;
+	let relationshipToUser = UserRelationship.NONE;
+
+	if (locals.user && locals.user.id !== article.author.id) {
+		try {
+			const result = await relationship.getRelationship(locals.user.id, article.author.id);
+
+			relationshipFromUser = result.fromUser;
+			relationshipToUser = result.toUser;
+		} catch (e) {
+			if (!(e instanceof Error) || e.cause !== 400) throw e;
+		}
+	}
+
 	return {
 		article,
+		relationshipFromUser,
+		relationshipToUser,
 	};
 }) satisfies PageServerLoad;
 
