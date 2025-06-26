@@ -7,11 +7,18 @@
 	import { EllipsisVertical, Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
-	import { ArticleCategory, ArticleType, UserRelationship } from '@app';
+	import { ArticleCategory, ArticleType, DMChannelType, UserRelationship } from '@app';
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
 	import { goto, invalidate, invalidateAll, onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
-	import { cn, formatDatetimeString, sanitizeHTML, twemoji, uploadImage } from '$lib/utils';
+	import {
+		cn,
+		formatDatetimeString,
+		getLinkPrefix,
+		sanitizeHTML,
+		twemoji,
+		uploadImage,
+	} from '$lib/utils';
 	import Muted from '$lib/components/typo/muted.svelte';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
@@ -343,6 +350,22 @@
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</H2>
+	{#if info && info.type && info.type !== DMChannelType.GENERAL}
+		{@const articleType =
+			info.type === DMChannelType.REQUEST
+				? ArticleType.REQUEST
+				: info.type === DMChannelType.COMMISSION
+					? ArticleType.COMMISSION
+					: undefined}
+		{@const href = articleType && `/${getLinkPrefix(articleType)}/${info.relatedArticle!.id}`}
+		{#if href}
+			<Muted class="mt-2">
+				관련 게시물: <Button {href} variant="link" target="_blank">
+					{info.relatedArticle!.title}
+				</Button>
+			</Muted>
+		{/if}
+	{/if}
 	<section
 		bind:this={container}
 		onscroll={onScrollContainer}

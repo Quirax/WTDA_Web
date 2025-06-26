@@ -329,6 +329,42 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 			.where(eq(table.dmChannel.id, channelId))
 	).at(0);
 
+	let relatedArticle: App.Articles | undefined = undefined;
+
+	switch (channelInfo?.type) {
+		case DMChannelType.GENERAL:
+			/* noop */
+			break;
+		case DMChannelType.REQUEST:
+			relatedArticle = (
+				await db
+					.select({
+						id: table.commissionRequest.id,
+						thumbnail: table.commissionRequest.thumbnail,
+						title: table.commissionRequest.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+							birthday: table.user.birthday,
+							authExpiresAt: table.user.authExpiresAt,
+						},
+						category: table.commissionRequest.category,
+						tags: table.commissionRequest.tags,
+					})
+					.from(table.commissionRequest)
+					.where(eq(table.commissionRequest.id, channelInfo.relatedArticle!))
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+			).at(0);
+			break;
+		case DMChannelType.COMMISSION:
+			// TODO: 커미션 관련 DM 채널인 경우의 동작 구현
+			break;
+	}
+
 	const participants = (
 		await db
 			.select({
@@ -344,6 +380,7 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 
 	return {
 		...channelInfo,
+		relatedArticle,
 		participants: participants,
 		isAbleToSend: await isAbleToSend(db, channelId, sender),
 	};
