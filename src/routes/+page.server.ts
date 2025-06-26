@@ -16,7 +16,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 	try {
 		const [requests] = await Promise.all(
-			articlesPerType([ArticleType.REQUEST], {}, locals.user).map((v) => v?.limit(10)),
+			articlesPerType([ArticleType.REQUEST], {}, locals.user).map((v) =>
+				v?.orderBy(desc(v._.selectedFields.modifyDate)).limit(10),
+			),
 		);
 
 		return { requests };
