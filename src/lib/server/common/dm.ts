@@ -1,4 +1,4 @@
-import { DMChannelType, UserRelationship } from '@app';
+import { ArticleType, DMChannelType, UserRelationship } from '@app';
 import { db, generateID, table } from '../db';
 import {
 	and,
@@ -37,14 +37,14 @@ type Transaction =
 export const createDMChannel = async (
 	mainTx: Transaction,
 	type = DMChannelType.GENERAL,
-	relatedArticle?: string,
+	relatedArticle?: App.Articles,
 ) => {
 	const channelId = generateID();
 
 	await mainTx.insert(table.dmChannel).values({
 		id: channelId,
 		type,
-		relatedArticle,
+		relatedArticle: relatedArticle?.id,
 	});
 
 	return channelId;
@@ -63,7 +63,7 @@ export const joinToChannel = async (
 
 		const dm: App.DM = {
 			id: generateID(),
-			type: 'leave',
+			type: 'join',
 			sentAt: new Date(),
 			sender: user,
 		};
@@ -260,7 +260,7 @@ export const beginDMProc = async (
 	fromUser: NonNullable<App.User>,
 	toUser: NonNullable<App.User>,
 	type = DMChannelType.GENERAL,
-	relatedArticle?: string,
+	relatedArticle?: App.Articles,
 ) => {
 	// 자기 자신과 DM할 수 없음
 	if (fromUser.id === toUser.id) throw new Error('Cannot chat with yourself', { cause: 400 });
@@ -277,25 +277,45 @@ export const beginDMProc = async (
 	// 이미 채널이 있는 경우 해당 채널의 ID 반환
 	const result = (
 		await getDMChannels(fromUser.id, toUser.id, (_, ch) =>
-			and(eq(ch.type, type), relatedArticle ? eq(ch.relatedArticle, relatedArticle) : undefined),
+			and(eq(ch.type, type), relatedArticle ? eq(ch.relatedArticle, relatedArticle.id) : undefined),
 		)
 	).at(0);
 	if (result) return result.id;
 
-	return await db.transaction(async (tx) => {
-		// 채널 생성
-		const channelId = await createDMChannel(tx, type, relatedArticle);
+	return await db
+		.transaction(async (tx) => {
+			// 채널 생성
+			const channelId = await createDMChannel(tx, type, relatedArticle);
 
-		// 해당 채널에 가입
-		await joinToChannel(tx, fromUser, channelId);
-		await joinToChannel(tx, toUser, channelId);
+			// 해당 채널에 가입
+			await joinToChannel(tx, fromUser, channelId);
+			await joinToChannel(tx, toUser, channelId);
 
-		telecom.notify(fromUser.id, { event: 'join', channelId, userId: fromUser.id });
-		telecom.notify(toUser.id, { event: 'join', channelId, userId: toUser.id });
+			switch (type) {
+				case DMChannelType.GENERAL:
+					/* noop */
+					break;
+				case DMChannelType.REQUEST:
+					await send(tx, channelId, fromUser, {
+						type: 'general',
+						relatedPost: {
+							type: ArticleType.REQUEST,
+							article: relatedArticle,
+						},
+					} as App.DM & App.GeneralDM);
+					break;
+				case DMChannelType.COMMISSION:
+					// TODO: 커미션 관련 DM인 경우 구현
+					break;
+			}
 
-		// 해당 채널 ID를 반환
-		return channelId;
-	});
+			telecom.notify(fromUser.id, { event: 'join', channelId, userId: fromUser.id });
+			telecom.notify(toUser.id, { event: 'join', channelId, userId: toUser.id });
+
+			// 해당 채널 ID를 반환
+			return channelId;
+		})
+		.then((channelId) => new Promise((resolve) => setTimeout(() => resolve(channelId), 300))); // 채널 생성 후 1초 뒤에 반환
 };
 
 export const getDMChannelInfo = async (channelId: string, sender: NonNullable<App.User>) => {
@@ -308,6 +328,42 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 			.from(table.dmChannel)
 			.where(eq(table.dmChannel.id, channelId))
 	).at(0);
+
+	let relatedArticle: App.Articles | undefined = undefined;
+
+	switch (channelInfo?.type) {
+		case DMChannelType.GENERAL:
+			/* noop */
+			break;
+		case DMChannelType.REQUEST:
+			relatedArticle = (
+				await db
+					.select({
+						id: table.commissionRequest.id,
+						thumbnail: table.commissionRequest.thumbnail,
+						title: table.commissionRequest.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+							birthday: table.user.birthday,
+							authExpiresAt: table.user.authExpiresAt,
+						},
+						category: table.commissionRequest.category,
+						tags: table.commissionRequest.tags,
+					})
+					.from(table.commissionRequest)
+					.where(eq(table.commissionRequest.id, channelInfo.relatedArticle!))
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+			).at(0);
+			break;
+		case DMChannelType.COMMISSION:
+			// TODO: 커미션 관련 DM 채널인 경우의 동작 구현
+			break;
+	}
 
 	const participants = (
 		await db
@@ -324,8 +380,9 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 
 	return {
 		...channelInfo,
+		relatedArticle,
 		participants: participants,
-		isAbleToSend: await isAbleToSend(channelId, sender),
+		isAbleToSend: await isAbleToSend(db, channelId, sender),
 	};
 };
 
@@ -430,55 +487,62 @@ export const get = async (channelId: string, before: Date, me: NonNullable<App.U
 	}));
 };
 
-const relationshipToUser = alias(table.userRelationship, 'relationshipToUser');
-const relationshipFromUser = alias(table.userRelationship, 'relationshipFromUser');
+export const isAbleToSend = async (
+	mainTx: Transaction,
+	channelId: string,
+	sender: NonNullable<App.User>,
+) => {
+	const relationshipToUser = alias(table.userRelationship, 'relationshipToUser');
+	const relationshipFromUser = alias(table.userRelationship, 'relationshipFromUser');
 
-const ableToSendSubquery = db
-	.select({
-		participant: table.dmParticipant.participantId,
-		relationshipToUser: aliasedColumn(relationshipToUser.relationship, 'relationshipToUser'),
-		relationshipFromUser: aliasedColumn(relationshipFromUser.relationship, 'relationshipFromUser'),
-	})
-	.from(table.dmParticipant)
-	.where(
-		and(
-			eq(table.dmParticipant.channelId, sql.placeholder('channelId')),
-			ne(table.dmParticipant.participantId, sql.placeholder('senderId')),
-		),
-	)
-	.leftJoin(
-		relationshipToUser,
-		and(
-			eq(relationshipToUser.from, sql.placeholder('senderId')),
-			eq(relationshipToUser.to, table.dmParticipant.participantId),
-		),
-	)
-	.leftJoin(
-		relationshipFromUser,
-		and(
-			eq(relationshipFromUser.to, sql.placeholder('senderId')),
-			eq(relationshipFromUser.from, table.dmParticipant.participantId),
-		),
-	)
-	.as('sq');
-
-const ableToSendQuery = db
-	.select()
-	.from(ableToSendSubquery)
-	.where(
-		and(
-			or(
-				isNull(ableToSendSubquery.relationshipFromUser),
-				ne(ableToSendSubquery.relationshipFromUser, UserRelationship.BLOCKED),
+	const ableToSendSubquery = mainTx
+		.select({
+			participant: table.dmParticipant.participantId,
+			relationshipToUser: aliasedColumn(relationshipToUser.relationship, 'relationshipToUser'),
+			relationshipFromUser: aliasedColumn(
+				relationshipFromUser.relationship,
+				'relationshipFromUser',
 			),
-			or(
-				isNull(ableToSendSubquery.relationshipToUser),
-				ne(ableToSendSubquery.relationshipToUser, UserRelationship.BLOCKED),
+		})
+		.from(table.dmParticipant)
+		.where(
+			and(
+				eq(table.dmParticipant.channelId, sql.placeholder('channelId')),
+				ne(table.dmParticipant.participantId, sql.placeholder('senderId')),
 			),
-		),
-	);
+		)
+		.leftJoin(
+			relationshipToUser,
+			and(
+				eq(relationshipToUser.from, sql.placeholder('senderId')),
+				eq(relationshipToUser.to, table.dmParticipant.participantId),
+			),
+		)
+		.leftJoin(
+			relationshipFromUser,
+			and(
+				eq(relationshipFromUser.to, sql.placeholder('senderId')),
+				eq(relationshipFromUser.from, table.dmParticipant.participantId),
+			),
+		)
+		.as('sq');
 
-export const isAbleToSend = async (channelId: string, sender: NonNullable<App.User>) => {
+	const ableToSendQuery = mainTx
+		.select()
+		.from(ableToSendSubquery)
+		.where(
+			and(
+				or(
+					isNull(ableToSendSubquery.relationshipFromUser),
+					ne(ableToSendSubquery.relationshipFromUser, UserRelationship.BLOCKED),
+				),
+				or(
+					isNull(ableToSendSubquery.relationshipToUser),
+					ne(ableToSendSubquery.relationshipToUser, UserRelationship.BLOCKED),
+				),
+			),
+		);
+
 	const result = await ableToSendQuery.execute({
 		channelId,
 		senderId: sender.id,
@@ -488,6 +552,7 @@ export const isAbleToSend = async (channelId: string, sender: NonNullable<App.Us
 };
 
 export const send = async (
+	mainTx: Transaction,
 	channelId: string,
 	sender: NonNullable<App.User>,
 	content: Omit<App.DM, 'id' | 'sentAt' | 'sender'>,
@@ -496,9 +561,10 @@ export const send = async (
 	const messageId = generateID();
 	const sentAt = new Date();
 
-	if (!(await isAbleToSend(channelId, sender))) throw Error('Not able to send', { cause: 406 });
+	if (!(await isAbleToSend(mainTx, channelId, sender)))
+		throw Error('Not able to send', { cause: 406 });
 
-	const _relatedMessage = await db.transaction(async (tx) => {
+	const _relatedMessage = await mainTx.transaction(async (tx) => {
 		await tx.insert(table.dmContent).values({
 			channelId,
 			messageId,
@@ -568,7 +634,7 @@ export const send = async (
 	];
 
 	(
-		await db
+		await mainTx
 			.select({ uid: table.dmParticipant.participantId })
 			.from(table.dmParticipant)
 			.where(eq(table.dmParticipant.channelId, channelId))

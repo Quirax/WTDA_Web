@@ -245,11 +245,11 @@
 	let profileEditMode = $state(false);
 
 	// Profile link copy
-	let openLinkCopyAlert = $state(false);
-
 	const onCopyProfileLink = () => {
 		navigator.clipboard.writeText(location.href).then(() => {
-			openLinkCopyAlert = true;
+			toast.success('프로필 링크가 복사되었습니다.', {
+				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			});
 		});
 	};
 
@@ -321,8 +321,6 @@
 		],
 	};
 
-	let openErrorOnBeginDM = $state(false);
-
 	const onBeginDM = async () => {
 		const result = await fetch('?/beginDM', { method: 'post', body: new FormData() })
 			.then((r) => r.text())
@@ -333,7 +331,9 @@
 
 			if (channelId) goto(`/dm/${channelId}`);
 		} else {
-			openErrorOnBeginDM = true;
+			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
+				description: '고객센터에 문의해주시기 바랍니다.',
+			});
 		}
 	};
 </script>
@@ -891,10 +891,6 @@
 	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnProfileUpdateAlert} />
-<AlertDialog
-	title="프로필 링크가 복사되었습니다."
-	description="원하는 곳에 붙여넣어 사용하시기 바랍니다."
-	bind:open={openLinkCopyAlert} />
 
 {#snippet blockDescription()}
 	<Ul>
@@ -927,10 +923,6 @@
 	title="사용자 차단 해제 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openErrorOnUnblock} />
-<AlertDialog
-	title="사용자와의 메시지 채널 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
-	bind:open={openErrorOnBeginDM} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

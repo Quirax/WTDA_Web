@@ -10,16 +10,24 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { userStore } from '$lib/context';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Ul from '$lib/components/typo/ul.svelte';
-	import { AdultContents } from '@app';
+	import { AdultContents, UserRelationship } from '@app';
 	import { page } from '$app/state';
+	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { toast } from 'svelte-sonner';
+	import { deserialize } from '$app/forms';
+	import { source } from 'sveltekit-sse';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
+		relationshipToUser: UserRelationship;
+		relationshipFromUser: UserRelationship;
 	}
 
-	const { article }: Props = $props();
+	const { article, relationshipFromUser, relationshipToUser }: Props = $props();
 
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
@@ -43,6 +51,47 @@
 
 		openAfterDeletionAlert = true;
 	};
+
+	// Article link copy
+	const onCopyArticleLink = () => {
+		navigator.clipboard.writeText(location.href).then(() => {
+			toast.success('게시물 링크가 복사되었습니다.', {
+				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			});
+		});
+	};
+
+	// DM 시작
+	const onBeginDM = async () => {
+		const result = await fetch('?/beginDM', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			const channelId = result.data?.channelId;
+
+			if (channelId) goto(`/dm/${channelId}`);
+		} else {
+			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
+				description: '고객센터에 문의해주시기 바랍니다.',
+			});
+		}
+	};
+
+	source('/sse')
+		.select('relationshipChanged')
+		.subscribe(async (message) => {
+			if (!message) return;
+			const parsed = JSON.parse(message);
+
+			if (!me) return;
+
+			if (
+				!(parsed.fromUser === me.id && parsed.toUser === article.author.id) &&
+				!(parsed.toUser === me.id && parsed.fromUser === article.author.id)
+			)
+				invalidate('r:info');
+		});
 </script>
 
 <svelte:head>
@@ -129,6 +178,41 @@
 				</Table.Body>
 			</Table.Root>
 		</section>
+		{#if me && article.author.id !== me.id}
+			<section class="flex">
+				<Tooltip
+					class="w-full"
+					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
+						relationshipToUser !== UserRelationship.BLOCKED}>
+					{#snippet child({ props })}
+						<div {...props} class="w-full">
+							<Button
+								class="w-full flex-1"
+								onclick={onBeginDM}
+								disabled={relationshipFromUser === UserRelationship.BLOCKED ||
+									relationshipToUser === UserRelationship.BLOCKED}>
+								<MessageSquare />
+								이 의뢰에 관해 메시지하기
+							</Button>
+						</div>
+					{/snippet}
+				</Tooltip>
+				<Button size="icon" variant="outline" onclick={onCopyArticleLink}><Share2 /></Button>
+				<!-- TODO 구현 완료 시 재활성화
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class="m-0 p-0">
+						{#snippet child({ props })}
+							<Button {...props} variant="outline" size="icon"><EllipsisVertical /></Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content class="w-56" align="end">
+						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+						-->
+			</section>
+		{/if}
 		<section>
 			<H3>기타 정보</H3>
 			<Table.Root>

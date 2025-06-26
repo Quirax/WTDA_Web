@@ -4,10 +4,14 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
-import { AdultContents, ErrorCode } from '@app';
+import { AdultContents, ErrorCode, DMChannelType, UserRelationship } from '@app';
 import { isAdult } from '$lib/utils';
+import { beginDMProc } from '$lib/server/common/dm';
+import * as relationship from '$lib/server/common/relationship';
 
-export const load = (async ({ params, locals }) => {
+export const load = (async ({ params, locals, depends }) => {
+	depends('r:info');
+
 	const id = params.id;
 
 	const article = (
@@ -58,8 +62,24 @@ export const load = (async ({ params, locals }) => {
 		}
 	}
 
+	let relationshipFromUser = UserRelationship.NONE;
+	let relationshipToUser = UserRelationship.NONE;
+
+	if (locals.user && locals.user.id !== article.author.id) {
+		try {
+			const result = await relationship.getRelationship(locals.user.id, article.author.id);
+
+			relationshipFromUser = result.fromUser;
+			relationshipToUser = result.toUser;
+		} catch (e) {
+			if (!(e instanceof Error) || e.cause !== 400) throw e;
+		}
+	}
+
 	return {
 		article,
+		relationshipFromUser,
+		relationshipToUser,
 	};
 }) satisfies PageServerLoad;
 
@@ -92,5 +112,60 @@ export const actions: Actions = {
 		}
 
 		return { message: 'Deletion of the article completed' };
+	},
+
+	beginDM: async ({ locals, params }) => {
+		if (!locals.user) return fail(403, { message: 'Not logined' });
+
+		try {
+			const article = (
+				await db
+					.select({
+						id: table.commissionRequest.id,
+						thumbnail: table.commissionRequest.thumbnail,
+						title: table.commissionRequest.title,
+						author: {
+							id: table.user.id,
+							username: table.user.username,
+							profileImage: table.user.profileImage,
+							email: table.user.email,
+							preferences: table.user.preferences,
+							profile: table.user.profile,
+							birthday: table.user.birthday,
+							authExpiresAt: table.user.authExpiresAt,
+							status: table.user.status,
+						},
+						category: table.commissionRequest.category,
+						tags: table.commissionRequest.tags,
+						createDate: table.commissionRequest.createDate,
+						modifyDate: table.commissionRequest.modifyDate,
+						content: table.commissionRequest.content,
+						containsAdultContents: table.commissionRequest.containsAdultContents,
+						budget: table.commissionRequest.budget,
+						deadline: table.commissionRequest.deadline,
+						isForCommercial: table.commissionRequest.isForCommercial,
+						purpose: table.commissionRequest.purpose,
+						visibleOnlyToCommissioner: table.commissionRequest.visibleOnlyToCommissioner,
+					})
+					.from(table.commissionRequest)
+					.where(eq(table.commissionRequest.id, params.id))
+					.innerJoin(table.user, eq(table.commissionRequest.author, table.user.id))
+			).at(0);
+
+			if (!article) return fail(404, { message: 'No article found' });
+
+			const user = article.author;
+
+			const channelId = await beginDMProc(locals.user, user, DMChannelType.REQUEST, article);
+
+			return { channelId };
+		} catch (e) {
+			if (e instanceof Error) {
+				if (typeof e.cause === 'number') return fail(e.cause, { message: e.message });
+			}
+
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
 	},
 };

@@ -46,6 +46,7 @@ export const actions: Actions = {
 
 		try {
 			const dms = await dm.send(
+				db,
 				channelId,
 				locals.user,
 				{
