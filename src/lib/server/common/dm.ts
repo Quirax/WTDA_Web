@@ -63,7 +63,7 @@ export const joinToChannel = async (
 
 		const dm: App.DM = {
 			id: generateID(),
-			type: 'leave',
+			type: 'join',
 			sentAt: new Date(),
 			sender: user,
 		};
@@ -282,38 +282,40 @@ export const beginDMProc = async (
 	).at(0);
 	if (result) return result.id;
 
-	return await db.transaction(async (tx) => {
-		// 채널 생성
-		const channelId = await createDMChannel(tx, type, relatedArticle);
+	return await db
+		.transaction(async (tx) => {
+			// 채널 생성
+			const channelId = await createDMChannel(tx, type, relatedArticle);
 
-		// 해당 채널에 가입
-		await joinToChannel(tx, fromUser, channelId);
-		await joinToChannel(tx, toUser, channelId);
+			// 해당 채널에 가입
+			await joinToChannel(tx, fromUser, channelId);
+			await joinToChannel(tx, toUser, channelId);
 
-		telecom.notify(fromUser.id, { event: 'join', channelId, userId: fromUser.id });
-		telecom.notify(toUser.id, { event: 'join', channelId, userId: toUser.id });
+			switch (type) {
+				case DMChannelType.GENERAL:
+					/* noop */
+					break;
+				case DMChannelType.REQUEST:
+					await send(tx, channelId, fromUser, {
+						type: 'general',
+						relatedPost: {
+							type: ArticleType.REQUEST,
+							article: relatedArticle,
+						},
+					} as App.DM & App.GeneralDM);
+					break;
+				case DMChannelType.COMMISSION:
+					// TODO: 커미션 관련 DM인 경우 구현
+					break;
+			}
 
-		switch (type) {
-			case DMChannelType.GENERAL:
-				/* noop */
-				break;
-			case DMChannelType.REQUEST:
-				await send(tx, channelId, fromUser, {
-					type: 'general',
-					relatedPost: {
-						type: ArticleType.REQUEST,
-						article: relatedArticle,
-					},
-				} as App.DM & App.GeneralDM);
-				break;
-			case DMChannelType.COMMISSION:
-				// TODO: 커미션 관련 DM인 경우 구현
-				break;
-		}
+			telecom.notify(fromUser.id, { event: 'join', channelId, userId: fromUser.id });
+			telecom.notify(toUser.id, { event: 'join', channelId, userId: toUser.id });
 
-		// 해당 채널 ID를 반환
-		return channelId;
-	});
+			// 해당 채널 ID를 반환
+			return channelId;
+		})
+		.then((channelId) => new Promise((resolve) => setTimeout(() => resolve(channelId), 300))); // 채널 생성 후 1초 뒤에 반환
 };
 
 export const getDMChannelInfo = async (channelId: string, sender: NonNullable<App.User>) => {
