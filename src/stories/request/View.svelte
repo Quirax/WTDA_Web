@@ -18,6 +18,7 @@
 	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { toast } from 'svelte-sonner';
+	import { deserialize } from '$app/forms';
 
 	interface Props extends ReturnType<typeof $props> {
 		article: App.Request;
@@ -55,6 +56,23 @@
 				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
 			});
 		});
+	};
+
+	// DM 시작
+	const onBeginDM = async () => {
+		const result = await fetch('?/beginDM', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			const channelId = result.data?.channelId;
+
+			if (channelId) goto(`/dm/${channelId}`);
+		} else {
+			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
+				description: '고객센터에 문의해주시기 바랍니다.',
+			});
+		}
 	};
 </script>
 
@@ -149,8 +167,7 @@
 						relationshipToUser !== UserRelationship.BLOCKED} -->
 					{#snippet child({ props })}
 						<div {...props} class="w-full">
-							<Button class="w-full flex-1">
-								<!-- onclick={onBeginDM} -->
+							<Button class="w-full flex-1" onclick={onBeginDM}>
 								<!-- disabled={relationshipFromUser === UserRelationship.BLOCKED ||
 									relationshipToUser === UserRelationship.BLOCKED ||
 									user.id === me?.id} -->
