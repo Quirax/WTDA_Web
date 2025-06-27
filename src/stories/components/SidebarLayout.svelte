@@ -15,7 +15,7 @@
 	const { containerClass, navClass, contentClass, nav, content }: Props = $props();
 </script>
 
-<div class={cn('w-ful flex max-md:flex-col', containerClass)}>
+<div class={cn('flex min-h-[90vh] w-full max-md:flex-col', containerClass)}>
 	<nav
 		class={cn(
 			'bg-background mt-16 w-70 flex-none overflow-y-auto max-md:w-full',
