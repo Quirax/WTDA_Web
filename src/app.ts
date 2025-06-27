@@ -161,3 +161,8 @@ export enum DMChannelType {
 	REQUEST = 'REQUEST', // 의뢰 관련 DM
 	COMMISSION = 'COMMISSION', // 커미션 신청 관련 DM
 }
+
+export enum UserRole {
+	GENERAL = 'GENERAL', // 일반 사용자
+	ADMIN = 'ADMIN', // 관리자
+}
