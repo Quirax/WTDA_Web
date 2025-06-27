@@ -6,7 +6,7 @@ import type { BuildColumns, ColumnBuilderBase, InferModelFromColumns } from 'dri
 import { ArticleType, UserStatus } from '../app';
 import { twemoji as originalTwemoji } from 'twemoji-svelte-action';
 
-export type { WithoutChild } from 'bits-ui';
+export type { WithoutChild, WithoutChildrenOrChild, WithElementRef } from 'bits-ui';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
