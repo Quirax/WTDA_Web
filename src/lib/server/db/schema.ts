@@ -14,6 +14,7 @@ import {
 	type PgTableExtraConfigValue,
 	primaryKey,
 	foreignKey,
+	type AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import {
 	AdultContents,
@@ -50,9 +51,22 @@ export const user = pgTable(
 		authExpiresAt: timestamp('auth_expires_at', { withTimezone: true, mode: 'date' }),
 		notificationToken: text('notification_token').array().notNull().default([]),
 		role: userRole('user_role').notNull().default(UserRole.GENERAL),
+		invitationCode: text('invitation_code').references(() => invitationCode.code, {
+			onDelete: 'no action',
+		}),
 	},
 	(table) => [index('username_idx').using('gin', table.username.op('gin_bigm_ops'))],
 );
+
+export const invitationCode = pgTable('invitation_code', {
+	code: text('code').primaryKey(),
+	createdBy: text('created_by')
+		.notNull()
+		.references((): AnyPgColumn => user.id),
+	createdDate: timestamp('create_date', { withTimezone: true, mode: 'date' })
+		.notNull()
+		.defaultNow(),
+});
 
 export const userRelationship = pgTable(
 	'user_relationship',
