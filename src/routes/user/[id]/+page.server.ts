@@ -352,6 +352,7 @@ export const actions: Actions = {
 						birthday: table.user.birthday,
 						authExpiresAt: table.user.authExpiresAt,
 						status: table.user.status,
+						role: table.user.role,
 					})
 					.from(table.user)
 					.where(eq(table.user.id, params.id))
