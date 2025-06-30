@@ -1,9 +1,10 @@
-import { db, table } from '$lib/server/db';
+import { db, generateID, table } from '$lib/server/db';
 import { desc, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { alias } from 'drizzle-orm/pg-core';
 import { fail } from '@sveltejs/kit';
 import { invitationCodesPerPage } from '$lib/config';
+import { UserRole } from '@app';
 
 export const load = (async () => {
 	return {};
@@ -34,6 +35,23 @@ export const actions: Actions = {
 				.offset(invitationCodesPerPage * (page - 1));
 
 			return { message: 'Got invitation codes', list: invitationCodes, total };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
+
+	create: async ({ locals }) => {
+		if (!locals.user || locals.user.role !== UserRole.ADMIN)
+			return fail(403, { message: 'You are not allowed' });
+
+		try {
+			await db.insert(table.invitationCode).values({
+				code: generateID(10),
+				createdBy: locals.user.id,
+			});
+
+			return { message: 'Created an invitaion code' };
 		} catch (e) {
 			console.error(e);
 			return fail(500, { message: 'An error has occurred' });

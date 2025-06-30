@@ -16,6 +16,7 @@
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Avatar from '$stories/components/Avatar.svelte';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	let status = $state(FetchStatus.LOADING);
 	let list = $state<InvitationCode[]>([]);
@@ -52,6 +53,23 @@
 	onMount(() => {
 		getList();
 	});
+
+	let openBeforeCreateAlert = $state(false);
+
+	const onCreate = async () => {
+		const result = await fetch('?/create', { method: 'post', body: new FormData() })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			getList();
+		} else {
+			console.error(result);
+			toast.error('초대코드를 만드는 도중 오류가 발생하였습니다.', {
+				description: '개발 담당자에게 문의하시기 바랍니다.',
+			});
+		}
+	};
 </script>
 
 <Header title="초대코드 관리" />
@@ -164,4 +182,14 @@
 			perPage={invitationCodesPerPage}
 			siblingCount={isDesktop() ? 1 : 0} />
 	{/if}
+	<section class="mt-4 text-right">
+		<Button onclick={() => (openBeforeCreateAlert = true)}>초대코드 만들기</Button>
+	</section>
 </Section>
+
+<AlertDialog
+	title="초대코드를 만드시겠습니까?"
+	description="허가되지 않은 사람의 가입을 방지하기 위해 필요한 만큼만 생성하고, 신중하게 전달하세요."
+	cancel={true}
+	onAction={onCreate}
+	bind:open={openBeforeCreateAlert} />
