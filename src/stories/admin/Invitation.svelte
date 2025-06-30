@@ -17,6 +17,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { Code } from '$lib/components/typo';
 
 	let status = $state(FetchStatus.LOADING);
 	let list = $state<InvitationCode[]>([]);
@@ -94,7 +95,7 @@
 					{#each list as item}
 						<Table.Row>
 							<Table.Cell>
-								{item.code}
+								<Code>{item.code}</Code>
 							</Table.Cell>
 							<Table.Cell>
 								<Button variant="link" class="text-inherit" href="/user/{item.createdBy.id}">
