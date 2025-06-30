@@ -139,7 +139,6 @@
 											withoutLink />
 										{item.usedBy.username}
 									</Button>
-									{item.usedBy?.username}
 								{:else}
 									<Muted>사용되지 않음</Muted>
 								{/if}
