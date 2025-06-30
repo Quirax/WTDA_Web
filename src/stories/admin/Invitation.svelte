@@ -71,6 +71,29 @@
 			});
 		}
 	};
+
+	let openBeforeDeleteAlert = $state(false);
+	let deleteTarget = $state<string>();
+
+	const onDelete = async () => {
+		console.log(deleteTarget);
+
+		const formData = new FormData();
+		formData.append('target', deleteTarget || '');
+
+		const result = await fetch('?/delete', { method: 'post', body: formData })
+			.then((r) => r.text())
+			.then((r) => deserialize(r));
+
+		if (result.type === 'success') {
+			getList();
+		} else {
+			console.error(result);
+			toast.error('초대코드를 삭제하는 도중 오류가 발생하였습니다.', {
+				description: '개발 담당자에게 문의하시기 바랍니다.',
+			});
+		}
+	};
 </script>
 
 <Header title="초대코드 관리" />
@@ -122,15 +145,17 @@
 								{/if}
 							</Table.Cell>
 							<Table.Cell class="text-center">
-								<!-- <Button
-												variant="ghost"
-												size="icon"
-												onclick={() => {
-													deleteAnnouncementAlertState.announcementID = item.id;
-													deleteAnnouncementAlertState.open = true;
-												}}> -->
-								<Trash2 />
-								<!-- </Button> -->
+								{#if !item.usedBy}
+									<Button
+										variant="ghost"
+										size="icon"
+										onclick={() => {
+											deleteTarget = item.code;
+											openBeforeDeleteAlert = true;
+										}}>
+										<Trash2 />
+									</Button>
+								{/if}
 							</Table.Cell>
 						</Table.Row>
 					{/each}
@@ -194,3 +219,10 @@
 	cancel={true}
 	onAction={onCreate}
 	bind:open={openBeforeCreateAlert} />
+
+<AlertDialog
+	title="정말로 삭제하시겠습니까?"
+	description="이 초대코드는 완전히 삭제됩니다."
+	cancel={true}
+	onAction={onDelete}
+	bind:open={openBeforeDeleteAlert} />

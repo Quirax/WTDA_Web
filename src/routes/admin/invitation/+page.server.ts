@@ -57,6 +57,33 @@ export const actions: Actions = {
 			return fail(500, { message: 'An error has occurred' });
 		}
 	},
+
+	delete: async ({ locals, request }) => {
+		if (!locals.user || locals.user.role !== UserRole.ADMIN)
+			return fail(403, { message: 'You are not allowed' });
+
+		const target = (await request.formData()).get('target') as string;
+
+		try {
+			if (
+				(
+					await db
+						.select({ id: table.user.id })
+						.from(table.user)
+						.where(eq(table.user.invitationCode, target))
+				).length > 0
+			) {
+				return fail(405, { message: 'Cannot delete the used invitation code' });
+			}
+
+			await db.delete(table.invitationCode).where(eq(table.invitationCode.code, target));
+
+			return { message: 'Deleted the invitaion code' };
+		} catch (e) {
+			console.error(e);
+			return fail(500, { message: 'An error has occurred' });
+		}
+	},
 };
 
 export type InvitationCode = {
