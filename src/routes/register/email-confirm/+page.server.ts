@@ -21,6 +21,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 export const actions: Actions = {
 	send: async (event) => {
+		// TODO 1차 알파테스트 전용: 입력받은 초대코드가 유효한지 확인
+
 		const confirmCode = mailauth.generateConfirmCode();
 		const sessionToken = mailauth.generateSessionToken();
 
@@ -69,7 +71,10 @@ export const actions: Actions = {
 
 			await db
 				.update(table.user)
-				.set({ status: UserStatus.NOT_AUTHENTICATED })
+				.set({
+					status: UserStatus.NOT_AUTHENTICATED,
+					invitationCode: form.data.invitationCode, // XXX: 알파테스트 전용
+				})
 				.where(eq(table.user.id, emailConfirm.userId));
 		} catch (e: any) {
 			console.error(e);

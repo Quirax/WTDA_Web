@@ -90,6 +90,7 @@
 		if (confirmFor === EmailConfirmFor.RESET_PASSWORD) {
 			formData.append('email', email);
 		}
+		// TODO 1차 알파테스트: 가입 시 확인 이메일 전송 요청 시 초대코드도 전달
 
 		const result = await fetch('?/send', {
 			method: 'post',
@@ -130,7 +131,7 @@
 	<P>{descriptions.desc}</P>
 	<form method="POST" class="w-full sm:w-2/3" action="?/do" use:enhance>
 		{#if confirmFor === EmailConfirmFor.RESET_PASSWORD}
-			<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
+			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>비밀번호를 재설정할 이메일 주소</Form.Label>
@@ -144,14 +145,18 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<!-- XXX: (여기부터) 알파테스트 전용 -->
+		{:else if confirmFor === EmailConfirmFor.REGISTRATION}
+			<!-- TODO 1차 알파테스트: 초대코드 입력란 추가 -->
+			<!-- XXX: (여기까지) 알파테스트 전용 -->
 		{/if}
-		<div class="flex flex-col my-4 space-y-1">
-			<div class="text-sm font-medium leading-none">
+		<div class="my-4 flex flex-col space-y-1">
+			<div class="text-sm leading-none font-medium">
 				아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 			</div>
 		</div>
 		<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
-		<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
+		<Form.Field {form} name="confirmCode" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>
