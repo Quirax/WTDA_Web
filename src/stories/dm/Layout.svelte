@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import { tick } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
+	import SidebarLayout from '$stories/components/SidebarLayout.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM; read: boolean })[];
@@ -33,12 +34,8 @@
 	source('/sse').select('dmRead').subscribe(onMessage);
 </script>
 
-<div class={cn('w-ful flex max-md:flex-col', (!page.params.id && 'md:h-[90vh]') || 'h-[90vh]')}>
-	<nav
-		class={cn(
-			'bg-background mt-16 w-70 flex-none overflow-y-auto max-md:w-full',
-			!!page.params.id && 'max-md:hidden',
-		)}>
+<SidebarLayout containerClass={(!page.params.id && 'md:h-[90vh]') || 'h-[90vh]'}>
+	{#snippet nav()}
 		{#each channels as ch}
 			{@const participants = (ch.participants || []).filter((v) => v!.id !== user!.id)}
 			<a
@@ -80,9 +77,8 @@
 				</div>
 			</a>
 		{/each}
-	</nav>
-
-	<div class="size-full">
+	{/snippet}
+	{#snippet content()}
 		{@render children()}
-	</div>
-</div>
+	{/snippet}
+</SidebarLayout>

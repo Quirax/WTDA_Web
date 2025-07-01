@@ -83,3 +83,5 @@ export const announcementsPerPage = 5;
 export const searchResultsPerPage = 10;
 export const profileArticlesPerPage = 10;
 export const dmsPerPage = 20;
+
+export const invitationCodesPerPage = 10;

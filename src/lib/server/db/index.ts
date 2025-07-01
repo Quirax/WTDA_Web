@@ -10,6 +10,7 @@ export const db = drizzle(client);
 db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
 db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_bigm;`);
 
-export const generateID = () => encodeBase32LowerCase(crypto.getRandomValues(new Uint8Array(15)));
+export const generateID = (length = 15) =>
+	encodeBase32LowerCase(crypto.getRandomValues(new Uint8Array(length)));
 
 export * as table from './schema';

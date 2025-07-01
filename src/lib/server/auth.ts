@@ -42,6 +42,7 @@ export async function validateSessionToken(token: string) {
 				profile: table.user.profile,
 				birthday: table.user.birthday,
 				authExpiresAt: table.user.authExpiresAt,
+				role: table.user.role,
 			},
 			session: table.session,
 		})
