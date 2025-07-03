@@ -3,7 +3,7 @@ import { desc, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 import { alias } from 'drizzle-orm/pg-core';
 import { fail } from '@sveltejs/kit';
-import { invitationCodesPerPage } from '$lib/config';
+import { invitationCodeLength, invitationCodesPerPage } from '$lib/config';
 import { UserRole } from '@app';
 
 export const load = (async () => {
@@ -47,7 +47,7 @@ export const actions: Actions = {
 
 		try {
 			await db.insert(table.invitationCode).values({
-				code: generateID(10),
+				code: generateID(invitationCodeLength),
 				createdBy: locals.user.id,
 			});
 

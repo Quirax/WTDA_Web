@@ -15,6 +15,7 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -78,9 +79,9 @@
 	};
 
 	let email = $state('');
+	let invitationCode = $state(''); // XXX 알파테스트 전용
 
 	let openUserNotFoundAlert = $state(false);
-	let openSendErrorAlert = $state(false);
 
 	const onSend = async () => {
 		const formData = new FormData();
@@ -89,6 +90,11 @@
 
 		if (confirmFor === EmailConfirmFor.RESET_PASSWORD) {
 			formData.append('email', email);
+			// XXX (여기부터) 알파테스트 전용
+		} else if (confirmFor === EmailConfirmFor.REGISTRATION) {
+			// 1차 알파테스트: 가입 시 확인 이메일 전송 요청 시 초대코드도 전달
+			formData.append('invitation_code', invitationCode);
+			// XXX (여기까지) 알파테스트 전용
 		}
 
 		const result = await fetch('?/send', {
@@ -97,8 +103,19 @@
 		}).then((r) => r.json());
 
 		if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-			if (result.status === 404) openUserNotFoundAlert = true;
-			else openSendErrorAlert = true;
+			if (result.status === 404) {
+				// XXX (여기부터) 알파테스트 전용
+				if (confirmFor === EmailConfirmFor.REGISTRATION) {
+					toast.error('초대코드가 잘못되었습니다.', {
+						description: '다시 확인하시거나 관리자에게 문의하시기 바랍니다.',
+					});
+				} else
+					// XXX (여기까지) 알파테스트 전용
+					openUserNotFoundAlert = true;
+			} else
+				toast.error('인증메일을 보내는 도중 오류가 발생했습니다.', {
+					description: '고객센터에 문의해주시기 바랍니다.',
+				});
 			expiresIn = 0;
 			return;
 		}
@@ -130,7 +147,7 @@
 	<P>{descriptions.desc}</P>
 	<form method="POST" class="w-full sm:w-2/3" action="?/do" use:enhance>
 		{#if confirmFor === EmailConfirmFor.RESET_PASSWORD}
-			<Form.Field {form} name="email" class="flex flex-col my-4 space-y-1">
+			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>비밀번호를 재설정할 이메일 주소</Form.Label>
@@ -139,19 +156,43 @@
 							placeholder="이메일 주소"
 							bind:value={email}
 							{...$constraints.email}
+							disabled={expiresIn > 0 || expiresIn === -1}
 							required />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<!-- XXX: (여기부터) 알파테스트 전용 -->
+		{:else if confirmFor === EmailConfirmFor.REGISTRATION}
+			<!-- 1차 알파테스트: 초대코드 입력란 추가 -->
+			<Form.Field {form} name="invitationCode" class="my-4 flex flex-col space-y-1">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>초대코드</Form.Label>
+						<Input
+							{...props}
+							placeholder="초대코드"
+							bind:value={invitationCode}
+							{...$constraints.invitationCode}
+							disabled={expiresIn > 0 || expiresIn === -1}
+							required />
+					{/snippet}
+				</Form.Control>
+				<Form.Description>
+					알파테스트 기간 중에는 관리자로부터 초대코드를 발급받아야 합니다. 아직 발급받지 않은 경우
+					관리자에게 문의하시기 바랍니다.
+				</Form.Description>
+				<Form.FieldErrors />
+			</Form.Field>
+			<!-- XXX: (여기까지) 알파테스트 전용 -->
 		{/if}
-		<div class="flex flex-col my-4 space-y-1">
-			<div class="text-sm font-medium leading-none">
+		<div class="my-4 flex flex-col space-y-1">
+			<div class="text-sm leading-none font-medium">
 				아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
 			</div>
 		</div>
 		<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
-		<Form.Field {form} name="confirmCode" class="flex flex-col my-4 space-y-1">
+		<Form.Field {form} name="confirmCode" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>
@@ -181,7 +222,3 @@
 	title="이메일 인증 처리 도중 오류가 발생했습니다."
 	description="고객센터에 문의해주시기 바랍니다."
 	bind:open={openOtherErrorAlert} />
-<AlertDialog
-	title="인증메일을 보내는 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
-	bind:open={openSendErrorAlert} />

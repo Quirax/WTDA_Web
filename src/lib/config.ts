@@ -84,4 +84,7 @@ export const searchResultsPerPage = 10;
 export const profileArticlesPerPage = 10;
 export const dmsPerPage = 20;
 
+// XXX (여기부터) 알파테스트 전용
 export const invitationCodesPerPage = 10;
+export const invitationCodeLength = 10;
+// XXX (여기까지) 알파테스트 전용
