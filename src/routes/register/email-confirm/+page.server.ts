@@ -19,9 +19,42 @@ export const load: PageServerLoad = async ({ locals }) => {
 	};
 };
 
+// XXX (여기부터) 알파테스트 전용
+const checkInvitationCode = async (invitationCode: string | null) => {
+	if (!invitationCode) throw new Error('Invitation code is required', { cause: 400 });
+
+	const invitationCodeRecord = (
+		await db
+			.select()
+			.from(table.invitationCode)
+			.where(eq(table.invitationCode.code, invitationCode))
+	).at(0);
+
+	if (!invitationCodeRecord) throw new Error('Invalid invitation code', { cause: 404 });
+
+	const invitationCodeUser = (
+		await db
+			.select({ invitationCode: table.user.invitationCode })
+			.from(table.user)
+			.where(eq(table.user.invitationCode, invitationCode))
+	).at(0);
+
+	if (invitationCodeUser) throw new Error('Invalid invitation code', { cause: 404 });
+};
+// XXX (여기까지) 알파테스트 전용
+
 export const actions: Actions = {
 	send: async (event) => {
-		// TODO 1차 알파테스트 전용: 입력받은 초대코드가 유효한지 확인
+		// XXX (여기부터) 알파테스트 전용
+		const invitationCode = (await event.request.formData()).get('invitation_code') as string | null;
+
+		try {
+			await checkInvitationCode(invitationCode);
+		} catch (e) {
+			if (e instanceof Error && typeof e.cause === 'number')
+				return fail(e.cause, { message: e.message });
+		}
+		// XXX (여기까지) 알파테스트 전용
 
 		const confirmCode = mailauth.generateConfirmCode();
 		const sessionToken = mailauth.generateSessionToken();
@@ -37,6 +70,13 @@ export const actions: Actions = {
 			);
 
 			mailauth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+
+			// XXX (여기부터) 알파테스트 전용
+			event.cookies.set('email-confirm-invitation-code', invitationCode!, {
+				expires: session.expiresAt,
+				path: '/',
+			});
+			// XXX (여기까지) 알파테스트 전용
 
 			return {
 				message: 'Email sent',
@@ -54,6 +94,17 @@ export const actions: Actions = {
 		if (!form.valid) {
 			return fail(400, { message: 'The form is not valid.', form });
 		}
+
+		// XXX (여기부터) 알파테스트 전용
+		const invitationCode = event.cookies.get('email-confirm-invitation-code') || null;
+
+		try {
+			await checkInvitationCode(invitationCode);
+		} catch (e) {
+			if (e instanceof Error && typeof e.cause === 'number')
+				return fail(e.cause, { message: e.message });
+		}
+		// XXX (여기까지) 알파테스트 전용
 
 		const sessionToken = event.cookies.get(mailauth.sessionCookieName);
 		if (!sessionToken) {
@@ -73,7 +124,7 @@ export const actions: Actions = {
 				.update(table.user)
 				.set({
 					status: UserStatus.NOT_AUTHENTICATED,
-					invitationCode: form.data.invitationCode, // XXX: 알파테스트 전용
+					invitationCode: invitationCode, // XXX 알파테스트 전용
 				})
 				.where(eq(table.user.id, emailConfirm.userId));
 		} catch (e: any) {
