@@ -3,7 +3,7 @@
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import { cn, twemoji } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
-	import { beforeNavigate, invalidate, invalidateAll } from '$app/navigation';
+	import { beforeNavigate, invalidate } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';

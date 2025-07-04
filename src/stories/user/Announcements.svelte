@@ -6,7 +6,7 @@
 	import { deserialize } from '$app/forms';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { announcementSchema, type AnnouncementSchema } from '$lib/schema/profile';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { ChevronRight, NotepadTextDashed, Pencil, Trash2, TriangleAlert } from 'lucide-svelte';
 	import { userStore } from '$lib/context';
@@ -137,7 +137,7 @@
 
 		if (result.type === 'success') {
 			getAnnouncementsList();
-			invalidateAll();
+			invalidate('user:info');
 		} else {
 			console.error(result);
 			openErrorOnAnnouncementAlert = true;
@@ -161,7 +161,7 @@
 					openErrorOnAnnouncementAlert = true;
 				}
 			} else {
-				invalidateAll();
+				invalidate('user:info');
 				openAnnouncementEditor = false;
 			}
 		},

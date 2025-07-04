@@ -23,7 +23,7 @@
 	sessionStore.set(data.session);
 
 	afterNavigate(() => {
-		invalidate('/').then(() => {
+		invalidate('session').then(() => {
 			userStore.set(data.user);
 			sessionStore.set(data.session);
 		});

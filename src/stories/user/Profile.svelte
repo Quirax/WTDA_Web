@@ -273,7 +273,7 @@
 					onClick: onUnblock,
 				},
 			});
-			invalidateAll();
+			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
 			openErrorOnBlock = true;
@@ -287,7 +287,7 @@
 
 		if (result.type === 'success') {
 			toast.success('사용자 차단을 해제하였습니다.');
-			invalidateAll();
+			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
 			openErrorOnBlock = true;

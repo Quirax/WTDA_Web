@@ -258,7 +258,7 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			await invalidateAll();
+			invalidate('dm:channels');
 		}
 	};
 
