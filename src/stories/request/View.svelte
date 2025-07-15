@@ -55,8 +55,8 @@
 	// Article link copy
 	const onCopyArticleLink = () => {
 		navigator.clipboard.writeText(location.href).then(() => {
-			toast.success('게시물 링크가 복사되었습니다.', {
-				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			toast.success(m['LINK_COPIED.TITLE']({ item: m['ARTICLE.THIS']() }), {
+				description: m['LINK_COPIED.DESCRIPTION'](),
 			});
 		});
 	};
@@ -72,8 +72,8 @@
 
 			if (channelId) goto(`/dm/${channelId}`);
 		} else {
-			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
-				description: '고객센터에 문의해주시기 바랍니다.',
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['DM.WHILE_BEGIN_DM']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
 			});
 		}
 	};
@@ -186,7 +186,7 @@
 			<section class="flex">
 				<Tooltip
 					class="w-full"
-					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					text={m['DM.UNABLE_TO_DM_WHEN_BLOCKED']()}
 					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
 						relationshipToUser !== UserRelationship.BLOCKED}>
 					{#snippet child({ props })}
@@ -197,7 +197,7 @@
 								disabled={relationshipFromUser === UserRelationship.BLOCKED ||
 									relationshipToUser === UserRelationship.BLOCKED}>
 								<MessageSquare />
-								이 의뢰에 관해 메시지하기
+								{m['DM.BEGIN_DM_ABOUT']({ articleType: ArticleType.REQUEST })}
 							</Button>
 						</div>
 					{/snippet}
@@ -211,7 +211,7 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+						<DropdownMenu.Item onclick={() => {}}>{m['REPORT']()}</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 						-->
