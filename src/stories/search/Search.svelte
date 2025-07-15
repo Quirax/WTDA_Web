@@ -3,7 +3,7 @@
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { ArticleTypeText, CategoryText, SearchFlagText, SearchRangeText } from '$lib/messages';
+	import { ArticleTypeText, CategoryText, m, SearchFlagText, SearchRangeText } from '$lib/messages';
 	import * as Popover from '$lib/components/ui/popover';
 	import { cn, isAdult as adultCheck, isDesktop } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
@@ -31,6 +31,7 @@
 	import { searchResultsPerPage } from '$lib/config';
 	import { untrack } from 'svelte';
 	import { userStore } from '$lib/context';
+	import { replace } from '$lib/utils.svelte';
 
 	interface Props {
 		params: SuperValidated<Infer<FormSchema>>;
@@ -73,8 +74,9 @@
 	const budgetRangeText = () => {
 		const rangeTexts: string[] = Array(0);
 
-		if ($formData.min_budget !== null || $formData.max_budget !== null) rangeTexts.push('설정됨');
-		if ($formData.budget_negotiable) rangeTexts.push('협상 가능');
+		if ($formData.min_budget !== null || $formData.max_budget !== null)
+			rangeTexts.push(m['SEARCH.SETTED']());
+		if ($formData.budget_negotiable) rangeTexts.push(m['ARTICLE.NEGOTIABLE']());
 
 		if (rangeTexts.length === 0) return '';
 		else return ` (${rangeTexts.join(', ')})`;
@@ -101,8 +103,8 @@
 	const dateRangeText = () => {
 		const rangeTexts: string[] = Array(0);
 
-		if (startDate || endDate) rangeTexts.push('설정됨');
-		if ($formData.date_negotiable) rangeTexts.push('협상 가능');
+		if (startDate || endDate) rangeTexts.push(m['SEARCH.SETTED']());
+		if ($formData.date_negotiable) rangeTexts.push(m['ARTICLE.NEGOTIABLE']());
 
 		if (rangeTexts.length === 0) return '';
 		else return ` (${rangeTexts.join(', ')})`;
@@ -118,11 +120,11 @@
 	});
 </script>
 
-<Header title="'{query}' 검색결과" />
+<Header title={m['SEARCH.RESULT_TITLE']({ query })} />
 
 <!-- ref: https://svelte.dev/docs/kit/link-options#data-sveltekit-preload-data -->
 <Section data-sveltekit-preload-data="off">
-	<H2>'{query}' 검색결과</H2>
+	<H2>{m['SEARCH.RESULT_TITLE']({ query })}</H2>
 	<form
 		bind:this={formElement}
 		method="GET"
@@ -134,7 +136,7 @@
 					<Input
 						{...props}
 						type="search"
-						placeholder="검색하기"
+						placeholder={m['SEARCH.PLACEHOLDER']()}
 						bind:value={$formData.query}
 						{...$constraints.query}
 						class="h-xl w-full border-stone-200 bg-stone-50 text-xl text-stone-950" />
@@ -147,7 +149,7 @@
 								$errors = validated.errors;
 							}
 						}}>
-						검색
+						{m['SEARCH.BUTTON']()}
 					</Button>
 				{/snippet}
 			</Form.Control>
@@ -159,7 +161,7 @@
 						<Select.Root type="multiple" {...props} bind:value={$formData.search_range}>
 							<Select.Trigger>
 								<div class="mr-2">
-									{'검색 범위' + (searchRangeText ? ': ' + searchRangeText : '')}
+									{m['SEARCH.RANGE.LABEL']() + (searchRangeText ? ': ' + searchRangeText : '')}
 								</div>
 							</Select.Trigger>
 							<Select.Content>
@@ -180,7 +182,7 @@
 						<Select.Root type="multiple" {...props} bind:value={$formData.type}>
 							<Select.Trigger>
 								<div class="mr-2">
-									{'타입' + (typeText ? ': ' + typeText : '')}
+									{m['SEARCH.TYPE']() + (typeText ? ': ' + typeText : '')}
 								</div>
 							</Select.Trigger>
 							<Select.Content>
@@ -200,7 +202,7 @@
 					{#snippet children({ props })}
 						<Select.Root type="multiple" {...props} bind:value={$formData.category}>
 							<Select.Trigger class="w-[10em]">
-								{'카테고리 (' + $formData.category.length + '개)'}
+								{m['SEARCH.CATEGORY']({ count: $formData.category.length })}
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(CategoryText) as [k, v]}
@@ -231,22 +233,22 @@
 						(($errors.min_budget?.length || 0) > 0 || ($errors.max_budget?.length || 0) > 0) &&
 							'border-destructive bg-destructive/10 border-2',
 					)}>
-					{`금액 범위${budgetRangeText()}`}
+					{m['SEARCH.BUDGET']({ range: budgetRangeText() })}
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
 					<Form.Field {form} name="min_budget">
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center">
-									<span class="flex-none">최소:&nbsp;</span>
+									<span class="flex-none">{m['SEARCH.MINIMUM']()}&nbsp;</span>
 									<Input
 										{...props}
-										placeholder="금액"
+										placeholder={m['FORM.CURRENCY']()}
 										type="currency"
 										nullable
 										bind:value={$formData.min_budget}
 										{...$constraints.min_budget} />
-									<span class="flex-none">&nbsp;포인트</span>
+									<span class="flex-none">&nbsp;{m['POINT']()}</span>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -256,15 +258,15 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center">
-									<span class="flex-none">최대:&nbsp;</span>
+									<span class="flex-none">{m['SEARCH.MAXIMUM']()}&nbsp;</span>
 									<Input
 										{...props}
-										placeholder="금액"
+										placeholder={m['FORM.CURRENCY']()}
 										type="currency"
 										nullable
 										bind:value={$formData.max_budget}
 										{...$constraints.max_budget} />
-									<span class="flex-none">&nbsp;포인트</span>
+									<span class="flex-none">&nbsp;{m['POINT']()}</span>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -275,7 +277,7 @@
 							{#snippet children({ props })}
 								<Checkbox {...props} bind:checked={$formData.budget_negotiable} />
 								<div class="leading-none">
-									<Form.Label>협상 가능한 경우를 포함함</Form.Label>
+									<Form.Label>{m['SEARCH.INCLUDE_NEGOTIABLES']()}</Form.Label>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -297,13 +299,14 @@
 						(($errors.date_start?.length || 0) > 0 || ($errors.date_end?.length || 0) > 0) &&
 							'border-destructive bg-destructive/10 border-2',
 					)}>
-					{`일정 범위${dateRangeText()}`}
+					{m['SEARCH.DATE']({ range: dateRangeText() })}
 				</Popover.Trigger>
 				<Popover.Content class="flex w-auto flex-col space-y-2 p-2">
 					<Form.Field {form} name="date_start">
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center">
+									<span class="flex-none">{m['SEARCH.DATE_FROM']()}&nbsp;</span>
 									<Popover.Root>
 										<Popover.Trigger
 											class={cn(
@@ -314,13 +317,14 @@
 												!$formData.date_start && 'text-muted-foreground',
 											)}>
 											<CalendarIcon />
-											{$formData.date_start ? df.format($formData.date_start) : '날짜 선택'}
+											{$formData.date_start
+												? df.format($formData.date_start)
+												: m['FORM.SELECT_ITEM']({ item: m['FORM.DATE']() })}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
 											<Calendar type="single" locale="ko-KR" bind:value={startDate} />
 										</Popover.Content>
 									</Popover.Root>
-									<span class="flex-none">&nbsp;부터</span>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -330,6 +334,7 @@
 						<Form.Control>
 							{#snippet children({ props })}
 								<div class="flex items-center">
+									<span class="flex-none">{m['SEARCH.DATE_TO']()}&nbsp;</span>
 									<Popover.Root>
 										<Popover.Trigger
 											class={cn(
@@ -340,13 +345,14 @@
 												!$formData.date_end && 'text-muted-foreground',
 											)}>
 											<CalendarIcon />
-											{$formData.date_end ? df.format($formData.date_end) : '날짜 선택'}
+											{$formData.date_end
+												? df.format($formData.date_end)
+												: m['FORM.SELECT_ITEM']({ item: m['FORM.DATE']() })}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
 											<Calendar type="single" locale="ko-KR" bind:value={endDate} />
 										</Popover.Content>
 									</Popover.Root>
-									<span class="flex-none">&nbsp;까지</span>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -357,7 +363,7 @@
 							{#snippet children({ props })}
 								<Checkbox {...props} bind:checked={$formData.date_negotiable} />
 								<div class="leading-none">
-									<Form.Label>협상 가능한 경우를 포함함</Form.Label>
+									<Form.Label>{m['SEARCH.INCLUDE_NEGOTIABLES']()}</Form.Label>
 								</div>
 							{/snippet}
 						</Form.Control>
@@ -370,7 +376,7 @@
 					{#snippet children({ props })}
 						<Select.Root type="single" {...props} bind:value={$formData.commercial_use}>
 							<Select.Trigger class="w-[11em]">
-								{'상업적 목적: ' + flagText($formData.commercial_use)}
+								{m['SEARCH.FOR_COMMERCIAL_USE']({ flag: flagText($formData.commercial_use) })}
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchFlagText) as [k, v]}
@@ -400,7 +406,9 @@
 								}
 							}>
 							<Select.Trigger>
-								<div class="mr-2">{'성인 콘텐츠: ' + flagText($formData.adult_contents)}</div>
+								<div class="mr-2">
+									{m['SEARCH.ADULT_CONTENTS']({ flag: flagText($formData.adult_contents) })}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchFlagText) as [k, v]}
@@ -431,7 +439,9 @@
 								(v) => ($formData.grotesque_contents = notAllowed ? 'excluded' : v)
 							}>
 							<Select.Trigger>
-								<div class="mr-2">{'잔인한 콘텐츠: ' + flagText($formData.grotesque_contents)}</div>
+								<div class="mr-2">
+									{m['SEARCH.GROTESQUE_CONTENTS']({ flag: flagText($formData.grotesque_contents) })}
+								</div>
 							</Select.Trigger>
 							<Select.Content>
 								{#each Object.entries(SearchFlagText) as [k, v]}
@@ -447,10 +457,7 @@
 		</div>
 
 		<div class="text-muted-foreground text-sm">
-			본인인증이 진행되지 않았거나 미성년자인 경우, 표시 설정이 되지 않은 경우, 성인 콘텐츠 및
-			잔인한 콘텐츠를 검색할 수 없습니다. <Button variant="link" href="/settings/info">
-				사용자 설정
-			</Button>에서 확인하시기 바랍니다.
+			{@render replace.link(m['SEARCH.RESTRICTED']())}
 		</div>
 
 		<input name="page" bind:value={page} hidden />

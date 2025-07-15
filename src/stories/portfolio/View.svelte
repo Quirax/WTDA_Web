@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { CategoryText } from '$lib/messages';
+	import { CategoryText, m } from '$lib/messages';
 	import { cn, formatDateString, formatDatetimeString, sanitizeHTML } from '$lib/utils';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import Header from '$stories/components/Header.svelte';
@@ -12,7 +12,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { goto } from '$app/navigation';
 	import Ul from '$lib/components/typo/ul.svelte';
-	import { AdultContents } from '@app';
+	import { AdultContents, ArticleType } from '@app';
 	import { page } from '$app/state';
 	import * as Card from '$lib/components/ui/card';
 	import * as Carousel from '$lib/components/ui/carousel';
@@ -66,14 +66,17 @@
 
 		{#if article.media.length > 0}
 			<MediaGallery
-				media={article.media.map((src, idx) => ({ src, alt: `첨부 미디어 ${idx + 1}` }))} />
+				media={article.media.map((src, idx) => ({
+					src,
+					alt: m['ARTICLE.MEDIA_ALT']({ idx: idx + 1 }),
+				}))} />
 		{/if}
 
 		<article class="html p-4">
 			{#if article.content}
 				{@html sanitizeHTML(article.content)}
 			{:else}
-				<span class="italic">세부 내용이 없습니다.</span>
+				<span class="italic">{m['ARTICLE.NO_CONTENT']()}</span>
 			{/if}
 		</article>
 		<div class="border-t pt-2">
@@ -88,17 +91,17 @@
 				<img
 					src={article.thumbnail}
 					class="aspect-video w-full object-cover"
-					alt="이 의뢰의 썸네일" />
+					alt={m['ARTICLE.THUMBNAIL_ALT']({ articleType: ArticleType.PORTFOLIO })} />
 			{:else}
 				<div class="banner-pattern bg-primary aspect-video w-full"></div>
 			{/if}
 		</div>
 		<section>
-			<H3 class="hidden">의뢰 기본 정보</H3>
+			<H3 class="hidden">{m['ARTICLE.DETAILS']({ articleType: ArticleType.PORTFOLIO })}</H3>
 			<Table.Root class="table-fixed">
 				<Table.Body>
 					<Table.Row>
-						<Table.Head class="w-[8em]">작성자</Table.Head>
+						<Table.Head class="w-[8em]">{m['ARTICLE.AUTHOR']()}</Table.Head>
 						<Table.Cell>
 							<Button variant="link" class="text-inherit" href="/user/{article.author.id}">
 								<Avatar
@@ -110,30 +113,32 @@
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>카테고리</Table.Head>
+						<Table.Head>{m['ARTICLE.CATEGORY']()}</Table.Head>
 						<Table.Cell>{CategoryText[article.category]()}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>작업 및 게시 일자</Table.Head>
+						<Table.Head>{m['PORTFOLIO.PUBLISH_DATE']()}</Table.Head>
 						<Table.Cell>
-							{article.publishDate ? formatDateString(article.publishDate) : '미상'}
+							{article.publishDate
+								? formatDateString(article.publishDate)
+								: m['PORTFOLIO.PUBLISH_DATE_UNKNOWN']()}
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>
 		</section>
 		<section>
-			<H3>기타 정보</H3>
+			<H3>{m['ARTICLE.MISC_INFO']()}</H3>
 			<Table.Root>
 				<Table.Body>
 					<Table.Row>
-						<Table.Head>작성일시</Table.Head>
+						<Table.Head>{m['ARTICLE.CREATE_DATE']()}</Table.Head>
 						<Table.Cell>
 							{formatDatetimeString(article.createDate)}
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>수정일시</Table.Head>
+						<Table.Head>{m['ARTICLE.MODIFY_DATE']()}</Table.Head>
 						<Table.Cell>{formatDatetimeString(article.modifyDate)}</Table.Cell>
 					</Table.Row>
 				</Table.Body>
@@ -141,41 +146,31 @@
 		</section>
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
-				<Button href="/pf/{article.id}/edit">수정하기</Button>
+				<Button href="/pf/{article.id}/edit">{m['ARTICLE.EDIT']()}</Button>
 				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
-					삭제하기
+					{m['ARTICLE.DELETE']()}
 				</Button>
 			</section>
 		{/if}
 	</section>
 </Section>
 
-{#snippet deleteDesc()}
-	<Ul>
-		<li>삭제한 게시물은 복구할 수 없습니다.</li>
-		<li>
-			이 의뢰와 관련된 커미션이 진행중인 경우 삭제할 수 없습니다. 커미션을 중단한 후 다시
-			시도하세요.
-		</li>
-	</Ul>
-{/snippet}
-
 <AlertDialog
-	title="정말로 삭제하시겠습니까?"
-	description={deleteDesc}
+	title={m['ARTICLE.BEFORE_DELETE_ALERT.TITLE']()}
+	description={m['ARTICLE.BEFORE_DELETE_ALERT.DESCRIPTION']()}
 	cancel={true}
 	onAction={onDelete}
 	bind:open={openBeforeDeletionAlert} />
 
 <AlertDialog
-	title="삭제 완료"
-	description="게시물을 삭제하였습니다"
+	title={m['ARTICLE.AFTER_DELETE_ALERT.TITLE']()}
+	description={m['ARTICLE.AFTER_DELETE_ALERT.DESCRIPTION']()}
 	onAction={() => {
 		goto('/');
 	}}
 	bind:open={openAfterDeletionAlert} />
 
 <AlertDialog
-	title="게시물 관련 처리 도중 오류가 발생하였습니다"
-	description="고객센터에 문의하시기 바랍니다다"
+	title={m['ARTICLE.ERROR_ALERT.TITLE']()}
+	description={m['ARTICLE.ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorAlert} />

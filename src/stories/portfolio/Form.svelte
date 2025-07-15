@@ -18,11 +18,11 @@
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { CategoryText } from '$lib/messages';
+	import { CategoryText, m } from '$lib/messages';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
-	import { AdultContents } from '@app';
+	import { AdultContents, ArticleType } from '@app';
 	import { userStore } from '$lib/context';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
@@ -62,7 +62,7 @@
 		if (!$formData.media.includes($formData.thumbnail)) $formData.thumbnail = null;
 	});
 
-	const doString = editMode ? '수정하기' : '만들기';
+	const doString = editMode ? m['ARTICLE.EDIT']() : m['ARTICLE.CREATE']();
 
 	const onDropMedia = async ({ detail }: any) => {
 		const { acceptedFiles } = detail;
@@ -81,17 +81,20 @@
 	};
 </script>
 
-<Header title="포트폴리오 {doString}" />
+<Header title={m['ARTICLE.FORM_TITLE']({ doString, articleType: ArticleType.PORTFOLIO })} />
 
 <Section>
-	<H2>포트폴리오 {doString}</H2>
+	<H2>{m['ARTICLE.FORM_TITLE']({ doString, articleType: ArticleType.PORTFOLIO })}</H2>
 	<form method="POST" use:enhance class="w-full sm:w-2/3">
 		<Form.Field {form} name="title" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 제목</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['ARTICLE.TITLE']()}
+					</Form.Label>
 					<Input
-						placeholder="제목"
+						placeholder={m['ARTICLE.TITLE']()}
 						{...props}
 						bind:value={$formData.title}
 						{...$constraints.title} />
@@ -103,10 +106,14 @@
 		<Form.Field {form} name="category" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 카테고리</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['ARTICLE.CATEGORY']()}
+					</Form.Label>
 					<Select.Root type="single" bind:value={$formData.category} name={props.name}>
 						<Select.Trigger class="w-[5em]" {...props}>
-							{CategoryText[$formData.category]() || '카테고리 선택'}
+							{CategoryText[$formData.category]() ||
+								m['FORM.SELECT_ITEM']({ item: m['ARTICLE.CATEGORY']() })}
 						</Select.Trigger>
 						<Select.Content>
 							{#each Object.entries(CategoryText) as [k, v]}
@@ -124,7 +131,10 @@
 		<Form.Field {form} name="publishDate" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 작업 및 게시 일자</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['PORTFOLIO.PUBLISH_DATE']()}
+					</Form.Label>
 					<RadioGroup.Root
 						name={props.name}
 						value={$formData.publishDate === null ? 'unknown' : 'certain-date'}>
@@ -156,7 +166,7 @@
 											<CalendarIcon />
 											{$formData.publishDate !== null
 												? df.format($formData.publishDate)
-												: '날짜 선택'}
+												: m['FORM.SELECT_ITEM']({ item: m['FORM.DATE']() })}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
 											<CalendarWithSelects
@@ -180,7 +190,7 @@
 								value="unknown"
 								id="publishDate-unknown"
 								onclick={() => ($formData.publishDate = null)} />
-							<Label for="publishDate-unknown">미상</Label>
+							<Label for="publishDate-unknown">{m['PORTFOLIO.PUBLISH_DATE_UNKNOWN']()}</Label>
 						</div>
 					</RadioGroup.Root>
 				{/snippet}
@@ -191,7 +201,7 @@
 		<Form.Field {form} name="media" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>첨부할 미디어</Form.Label>
+					<Form.Label>{m['ARTICLE.ATTACHING_MEDIA']()}</Form.Label>
 
 					{#if $formData.media.length > 0}
 						<div class="flex w-full justify-center">
@@ -221,32 +231,31 @@
 						on:drop={onDropMedia}
 						multiple={false}
 						class="dropzone size-full justify-center">
-						<p>여기로 첨부할 미디어를 드래그하거나 클릭하여 선택하세요.</p>
+						<p>{m['ARTICLE.ATTACHING_MEDIA_DROPZONE']()}</p>
 					</Dropzone>
 				{/snippet}
 			</Form.Control>
-			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
+			<Form.Description>{m['ARTICLE.ATTACHING_MEDIA_DESCRIPTION']()}</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>세부적인 설명</Form.Label>
+					<Form.Label>{m['ARTICLE.CONTENT']()}</Form.Label>
 					<Editor bind:value={$formData.content} />
 				{/snippet}
 			</Form.Control>
-			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="tags" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>태그</Form.Label>
+					<Form.Label>{m['ARTICLE.TAG']()}</Form.Label>
 					{#each $formData.tags || [] as _, idx (idx)}
 						<div class="flex items-center space-x-2">
-							<Input placeholder="태그" bind:value={$formData.tags![idx]} />
+							<Input placeholder={m['ARTICLE.TAG']()} bind:value={$formData.tags![idx]} />
 							<Button
 								variant="outline"
 								size="icon"
@@ -263,7 +272,7 @@
 							if (!$formData.tags) $formData.tags = [];
 							$formData.tags = [...$formData.tags, ''];
 						}}>
-						태그 추가
+						{m['FORM.ADD_ITEM']({ item: m['ARTICLE.TAG']() })}
 					</Button>
 				{/snippet}
 			</Form.Control>
@@ -287,10 +296,10 @@
 											: AdultContents.NORMAL)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip
-									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 작성할 수 없습니다."
-									disabled={isAdult(me)}>
-									<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip text={m['ARTICLE.ADULT_RESTRICTED']()} disabled={isAdult(me)}>
+									<Form.Label>
+										{m['ARTICLE.ADULT']({ articleType: ArticleType.PORTFOLIO })}
+									</Form.Label>
 								</Tooltip>
 							</div>
 						</div>
@@ -306,10 +315,10 @@
 											: AdultContents.ADULT_RESTRICTED)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip
-									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 작성할 수 없습니다."
-									disabled={isAdult(me)}>
-									<Form.Label>이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip text={m['ARTICLE.GROTESQUE_RESTRICTED']()} disabled={isAdult(me)}>
+									<Form.Label>
+										{m['ARTICLE.GROTESQUE']({ articleType: ArticleType.PORTFOLIO })}
+									</Form.Label>
 								</Tooltip>
 							</div>
 						</div>
@@ -319,6 +328,6 @@
 		</div>
 
 		<Form.Button>{doString}</Form.Button>
-		<Button variant="secondary" onclick={() => history.back()}>취소하기</Button>
+		<Button variant="secondary" onclick={() => history.back()}>{m['FORM.CANCEL']()}</Button>
 	</form>
 </Section>
