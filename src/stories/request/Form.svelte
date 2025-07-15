@@ -18,11 +18,11 @@
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { CategoryText } from '$lib/messages';
+	import { CategoryText, m } from '$lib/messages';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
-	import { AdultContents } from '@app';
+	import { AdultContents, ArticleType } from '@app';
 	import { userStore } from '$lib/context';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import MediaListCarousel from '$stories/components/MediaListCarousel.svelte';
@@ -62,20 +62,23 @@
 		if (!thumbnails.includes($formData.thumbnail)) $formData.thumbnail = null;
 	});
 
-	const doString = editMode ? '수정하기' : '만들기';
+	const doString = editMode ? m['ARTICLE.EDIT']() : m['ARTICLE.CREATE']();
 </script>
 
-<Header title="의뢰 {doString}" />
+<Header title={m['ARTICLE.FORM_TITLE']({ doString, articleType: ArticleType.REQUEST })} />
 
 <Section>
-	<H2>의뢰 {doString}</H2>
+	<H2>{m['ARTICLE.FORM_TITLE']({ doString, articleType: ArticleType.REQUEST })}</H2>
 	<form method="POST" use:enhance class="w-full sm:w-2/3">
 		<Form.Field {form} name="title" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 제목</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['ARTICLE.TITLE']()}
+					</Form.Label>
 					<Input
-						placeholder="제목"
+						placeholder={m['ARTICLE.TITLE']()}
 						{...props}
 						bind:value={$formData.title}
 						{...$constraints.title} />
@@ -87,10 +90,14 @@
 		<Form.Field {form} name="category" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 카테고리</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['ARTICLE.CATEGORY']()}
+					</Form.Label>
 					<Select.Root type="single" bind:value={$formData.category} name={props.name}>
 						<Select.Trigger class="w-[5em]" {...props}>
-							{CategoryText[$formData.category]() || '카테고리 선택'}
+							{CategoryText[$formData.category]() ||
+								m['FORM.SELECT_ITEM']({ item: m['ARTICLE.CATEGORY']() })}
 						</Select.Trigger>
 						<Select.Content>
 							{#each Object.entries(CategoryText) as [k, v]}
@@ -108,7 +115,10 @@
 		<Form.Field {form} name="budget" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 가능한 금액</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['REQUEST.BUDGET']()}
+					</Form.Label>
 					<RadioGroup.Root
 						name={props.name}
 						value={$formData.budget === null ? 'negotiable' : 'certain-budget'}>
@@ -120,13 +130,13 @@
 							<Label for="certain-budget" class="items-center max-lg:flex">
 								<div class="flex items-center">
 									<Input
-										placeholder="금액"
+										placeholder={m['FORM.CURRENCY']()}
 										type="currency"
 										{...props}
 										bind:value={$formData.budget}
 										disabled={$formData.budget === null}
 										{...$constraints.budget} />
-									<span class="flex-none">&nbsp;포인트</span>
+									<span class="flex-none">&nbsp;{m['POINT']()}</span>
 								</div>
 							</Label>
 						</div>
@@ -135,7 +145,7 @@
 								value="negotiable"
 								id="budget-negotiable"
 								onclick={() => ($formData.budget = null)} />
-							<Label for="budget-negotiable">협상 가능</Label>
+							<Label for="budget-negotiable">{m['ARTICLE.NEGOTIABLE']()}</Label>
 						</div>
 					</RadioGroup.Root>
 				{/snippet}
@@ -146,7 +156,10 @@
 		<Form.Field {form} name="deadline" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 작업 기한</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['REQUEST.DEADLINE']()}
+					</Form.Label>
 					<RadioGroup.Root
 						name={props.name}
 						value={$formData.deadline === null ? 'negotiable' : 'certain-date'}>
@@ -176,7 +189,9 @@
 											)}
 											disabled={$formData.deadline === null}>
 											<CalendarIcon />
-											{$formData.deadline !== null ? df.format($formData.deadline) : '날짜 선택'}
+											{$formData.deadline !== null
+												? df.format($formData.deadline)
+												: m['FORM.SELECT_ITEM']({ item: m['FORM.DATE']() })}
 										</Popover.Trigger>
 										<Popover.Content class="w-auto p-0">
 											<Calendar
@@ -200,7 +215,7 @@
 								value="negotiable"
 								id="deadline-negotiable"
 								onclick={() => ($formData.deadline = null)} />
-							<Label for="deadline-negotiable">협상 가능</Label>
+							<Label for="deadline-negotiable">{m['ARTICLE.NEGOTIABLE']()}</Label>
 						</div>
 					</RadioGroup.Root>
 				{/snippet}
@@ -211,16 +226,19 @@
 		<Form.Field {form} name="purpose" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label><Badge variant="destructive">필수</Badge> 사용 목적</Form.Label>
+					<Form.Label>
+						<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+						{m['REQUEST.PURPOSE_FORM']()}
+					</Form.Label>
 					<Input
-						placeholder="사용 목적"
+						placeholder={m['REQUEST.PURPOSE_FORM']()}
 						{...props}
 						bind:value={$formData.purpose}
 						{...$constraints.purpose} />
 				{/snippet}
 			</Form.Control>
 			<Form.Description>
-				커미션 작품을 어디에 사용할 것인지 적어주세요. (예: 프로필 이미지, 트위터 헤더)
+				{m['REQUEST.PURPOSE_DESCRIPTION']()}
 			</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
@@ -231,18 +249,17 @@
 					{#snippet children({ props })}
 						<Checkbox {...props} bind:checked={$formData.isForCommercial} />
 						<div class="space-y-1 leading-none">
-							<Form.Label>상업적 목적으로 사용합니다. (예: 인터넷 방송, 홍보물)</Form.Label>
+							<Form.Label>{m['REQUEST.FOR_COMMERCIAL']()}</Form.Label>
 						</div>
 						<input name={props.name} value={$formData.isForCommercial} hidden />
 					{/snippet}
 				</Form.Control>
 			</div>
 			<Form.Description>
-				상업적 목적으로 사용하는 경우 반드시 체크해야 합니다.
+				{m['REQUEST.FOR_COMMERCIAL_DESCRIPTION']()}
 				<br />
 				<span class="text-destructive font-bold">
-					비상업적 목적으로 커미션 진행 후 상업적 목적으로 사용하는 경우 커미션주의 저작권을
-					침해하는 것으로, 민&middot;형사상의 책임을 질 수 있습니다.
+					{m['REQUEST.FOR_COMMERCIAL_WARNING']()}
 				</span>
 			</Form.Description>
 			<Form.FieldErrors />
@@ -251,7 +268,7 @@
 		<Form.Field {form} name="content" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>세부적인 설명</Form.Label>
+					<Form.Label>{m['ARTICLE.CONTENT']()}</Form.Label>
 					<Editor
 						bind:value={$formData.content}
 						onchange={(_, delta) =>
@@ -282,17 +299,17 @@
 					{/if}
 				{/snippet}
 			</Form.Control>
-			<Form.Description>이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.</Form.Description>
+			<Form.Description>{m['ARTICLE.THUMBNAIL_SELECT_DESCRIPTION']()}</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="tags" class="mt-4 space-y-2">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>태그</Form.Label>
+					<Form.Label>{m['ARTICLE.TAG']()}</Form.Label>
 					{#each $formData.tags || [] as _, idx (idx)}
 						<div class="flex items-center space-x-2">
-							<Input placeholder="태그" bind:value={$formData.tags![idx]} />
+							<Input placeholder={m['ARTICLE.TAG']()} bind:value={$formData.tags![idx]} />
 							<Button
 								variant="outline"
 								size="icon"
@@ -309,7 +326,7 @@
 							if (!$formData.tags) $formData.tags = [];
 							$formData.tags = [...$formData.tags, ''];
 						}}>
-						태그 추가
+						{m['FORM.ADD_ITEM']({ item: m['ARTICLE.TAG']() })}
 					</Button>
 				{/snippet}
 			</Form.Control>
@@ -333,10 +350,10 @@
 											: AdultContents.NORMAL)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip
-									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 작성할 수 없습니다."
-									disabled={isAdult(me)}>
-									<Form.Label>이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip text={m['ARTICLE.ADULT_RESTRICTED']()} disabled={isAdult(me)}>
+									<Form.Label>
+										{m['ARTICLE.ADULT']({ articleType: ArticleType.REQUEST })}
+									</Form.Label>
 								</Tooltip>
 							</div>
 						</div>
@@ -352,10 +369,10 @@
 											: AdultContents.ADULT_RESTRICTED)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip
-									text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 작성할 수 없습니다."
-									disabled={isAdult(me)}>
-									<Form.Label>이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.</Form.Label>
+								<Tooltip text={m['ARTICLE.GROTESQUE_RESTRICTED']()} disabled={isAdult(me)}>
+									<Form.Label>
+										{m['ARTICLE.GROTESQUE']({ articleType: ArticleType.REQUEST })}
+									</Form.Label>
 								</Tooltip>
 							</div>
 						</div>
@@ -370,7 +387,7 @@
 						{#snippet children({ props })}
 							<Checkbox {...props} bind:checked={$formData.visibleOnlyToCommissioner} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>커미션주만 이 의뢰를 볼 수 있습니다.</Form.Label>
+								<Form.Label>{m['REQUEST.VISIBLE_ONLY_TO_COMMISSIONER']()}</Form.Label>
 							</div>
 							<input name={props.name} value={$formData.visibleOnlyToCommissioner} hidden />
 						{/snippet}
@@ -381,6 +398,6 @@
 		</div>
 
 		<Form.Button>{doString}</Form.Button>
-		<Button variant="secondary" onclick={() => history.back()}>취소하기</Button>
+		<Button variant="secondary" onclick={() => history.back()}>{m['FORM.CANCEL']()}</Button>
 	</form>
 </Section>

@@ -91,6 +91,7 @@
 		"@internationalized/date": "^3.8.1",
 		"@microsoft/fetch-event-source": "^2.0.1",
 		"@node-rs/argon2": "^2.0.2",
+		"@node-rs/argon2-wasm32-wasi": "^2.0.2",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"@willingtonortiz/svelte-simple-icons": "^0.0.3",
@@ -114,10 +115,12 @@
 		"svelte-file-dropzone": "^2.0.9",
 		"sveltekit-sse": "^0.13.19",
 		"tinycolor2": "^1.6.0",
-		"twemoji-svelte-action": "^1.0.5"
+		"twemoji-svelte-action": "^1.0.5",
+		"vite-plugin-top-level-await": "^1.5.0"
 	},
 	"main": "index.js",
 	"repository": "https://github.com/What-To-Do-Atelier/WTDA_Web.git",
 	"author": "Quirax Lee <quiraxical@gmail.com>",
-	"license": "MIT"
+	"license": "MIT",
+	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

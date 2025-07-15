@@ -15,7 +15,9 @@ import { allArticles } from '$lib/server/db/shorthands';
 import * as relationship from '$lib/server/common/relationship';
 import { beginDMProc } from '$lib/server/common/dm';
 
-export const load = (async ({ params, locals }) => {
+export const load = (async ({ params, locals, depends }) => {
+	depends('user:info');
+
 	const id = params.id;
 
 	// 내 프로필로 접근하려는 경우

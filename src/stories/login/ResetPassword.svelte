@@ -12,6 +12,7 @@
 	import { goto } from '$app/navigation';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -42,16 +43,19 @@
 	const { form: formData, enhance, constraints } = form;
 </script>
 
-<Header title="비밀번호 재설정" showSearchPanel={false} showUserPanel={false} />
+<Header
+	title={m['USER_INFO.RESET_PASSWORD.TITLE']()}
+	showSearchPanel={false}
+	showUserPanel={false} />
 
 <Section>
-	<H2>비밀번호 재설정</H2>
-	<P>새로운 비밀번호를 입력하십시오</P>
+	<H2>{m['USER_INFO.RESET_PASSWORD.TITLE']()}</H2>
+	<P>{m['USER_INFO.RESET_PASSWORD.DESCRIPTION_RESET']()}</P>
 	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
-		<Form.Field {form} name="password" class="flex flex-col my-4 space-y-1">
+		<Form.Field {form} name="password" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>새 비밀번호</Form.Label>
+					<Form.Label>{m['USER_INFO.RESET_PASSWORD.NEW_PASSWORD']()}</Form.Label>
 					<Input
 						{...props}
 						type="password"
@@ -59,13 +63,13 @@
 						{...$constraints.password} />
 				{/snippet}
 			</Form.Control>
-			<Form.Description>최소 8자 이상</Form.Description>
+			<Form.Description>{m['USER_INFO.PASSWORD_MIN_LENGTH']()}</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="passwordConfirm" class="flex flex-col mb-4 space-y-1">
+		<Form.Field {form} name="passwordConfirm" class="mb-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>비밀번호 확인</Form.Label>
+					<Form.Label>{m['USER_INFO.PASSWORD_CONFIRM']()}</Form.Label>
 					<Input
 						{...props}
 						type="password"
@@ -75,17 +79,17 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button disabled={disableButton}>비밀번호 재설정</Form.Button>
+		<Form.Button disabled={disableButton}>{m['USER_INFO.RESET_PASSWORD.TITLE']()}</Form.Button>
 	</form>
 </Section>
 
 <AlertDialog
-	title="비밀번호 재설정 도중 오류가 발생했습니다."
-	description="비밀번호 재설정 도중 오류가 발생했습니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.RESET_PASSWORD.TITLE']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openFailedAlert} />
 <AlertDialog
-	title="비밀번호가 재설정되었습니다."
-	description="변경된 비밀번호로 다시 로그인하시기 바랍니다."
+	title={m['USER_INFO.RESET_PASSWORD.COMPLETED.TITLE']()}
+	description={m['USER_INFO.RESET_PASSWORD.COMPLETED.DESCRIPTION']()}
 	onAction={() => {
 		goto('/login');
 	}}

@@ -32,6 +32,7 @@
 	import { toast } from 'svelte-sonner';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		info?: App.DMChannel;
@@ -120,8 +121,6 @@
 		container.scroll({ top: element.offsetTop });
 	};
 
-	// TODO: 스크롤 위치가 일정 범위 내일 때 마지막 DM 날짜 이전의 DM 불러오기. 만약에 없는 경우 이벤트 연결 끊기
-
 	let openEmojiList = $state(false);
 	let emojiListProps = $state({
 		x: 0,
@@ -183,11 +182,13 @@
 			console.log(result);
 
 			if (result.status === 406)
-				toast.error(
-					'이 대화방에서 메시지를 수신할 대상이 없습니다. 대화가 종료되었거나 상대방이 차단했을 수 있습니다.',
-				);
+				toast.error(m['DM.NO_RECEIVER.TITLE'](), {
+					description: m['DM.NO_RECEIVER.DESCRIPTION'](),
+				});
 			else
-				toast.error('메시지를 보내는 도중 오류가 발생하였습니다. 고객센터에 문의하시기 바랍니다.');
+				toast.error(m['DM.ERROR_ON_SEND.TITLE'](), {
+					description: m['DM.ERROR_ON_SEND.DESCRIPTION'](),
+				});
 		}
 	};
 
@@ -247,8 +248,11 @@
 
 	const title = $derived(
 		participants.length > 0
-			? `${info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username)} 님과의 대화`
-			: '종료된 대화',
+			? m['DM.TITLE']({
+					participants:
+						info?.participants.filter((v) => v.id !== user!.id).map((v) => v.username) || '',
+				})
+			: m['DM.CLOSED.TITLE'](),
 	);
 
 	let openBeforeLeaveAlert = $state(false);
@@ -258,7 +262,7 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			await invalidateAll();
+			invalidate('dm:channels');
 		}
 	};
 
@@ -341,10 +345,10 @@
 			<DropdownMenu.Content class="w-56" align="end">
 				<DropdownMenu.Group>
 					<DropdownMenu.Item onclick={() => (openBeforeLeaveAlert = true)}>
-						나가기
+						{m['DM.MENU.QUIT']()}
 					</DropdownMenu.Item>
 					<!-- TODO 구현 완료 시 재활성화
-					<DropdownMenu.Item onclick={() => {}}>신고하고 나가기</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => {}}>{m['DM.MENU.QUIT_WITH_REPORT']()}</DropdownMenu.Item>
 					-->
 				</DropdownMenu.Group>
 			</DropdownMenu.Content>
@@ -360,7 +364,7 @@
 		{@const href = articleType && `/${getLinkPrefix(articleType)}/${info.relatedArticle!.id}`}
 		{#if href}
 			<Muted class="mt-2">
-				관련 게시물: <Button {href} variant="link" target="_blank">
+				{m['DM.RELATED_ARTICLE']()}: <Button {href} variant="link" target="_blank">
 					{info.relatedArticle!.title}
 				</Button>
 			</Muted>
@@ -404,7 +408,7 @@
 					{@html sanitizeHTML(
 						(
 							(dmDraft.relatedMessage.type === 'general' && dmDraft.relatedMessage.message) ||
-							'<i>내용 없음</i>'
+							`<i>${m['DM.NO_CONTENT']()}</i>`
 						).replace(/\n/g, '<br>'),
 					)}
 				</div>
@@ -427,7 +431,10 @@
 		<section
 			class="bg-background flex w-full items-center justify-center space-x-2 border border-t-0 p-2">
 			<MediaListCarousel
-				media={dmDraft.attachments.map((v, idx) => ({ src: v, alt: `첨부 이미지 ${idx + 1}` }))}
+				media={dmDraft.attachments.map((v, idx) => ({
+					src: v,
+					alt: m['DM.ATTACHED_IMAGE_ALT']({ idx: idx + 1 }),
+				}))}
 				opts={{ loop: false }}
 				listClass="w-44 sm:w-88 md:max-[840px]:w-44 lg:w-132 xl:w-176 2xl:w-220"
 				itemClass="h-40 sm:basis-1/2 md:max-[840px]:basis-full lg:basis-1/3 xl:basis-1/4 2xl:basis-1/5">
@@ -445,6 +452,7 @@
 		</section>
 	{/if}
 	<section class="bg-background flex w-full items-center space-x-2 border border-t-0 p-2">
+		<!-- 파일 첨부 -->
 		<Dropzone
 			accept={imageFormat}
 			on:drop={onDropMedia}
@@ -455,14 +463,13 @@
 					size: 'icon',
 				}),
 			)}>
-			<!-- <Button size="icon" variant="secondary"> -->
-			<!-- 파일 첨부 -->
 			<Paperclip />
-			<!-- </Button> -->
 		</Dropzone>
 		<Input
 			name="chat"
-			placeholder={info?.isAbleToSend ? '메시지를 입력하세요...' : '대화할 수 없는 대화방입니다.'}
+			placeholder={info?.isAbleToSend
+				? m['DM.INPUT_PLACEHOLDER']()
+				: m['DM.CLOSED.INPUT_PLACEHOLDER']()}
 			bind:value={dmDraft.message}
 			onkeyup={onKeyUp}
 			disabled={!info?.isAbleToSend} />
@@ -480,8 +487,8 @@
 <EmojiList bind:open={openEmojiList} {...emojiListProps} />
 
 <AlertDialog
-	title="정말로 나가시겠습니까?"
-	description="나간 이후에도 새로운 대화방에서 대화를 진행할 수 있습니다. 이를 원하지 않는 경우 상대방을 차단하시기 바랍니다."
+	title={m['DM.ALERT_QUIT.TITLE']()}
+	description={m['DM.ALERT_QUIT.DESCRIPTION']()}
 	cancel={true}
 	onAction={onLeave}
 	bind:open={openBeforeLeaveAlert} />

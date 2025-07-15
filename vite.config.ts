@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/experimental-addon-test/vitest-plugin';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import topLevelAwait from 'vite-plugin-top-level-await';
 
 const dirname =
 	typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
@@ -15,6 +16,7 @@ const dirname =
 export default defineConfig({
 	plugins: [
 		sveltekit(),
+		topLevelAwait(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		tailwindcss(),
 		process.env.NODE_ENV === 'development'

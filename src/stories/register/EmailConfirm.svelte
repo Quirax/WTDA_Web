@@ -16,6 +16,8 @@
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { toast } from 'svelte-sonner';
+	import { m } from '$lib/messages';
+	import { replace } from '$lib/utils.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema>>;
@@ -39,16 +41,16 @@
 		switch (confirmFor) {
 			case EmailConfirmFor.REGISTRATION: {
 				return {
-					title: '이메일 인증',
-					heading: '거의 다 되었습니다!',
-					desc: '다른 악의적 사용자에 의해 이메일이 도용되었을 경우를 대비하여 최종적으로 이메일 인증을 진행합니다.',
+					title: m['USER_INFO.EMAIL_CONFIRM.TITLE'](),
+					heading: m['USER_INFO.EMAIL_CONFIRM.HEADING'](),
+					desc: m['USER_INFO.EMAIL_CONFIRM.DESCRIPTION'](),
 				};
 			}
 			case EmailConfirmFor.RESET_PASSWORD: {
 				return {
-					title: '비밀번호 재설정',
-					heading: '비밀번호 재설정',
-					desc: '다른 악의적 사용자에 의해 비밀번호가 재설정되지 않도록 이메일 인증을 진행합니다.',
+					title: m['USER_INFO.RESET_PASSWORD.TITLE'](),
+					heading: m['USER_INFO.RESET_PASSWORD.HEADING'](),
+					desc: m['USER_INFO.RESET_PASSWORD.DESCRIPTION'](),
 				};
 			}
 		}
@@ -113,8 +115,8 @@
 					// XXX (여기까지) 알파테스트 전용
 					openUserNotFoundAlert = true;
 			} else
-				toast.error('인증메일을 보내는 도중 오류가 발생했습니다.', {
-					description: '고객센터에 문의해주시기 바랍니다.',
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.WHILE.SENDING_EMAIL']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
 				});
 			expiresIn = 0;
 			return;
@@ -132,11 +134,8 @@
 
 {#snippet userNotFoundDesc()}
 	<Ul>
-		<li>회원가입 시 사용한 이메일이 맞는지 다시 확인하시기 바랍니다.</li>
-		<li>
-			회원가입을 하지 않으셨다면 <Button variant="link" href="/register">회원가입</Button>을 하시기
-			바랍니다.
-		</li>
+		<li>{m['USER_INFO.USER_NOT_FOUND.DESCRIPTION_CHECK_EMAIL']()}</li>
+		<li>{@render replace.link(m['USER_INFO.USER_NOT_FOUND.DESCRIPTION_REGISTER']())}</li>
 	</Ul>
 {/snippet}
 
@@ -150,10 +149,10 @@
 			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label>비밀번호를 재설정할 이메일 주소</Form.Label>
+						<Form.Label>{m['USER_INFO.EMAIL_TO_RESET_PASSWORD']()}</Form.Label>
 						<Input
 							{...props}
-							placeholder="이메일 주소"
+							placeholder={m['USER_INFO.EMAIL']()}
 							bind:value={email}
 							{...$constraints.email}
 							disabled={expiresIn > 0 || expiresIn === -1}
@@ -188,16 +187,18 @@
 		{/if}
 		<div class="my-4 flex flex-col space-y-1">
 			<div class="text-sm leading-none font-medium">
-				아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.
+				{m['USER_INFO.EMAIL_CONFIRM_INSTRUCTION']()}
 			</div>
 		</div>
-		<Button onclick={onSend} disabled={expiresIn === -1}>인증메일 보내기</Button>
+		<Button onclick={onSend} disabled={expiresIn === -1}>
+			{m['USER_INFO.SEND_CONFIRM_EMAIL']()}
+		</Button>
 		<Form.Field {form} name="confirmCode" class="my-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Form.Label>
-						인증 코드{expiresIn > 0
-							? ` (${Math.floor(expiresIn / 60)}:${String(expiresIn % 60).padStart(2, '0')} 후 만료)`
+						{m['USER_INFO.CONFIRM_CODE']()}{expiresIn > 0
+							? ` (${m['USER_INFO.EXPIRES_IN']({ minutes: Math.floor(expiresIn / 60), seconds: String(expiresIn % 60).padStart(2, '0') })})`
 							: ''}
 					</Form.Label>
 					<Input
@@ -210,15 +211,17 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button type="submit" disabled={expiresIn <= 0}>인증완료</Form.Button>
+		<Form.Button type="submit" disabled={expiresIn <= 0}>
+			{m['USER_INFO.COMPLETE_EMAIL_CONFIRM']()}
+		</Form.Button>
 	</form>
 </Section>
 
 <AlertDialog
-	title="해당 이메일을 사용하는 사용자가 없습니다."
+	title={m['USER_INFO.USER_NOT_FOUND.TITLE']()}
 	description={userNotFoundDesc}
 	bind:open={openUserNotFoundAlert} />
 <AlertDialog
-	title="이메일 인증 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.EMAIL_CONFIRM.TITLE']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openOtherErrorAlert} />

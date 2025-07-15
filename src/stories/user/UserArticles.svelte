@@ -10,6 +10,7 @@
 	import { profileArticlesPerPage } from '$lib/config';
 	import { isDesktop } from '$lib/utils';
 	import { goto } from '$app/navigation';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -77,23 +78,30 @@
 	<div class="flex justify-between">
 		<Tabs.Root bind:value={articleListTab} class="md:w-[400px]">
 			<Tabs.List class="[&>*]:text-lg [&>*]:font-bold">
-				<Tabs.Trigger value="all">전체</Tabs.Trigger>
-				<!-- <Tabs.Trigger value="commission_types">커미션 타입</Tabs.Trigger> -->
-				<Tabs.Trigger value="requests">의뢰</Tabs.Trigger>
-				<Tabs.Trigger value="portfolio">포트폴리오</Tabs.Trigger>
+				<Tabs.Trigger value="all">{m['PROFILE.ARTICLES.ALL']()}</Tabs.Trigger>
+				<!-- <Tabs.Trigger value="commission_types">{m['ARTICLE_TYPE.COMMISSION']()}</Tabs.Trigger> -->
+				<Tabs.Trigger value="requests">{m['ARTICLE_TYPE.REQUEST']()}</Tabs.Trigger>
+				<Tabs.Trigger value="portfolio">{m['ARTICLE_TYPE.PORTFOLIO']()}</Tabs.Trigger>
 			</Tabs.List>
 		</Tabs.Root>
 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger class="m-0 p-0">
 				{#snippet child({ props })}
-					<Button {...props} variant="default" class="px-4"><CirclePlus /> 새로 만들기</Button>
+					<Button {...props} variant="default" class="px-4">
+						<CirclePlus />
+						{m['PROFILE.ARTICLES.CREATE']()}
+					</Button>
 				{/snippet}
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="w-56" align="end">
 				<DropdownMenu.Group>
-					<DropdownMenu.Item onclick={() => goto('/r/create')}>의뢰</DropdownMenu.Item>
-					<DropdownMenu.Item onclick={() => goto('/pf/create')}>포트폴리오</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => goto('/r/create')}>
+						{m['ARTICLE_TYPE.REQUEST']()}
+					</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => goto('/pf/create')}>
+						{m['ARTICLE_TYPE.PORTFOLIO']()}
+					</DropdownMenu.Item>
 				</DropdownMenu.Group>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>

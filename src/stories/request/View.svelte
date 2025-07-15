@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import { CategoryText } from '$lib/messages';
+	import { CategoryText, m } from '$lib/messages';
 	import { formatDatetimeString, sanitizeHTML } from '$lib/utils';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import Header from '$stories/components/Header.svelte';
@@ -12,7 +12,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { goto, invalidate } from '$app/navigation';
 	import Ul from '$lib/components/typo/ul.svelte';
-	import { AdultContents, UserRelationship } from '@app';
+	import { AdultContents, ArticleType, UserRelationship } from '@app';
 	import { page } from '$app/state';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
@@ -55,8 +55,8 @@
 	// Article link copy
 	const onCopyArticleLink = () => {
 		navigator.clipboard.writeText(location.href).then(() => {
-			toast.success('게시물 링크가 복사되었습니다.', {
-				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			toast.success(m['LINK_COPIED.TITLE']({ item: m['ARTICLE.THIS']() }), {
+				description: m['LINK_COPIED.DESCRIPTION'](),
 			});
 		});
 	};
@@ -72,8 +72,8 @@
 
 			if (channelId) goto(`/dm/${channelId}`);
 		} else {
-			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
-				description: '고객센터에 문의해주시기 바랍니다.',
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['DM.WHILE_BEGIN_DM']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
 			});
 		}
 	};
@@ -112,7 +112,7 @@
 			{#if article.content}
 				{@html sanitizeHTML(article.content)}
 			{:else}
-				<span class="italic">세부 내용이 없습니다.</span>
+				<span class="italic">{m['ARTICLE.NO_CONTENT']()}</span>
 			{/if}
 		</article>
 		<div class="border-t pt-2">
@@ -127,17 +127,17 @@
 				<img
 					src={article.thumbnail}
 					class="aspect-video w-full object-cover"
-					alt="이 의뢰의 썸네일" />
+					alt={m['ARTICLE.THUMBNAIL_ALT']({ articleType: ArticleType.REQUEST })} />
 			{:else}
 				<div class="banner-pattern bg-primary aspect-video w-full"></div>
 			{/if}
 		</div>
 		<section>
-			<H3 class="hidden">의뢰 기본 정보</H3>
+			<H3 class="hidden">{m['ARTICLE.DETAILS']({ articleType: ArticleType.REQUEST })}</H3>
 			<Table.Root class="table-fixed">
 				<Table.Body>
 					<Table.Row>
-						<Table.Head class="w-[8em]">작성자</Table.Head>
+						<Table.Head class="w-[8em]">{m['ARTICLE.AUTHOR']()}</Table.Head>
 						<Table.Cell>
 							<Button variant="link" class="text-inherit" href="/user/{article.author.id}">
 								<Avatar
@@ -149,30 +149,34 @@
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>카테고리</Table.Head>
+						<Table.Head>{m['ARTICLE.CATEGORY']()}</Table.Head>
 						<Table.Cell>{CategoryText[article.category]()}</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>사용 목적</Table.Head>
+						<Table.Head>{m['REQUEST.PURPOSE']()}</Table.Head>
 						<Table.Cell class="break-all">
 							<div>
 								{article.purpose}
 							</div>
 							{#if article.isForCommercial}
-								<div class="text-destructive font-bold">(상업적 목적으로 사용)</div>
+								<div class="text-destructive font-bold">{m['REQUEST.FOR_COMMERCIAL']()}</div>
 							{/if}
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>가능한 금액</Table.Head>
+						<Table.Head>{m['REQUEST.BUDGET']()}</Table.Head>
 						<Table.Cell>
-							{article.budget ? article.budget.toLocaleString() + ' 포인트' : '협의 가능'}
+							{article.budget
+								? article.budget.toLocaleString() + ` ${m['POINT']()}`
+								: m['ARTICLE.NEGOTIABLE']()}
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>작업 기한</Table.Head>
+						<Table.Head>{m['REQUEST.DEADLINE']()}</Table.Head>
 						<Table.Cell>
-							{article.deadline ? formatDatetimeString(article.deadline) : '협의 가능'}
+							{article.deadline
+								? formatDatetimeString(article.deadline)
+								: m['ARTICLE.NEGOTIABLE']()}
 						</Table.Cell>
 					</Table.Row>
 				</Table.Body>
@@ -182,7 +186,7 @@
 			<section class="flex">
 				<Tooltip
 					class="w-full"
-					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					text={m['DM.UNABLE_TO_DM_WHEN_BLOCKED']()}
 					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
 						relationshipToUser !== UserRelationship.BLOCKED}>
 					{#snippet child({ props })}
@@ -193,7 +197,7 @@
 								disabled={relationshipFromUser === UserRelationship.BLOCKED ||
 									relationshipToUser === UserRelationship.BLOCKED}>
 								<MessageSquare />
-								이 의뢰에 관해 메시지하기
+								{m['DM.BEGIN_DM_ABOUT']({ articleType: ArticleType.REQUEST })}
 							</Button>
 						</div>
 					{/snippet}
@@ -207,24 +211,24 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content class="w-56" align="end">
-						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+						<DropdownMenu.Item onclick={() => {}}>{m['REPORT']()}</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 						-->
 			</section>
 		{/if}
 		<section>
-			<H3>기타 정보</H3>
+			<H3>{m['ARTICLE.MISC_INFO']()}</H3>
 			<Table.Root>
 				<Table.Body>
 					<Table.Row>
-						<Table.Head>작성일시</Table.Head>
+						<Table.Head>{m['ARTICLE.CREATE_DATE']()}</Table.Head>
 						<Table.Cell>
 							{formatDatetimeString(article.createDate)}
 						</Table.Cell>
 					</Table.Row>
 					<Table.Row>
-						<Table.Head>수정일시</Table.Head>
+						<Table.Head>{m['ARTICLE.MODIFY_DATE']()}</Table.Head>
 						<Table.Cell>{formatDatetimeString(article.modifyDate)}</Table.Cell>
 					</Table.Row>
 				</Table.Body>
@@ -232,9 +236,9 @@
 		</section>
 		{#if me && article.author.id === me.id}
 			<section class="text-right">
-				<Button href="/r/{article.id}/edit">수정하기</Button>
+				<Button href="/r/{article.id}/edit">{m['ARTICLE.EDIT']()}</Button>
 				<Button variant="destructive" onclick={() => (openBeforeDeletionAlert = true)}>
-					삭제하기
+					{m['ARTICLE.DELETE']()}
 				</Button>
 			</section>
 		{/if}
@@ -243,30 +247,31 @@
 
 {#snippet deleteDesc()}
 	<Ul>
-		<li>삭제한 게시물은 복구할 수 없습니다.</li>
+		<li>{m['ARTICLE.BEFORE_DELETE_ALERT.DESCRIPTION']()}</li>
 		<li>
-			이 의뢰와 관련된 커미션이 진행중인 경우 삭제할 수 없습니다. 커미션을 중단한 후 다시
-			시도하세요.
+			{m['ARTICLE.BEFORE_DELETE_ALERT.DESCRIPTION_COMMISSION']({
+				articleType: ArticleType.REQUEST,
+			})}
 		</li>
 	</Ul>
 {/snippet}
 
 <AlertDialog
-	title="정말로 삭제하시겠습니까?"
+	title={m['ARTICLE.BEFORE_DELETE_ALERT.TITLE']()}
 	description={deleteDesc}
 	cancel={true}
 	onAction={onDelete}
 	bind:open={openBeforeDeletionAlert} />
 
 <AlertDialog
-	title="삭제 완료"
-	description="게시물을 삭제하였습니다"
+	title={m['ARTICLE.AFTER_DELETE_ALERT.TITLE']()}
+	description={m['ARTICLE.AFTER_DELETE_ALERT.DESCRIPTION']()}
 	onAction={() => {
 		goto('/');
 	}}
 	bind:open={openAfterDeletionAlert} />
 
 <AlertDialog
-	title="게시물 관련 처리 도중 오류가 발생하였습니다"
-	description="고객센터에 문의하시기 바랍니다다"
+	title={m['ARTICLE.ERROR_ALERT.TITLE']()}
+	description={m['ARTICLE.ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorAlert} />

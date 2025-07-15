@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { m } from '$lib/messages';
 	import type { Snippet } from 'svelte';
 
 	interface Props extends ReturnType<typeof $props> {
@@ -38,7 +39,7 @@
 		<AlertDialog.Footer>
 			{#if cancel}
 				<AlertDialog.Cancel onclick={onCancel || (() => {})}>
-					{typeof cancel === 'string' ? cancel : '취소'}
+					{typeof cancel === 'string' ? cancel : m.CANCEL()}
 				</AlertDialog.Cancel>
 			{/if}
 			{#if action || !cancel}
@@ -47,7 +48,7 @@
 						open = false;
 						(onAction || (() => {}))();
 					}}>
-					{typeof action === 'string' ? action : '확인'}
+					{typeof action === 'string' ? action : m.CONFIRM()}
 				</AlertDialog.Action>
 			{/if}
 		</AlertDialog.Footer>

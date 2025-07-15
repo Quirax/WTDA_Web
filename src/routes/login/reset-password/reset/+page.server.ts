@@ -10,8 +10,12 @@ import { encodeHexLowerCase } from '@oslojs/encoding';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { getPasswordHash } from '$lib/server/auth';
 import { sendPasswordChangedNotification } from '$lib/server/mail';
+import { redirect } from '@sveltejs/kit';
 
-export const load = (async () => {
+export const load = (async ({ cookies }) => {
+	const sessionToken = cookies.get(mailauth.sessionCookieName);
+	if (!sessionToken) throw redirect(301, '/');
+
 	return {
 		form: await superValidate(zod(passwordSchema)),
 	};

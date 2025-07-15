@@ -6,6 +6,8 @@
 	import { footerInfo, isLink } from '$lib/config';
 
 	import './Footer.css';
+	import { replace } from '$lib/utils.svelte';
+	import { m } from '$lib/messages';
 
 	const anchorProps = {
 		class: 'hover:text-primary font-medium mb-1',
@@ -17,6 +19,11 @@
 	};
 </script>
 
+{#snippet link(href: string, token: string)}
+	{@const [target, text] = token.split('\u0002')}
+	<a {href} {target} {...anchorProps}>{text}</a>
+{/snippet}
+
 <!-- ref: https://stackoverflow.com/a/72232241 -->
 <footer
 	class="sticky top-[100vh] bg-stone-400 p-10 text-sm text-stone-800 dark:bg-stone-800 dark:text-stone-400">
@@ -24,7 +31,7 @@
 		{#each footerInfo.links as link}
 			<a href={link.href} target={link.target} {...anchorProps}>{link.text}</a>
 		{/each}
-		<div class="inline-flex space-x-4 flex-nowrap">
+		<div class="inline-flex flex-nowrap space-x-4">
 			{#each footerInfo.sns as link}
 				<a href={link.href} target={link.target} {...anchorProps}>
 					<SIIcon icon={link.icon} {...iconProps} title={link.text} />
@@ -45,14 +52,14 @@
 		{/each}
 	</div>
 	<div class=" leading-7 [&:not(:first-child)]:mt-6">
-		<span>
-			{#each footerInfo.usedDesignBy as by, idx}
-				<a href={by.href} target={by.target} {...anchorProps}>{by.text}</a>
-				{idx < footerInfo.usedDesignBy.length - 1 ? ',' : ''}
-			{/each}
-			등에서
-		</span>
-		디자인한 이미지 요소가 사용되었습니다.
+		{@render replace.link(
+			m['USED_DESIGN_BY']({
+				usedDesignBy: footerInfo.usedDesignBy
+					.map((by) => `\u0000${by.href}\u0001${by.target}\u0002${by.text}\u0000`)
+					.join(', '),
+			}),
+			link,
+		)}
 	</div>
 	<div class=" leading-7 [&:not(:first-child)]:mt-6">
 		{footerInfo.disclaimar}

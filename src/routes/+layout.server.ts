@@ -3,7 +3,9 @@ import { UserStatus } from '../app';
 import type { LayoutServerLoad } from './$types';
 import { setBaseURL } from '$lib/server/firebase';
 
-export const load: LayoutServerLoad = async ({ locals, route, url }) => {
+export const load: LayoutServerLoad = async ({ locals, route, url, depends }) => {
+	depends('session');
+
 	setBaseURL(url.host, url.protocol);
 
 	if (

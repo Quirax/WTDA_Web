@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { m } from '$lib/messages';
 	import { uploadImage } from '$lib/utils';
 	import type { Delta, QuillOptions } from 'quill';
 
@@ -43,7 +44,7 @@
 						upload: uploadImage,
 					},
 				},
-				placeholder: '내용을 입력하십시오...', // TODO: props
+				placeholder: m['EDITOR.PLACEHOLDER'](), // TODO: props
 				readOnly: false, // TODO: props
 				theme: 'snow',
 			};
@@ -61,9 +62,27 @@
 			holder!.parentElement!.classList.add('ql-ko');
 		});
 	});
+
+	const editorTextCSS = `
+		--editor-size-default: "${m['EDITOR.SIZE.DEFAULT']()}";
+		--editor-size-small: "${m['EDITOR.SIZE.SMALL']()}";
+		--editor-size-large: "${m['EDITOR.SIZE.LARGE']()}";
+		--editor-size-huge: "${m['EDITOR.SIZE.HUGE']()}";
+		--editor-header-default: "${m['EDITOR.HEADER.DEFAULT']()}";
+		--editor-header-level-1: "${m['EDITOR.HEADER.LEVEL']({ level: 1 })}";
+		--editor-header-level-2: "${m['EDITOR.HEADER.LEVEL']({ level: 2 })}";
+		--editor-header-level-3: "${m['EDITOR.HEADER.LEVEL']({ level: 3 })}";
+		--editor-header-level-4: "${m['EDITOR.HEADER.LEVEL']({ level: 4 })}";
+		--editor-header-level-5: "${m['EDITOR.HEADER.LEVEL']({ level: 5 })}";
+		--editor-header-level-6: "${m['EDITOR.HEADER.LEVEL']({ level: 6 })}";
+		--editor-tooltip-url: "${m['EDITOR.TOOLTIP.URL']()}";
+		--editor-tooltip-link: "${m['EDITOR.TOOLTIP.LINK']()}";
+		--editor-tooltip-save: "${m['EDITOR.TOOLTIP.SAVE']()}";
+		--editor-tooltip-remove: "${m['EDITOR.TOOLTIP.REMOVE']()}";
+	`;
 </script>
 
-<div class="flex size-full flex-col flex-nowrap">
+<div class="flex size-full flex-col flex-nowrap" style={editorTextCSS}>
 	<div bind:this={holder}></div>
 </div>
 
@@ -92,45 +111,45 @@
 		.ql-ko {
 			.ql-size {
 				& * {
-					@include change-picker('기본');
+					@include change-picker(var(--editor-size-default));
 				}
 				& [data-value='small'] {
-					@include change-picker('작게');
+					@include change-picker(var(--editor-size-small));
 				}
 				& [data-value='large'] {
-					@include change-picker('크게');
+					@include change-picker(var(--editor-size-large));
 				}
 				& [data-value='huge'] {
-					@include change-picker('더 크게');
+					@include change-picker(var(--editor-size-huge));
 				}
 			}
 			.ql-header {
 				& * {
-					@include change-picker('기본');
+					@include change-picker(var(--editor-header-default));
 				}
 
 				@for $lv from 1 through 6 {
 					& [data-value='#{$lv}'] {
-						@include change-picker('제목 #{$lv}');
+						@include change-picker(var(--editor-header-level-#{$lv}));
 					}
 				}
 			}
 
 			.ql-tooltip {
 				&::before {
-					@include change-content('URL에 방문:');
+					@include change-content(var(--editor-tooltip-url));
 				}
 
 				&[data-mode='link']::before {
-					@include change-content('링크 입력:');
+					@include change-content(var(--editor-tooltip-link));
 				}
 
 				.ql-action::after {
-					@include change-content('저장');
+					@include change-content(var(--editor-tooltip-save));
 				}
 
 				.ql-remove::before {
-					@include change-content('제거');
+					@include change-content(var(--editor-tooltip-remove));
 				}
 			}
 		}

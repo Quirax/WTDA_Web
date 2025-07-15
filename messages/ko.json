@@ -2,8 +2,6 @@
 	"$schema": "https://inlang.com/schema/inlang-message-format",
 	"CATEGORY_TEXT": "글",
 	"CATEGORY_DRAWING": "그림",
-	"ARTICLE_TYPE_REQUEST": "의뢰",
-	"ARTICLE_TYPE_COMMISSION": "​​커미션",
 	"SEARCH_RANGE_TITLE": "제목",
 	"SEARCH_RANGE_CONTENT": "내용",
 	"SEARCH_RANGE_TAG": "태그",
@@ -11,5 +9,532 @@
 	"SEARCH_FLAG_ALL": "포함",
 	"SEARCH_FLAG_EXCLUDED": "제외",
 	"SEARCH_FLAG_REQUIRED": "필수",
-	"ARTICLE_TYPE_PORTFOLIO": "포트폴리오"
+	"SEARCH": {
+		"RESULT_TITLE": "'{query}' 검색결과",
+		"SETTED": "설정됨",
+		"BUTTON": "검색",
+		"PLACEHOLDER": "검색하기...",
+		"RANGE": {
+			"LABEL": "검색 범위"
+		},
+		"TYPE": "타입",
+		"CATEGORY": "카테고리 ({count}개)",
+		"BUDGET": "금액 범위{range}",
+		"DATE": "일정 범위{range}",
+		"MINIMUM": "최소",
+		"MAXIMUM": "최대",
+		"INCLUDE_NEGOTIABLES": "협의 가능한 경우를 포함함",
+		"DATE_FROM": "시작",
+		"DATE_TO": "종료",
+		"FOR_COMMERCIAL_USE": "상업적 목적: {flag}",
+		"ADULT_CONTENTS": "성인 콘텐츠: {flag}",
+		"GROTESQUE_CONTENTS": "잔인한 콘텐츠: {flag}",
+		"RESTRICTED": "본인인증이 진행되지 않았거나 미성년자인 경우, 표시 설정이 되지 않은 경우, 성인 콘텐츠 및 잔인한 콘텐츠를 검색할 수 없습니다. \u0000/settings/info\u0001사용자 설정\u0000에서 확인하시기 바랍니다."
+	},
+	"DURATION": {
+		"LESS_THAN_1_MINUTES": "1분 미만"
+	},
+	"SELECT_MONTH": "월을 선택하세요",
+	"SELECT_YEAR": "연도를 선택하세요",
+	"EDITOR": {
+		"PLACEHOLDER": "내용을 입력하세요...",
+		"SIZE": {
+			"DEFAULT": "기본",
+			"SMALL": "작게",
+			"LARGE": "크게",
+			"HUGE": "더 크게"
+		},
+		"HEADER": {
+			"DEFAULT": "기본",
+			"LEVEL": "제목 {level}"
+		},
+		"TOOLTIP": {
+			"URL": "URL에 방문:",
+			"LINK": "링크 입력:",
+			"SAVE": "저장",
+			"REMOVE": "제거"
+		}
+	},
+	"NOTIFICATION": {
+		"PERMISSION_REJECTED": {
+			"TITLE": "데스크톱 알림을 받으시려면 알림을 허용해주세요.",
+			"ACTION": "알림 허용"
+		},
+		"TOKEN_FAILED": {
+			"TITLE": "문제가 발생해 데스크톱 알림을 받을 수 없어요.",
+			"DESCRIPTION": "Brave 브라우저를 사용하는 경우 설정에서 \"푸시 메시지에 Google 서비스 사용\"을 활성화해주세요."
+		}
+	},
+	"ARTICLE_TYPE": {
+		"REQUEST": "의뢰",
+		"COMMISSION": "​​커미션 타입",
+		"PORTFOLIO": "포트폴리오"
+	},
+	"MAIN_PAGE": {
+		"WELCOME": "뭐하지공방에 오신 것을 환영합니다",
+		"TAB": [
+			{
+				"declarations": ["input userMode"],
+				"selectors": ["userMode"],
+				"match": {
+					"userMode=requester": "저는 의뢰주입니다",
+					"userMode=comissioner": "저는 커미션주입니다",
+					"userMode=commissioner": "저는 커미션주입니다"
+				}
+			}
+		],
+		"SEARCH_PLACEHOLDER": "{articleType} 찾기",
+		"ARTICLE_LIST_TITLE": [
+			{
+				"declarations": ["input userMode"],
+				"selectors": ["userMode"],
+				"match": {
+					"userMode=requester": "새로 개장한 커미션 타입들입니다",
+					"userMode=commissioner": "새로 지원을 기다리는 의뢰들입니다"
+				}
+			}
+		],
+		"SUGGESTION": {
+			"SUBTITLE": "원하는 커미션 타입을 찾지 못하셨나요?",
+			"TITLE": "먼저 의뢰를 게시하세요!",
+			"DESCRIPTION": "의뢰를 찾는 작가님들이 여러분의 의뢰에 먼저 지원할 수 있습니다.\n물론 얼마든지 게시한 의뢰를 가지고 커미션을 직접 신청할 수도 있습니다."
+		}
+	},
+	"SITE_NAME": "뭐하지공방",
+	"CANCEL": "취소",
+	"CONFIRM": "확인",
+	"SITE_LOGO_ALT": "뭐하지공방 로고",
+	"HEADER_MENU": {
+		"PROFILE": "내 프로필",
+		"DM": "메시지",
+		"SETTINGS": "설정",
+		"LOGOUT": "로그아웃"
+	},
+	"LOGIN": "로그인",
+	"REGISTER": "회원가입",
+	"DM": {
+		"NO_RECEIVER": {
+			"TITLE": "이 대화방에서 메시지를 수신할 대상이 없습니다.",
+			"DESCRIPTION": "대화가 종료되었거나 상대방이 차단했을 수 있습니다."
+		},
+		"ERROR_ON_SEND": {
+			"TITLE": "메시지를 보내는 도중 오류가 발생하였습니다.",
+			"DESCRIPTION": "고객센터에 문의하시기 바랍니다."
+		},
+		"TITLE": "{participants} 님과의 대화",
+		"CLOSED": {
+			"TITLE": "종료된 대화",
+			"INPUT_PLACEHOLDER": "대화할 수 없는 대화방입니다."
+		},
+		"MENU": {
+			"QUIT": "나가기",
+			"QUIT_WITH_REPORT": "신고하고 나가기"
+		},
+		"RELATED_ARTICLE": "관련 게시물",
+		"NO_CONTENT": "내용 없음",
+		"ATTACHED_IMAGE_ALT": "첨부 이미지 {idx}",
+		"INPUT_PLACEHOLDER": "메시지를 입력하세요...",
+		"ALERT_QUIT": {
+			"TITLE": "정말로 나가시겠습니까?",
+			"DESCRIPTION": "나간 이후에도 새로운 대화방에서 대화를 진행할 수 있습니다. 이를 원하지 않는 경우 상대방을 차단하시기 바랍니다."
+		},
+		"NO_OTHER_PARTICIPANT": "다른 참여자 없음",
+		"MESSAGE": {
+			"JOIN": "{username} 님이 대화방에 들어왔습니다.",
+			"LEAVE": "{username} 님이 대화방에서 나갔습니다."
+		},
+		"ME": "나",
+		"LIST": {
+			"TITLE": "메시지 대화 목록",
+			"DESCRIPTION": "왼쪽 대화 항목를 선택하여 대화를 이어나가보세요."
+		},
+		"THUMBNAIL_ALT": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰의 썸네일",
+					"articleType=COMMISSION": "이 커미션 타입의 썸네일",
+					"articleType=PORTFOLIO": "이 포트폴리오의 썸네일"
+				}
+			}
+		],
+		"WHILE_BEGIN_DM": "사용자와의 메시지 채널 개설",
+		"UNABLE_TO_DM_WHEN_BLOCKED": "차단했거나 차단된 경우 메시지를 보낼 수 없습니다",
+		"BEGIN_DM": "메시지하기",
+		"BEGIN_DM_ABOUT": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰에 관해 메시지하기",
+					"articleType=COMMISSION": "이 커미션 타입에 관해 메시지하기",
+					"articleType=PORTFOLIO": "이 포트폴리오에 관해 메시지하기"
+				}
+			}
+		]
+	},
+	"HTTP_ERROR": {
+		"451": {
+			"ADULT_RESTRICTED": {
+				"TITLE": "성인인증 안내",
+				"HEADING": "이 콘텐츠는 성인인 회원만 볼 수 있습니다",
+				"RESTRICTED": "이 정보내용은 청소년유해매체물로서 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」 및 「청소년 보호법」에 따라 19세 미만의 청소년이 이용할 수 없습니다.",
+				"INSTRUCTION_LOGIN": "현재 \u0000/login\u0001로그인\u0000이 되어 있는지 확인하십시오.",
+				"INSTRUCTION_AUTHENTICATION": "\u0000/settings/info\u0001사용자 설정\u0000에서 본인인증이 되어 있는지 확인하십시오.",
+				"INSTRUCTION_NON_ADULT": "미성년자는 본인인증이 되어 있더라도 위 규정에 따라 이 콘텐츠를 볼 수 없습니다. 이 점 양해 부탁드립니다.",
+				"LEGAL_STATEMENT": "이 페이지는 \u0000https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EC%A0%95%EB%B3%B4%ED%86%B5%EC%8B%A0%EB%A7%9D%EC%9D%B4%EC%9A%A9%EC%B4%89%EC%A7%84%EB%B0%8F%EC%A0%95%EB%B3%B4%EB%B3%B4%ED%98%B8%EB%93%B1%EC%97%90%EA%B4%80%ED%95%9C%EB%B2%95%EB%A5%A0\u0001「정보통신망 이용촉진 및 정보보호 등에 관한 법률」\u0000 및 \u0000https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EC%B2%AD%EC%86%8C%EB%85%84%EB%B3%B4%ED%98%B8%EB%B2%95\u0001「청소년 보호법」\u0000, \u0000https://www.law.go.kr/LSW//admRulInfoP.do?admRulSeq=2100000024097\u0001「청소년 유해매체물의 표시방법」\u0000(방송통신위원회고시 제2015-17호)에 따라 작성되었습니다."
+			}
+		}
+	},
+	"FORM": {
+		"REQUIRED": "필수",
+		"SELECT_ITEM": "{item} 선택",
+		"ADD_ITEM": "{item} 추가",
+		"DATE": "날짜",
+		"CURRENCY": "금액",
+		"CANCEL": "취소하기",
+		"SAVE": "저장하기",
+		"DROPZONE": "여기로 {media}을(를) 드래그하거나 클릭하여 선택하세요."
+	},
+	"ARTICLE": {
+		"THIS": "게시물",
+		"FORM_TITLE": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "의뢰 {doString}",
+					"articleType=COMMISSION": "커미션 타입 {doString}.",
+					"articleType=PORTFOLIO": "포트폴리오 {doString}"
+				}
+			}
+		],
+		"CREATE": "만들기",
+		"EDIT": "수정하기",
+		"DELETE": "삭제하기",
+		"TITLE": "제목",
+		"CATEGORY": "카테고리",
+		"ATTACHING_MEDIA": "첨부할 미디어",
+		"ATTACHING_MEDIA_DROPZONE": "여기로 첨부할 미디어를 드래그하거나 클릭하여 선택하세요.",
+		"ATTACHING_MEDIA_DESCRIPTION": "이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.",
+		"CONTENT": "세부적인 설명",
+		"NO_CONTENT": "세부 내용이 없습니다.",
+		"THUMBNAIL_SELECT_DESCRIPTION": "이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.",
+		"TAG": "태그",
+		"ADULT_CONTENTS": "성인 콘텐츠",
+		"ADULT": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰에는 성인 콘텐츠가 포함되어 있습니다.",
+					"articleType=COMMISSION": "이 커미션 타입에는 성인 콘텐츠가 포함되어 있습니다.",
+					"articleType=PORTFOLIO": "이 포트폴리오에는 성인 콘텐츠가 포함되어 있습니다."
+				}
+			}
+		],
+		"ADULT_RESTRICTED": "관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 작성할 수 없습니다.",
+		"GROTESQUE_CONTENTS": "잔인한 콘텐츠",
+		"GROTESQUE": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.",
+					"articleType=COMMISSION": "이 커미션 타입에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다.",
+					"articleType=PORTFOLIO": "이 포트폴리오에는 유혈 등 잔인한 콘텐츠가 포함되어 있습니다."
+				}
+			}
+		],
+		"GROTESQUE_RESTRICTED": "관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 작성할 수 없습니다.",
+		"NEGOTIABLE": "협의 가능",
+		"THUMBNAIL_ALT": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰의 썸네일",
+					"articleType=COMMISSION": "이 커미션 타입의 썸네일",
+					"articleType=PORTFOLIO": "이 포트폴리오의 썸네일"
+				}
+			}
+		],
+		"MEDIA_ALT": "첨부 미디어 {idx}",
+		"DETAILS": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "의뢰 기본 정보",
+					"articleType=COMMISSION": "커미션 타입 기본 정보",
+					"articleType=PORTFOLIO": "포트폴리오 기본 정보"
+				}
+			}
+		],
+		"AUTHOR": "작성자",
+		"MISC_INFO": "기타 정보",
+		"CREATE_DATE": "작성일시",
+		"MODIFY_DATE": "수정일시",
+		"BEFORE_DELETE_ALERT": {
+			"TITLE": "정말로 삭제하시겠습니까?",
+			"DESCRIPTION": "삭제한 게시물은 복구할 수 없습니다.",
+			"DESCRIPTION_COMMISSION": [
+				{
+					"declarations": ["input articleType"],
+					"selectors": ["articleType"],
+					"match": {
+						"articleType=REQUEST": "이 의뢰와 관련된 커미션이 진행중인 경우 삭제할 수 없습니다. 커미션을 중단한 후 다시 시도하세요.",
+						"articleType=COMMISSION": "이 커미션 타입과 관련된 커미션이 진행중인 경우 삭제할 수 없습니다. 커미션을 중단한 후 다시 시도하세요.",
+						"articleType=PORTFOLIO": ""
+					}
+				}
+			]
+		},
+		"AFTER_DELETE_ALERT": {
+			"TITLE": "삭제 완료",
+			"DESCRIPTION": "게시물을 삭제하였습니다"
+		},
+		"ERROR_ALERT": {
+			"TITLE": "게시물 관련 처리 도중 오류가 발생하였습니다",
+			"DESCRIPTION": "고객센터에 문의하시기 바랍니다"
+		}
+	},
+	"PORTFOLIO": {
+		"PUBLISH_DATE": "작업 및 게시 일자",
+		"PUBLISH_DATE_UNKNOWN": "미상"
+	},
+	"REQUEST": {
+		"BUDGET": "가능한 금액",
+		"DEADLINE": "작업 기한",
+		"PURPOSE_FORM": "사용 목적",
+		"PURPOSE": "사용 목적",
+		"PURPOSE_DESCRIPTION": "커미션 작품을 어디에 사용할 것인지 적어주세요. (예: 프로필 이미지, 트위터 헤더)",
+		"FOR_COMMERCIAL": "(상업적 목적으로 사용)",
+		"FOR_COMMERCIAL_FORM": "상업적 목적으로 사용합니다. (예: 인터넷 방송, 홍보물)",
+		"FOR_COMMERCIAL_DESCRIPTION": "상업적 목적으로 사용하는 경우 반드시 체크해야 합니다.",
+		"FOR_COMMERCIAL_WARNING": "비상업적 목적으로 커미션 진행 후 상업적 목적으로 사용하는 경우 커미션주의 저작권을 침해하는 것으로, 민&middot;형사상의 책임을 질 수 있습니다.",
+		"VISIBLE_ONLY_TO_COMMISSIONER": "커미션주만 이 의뢰를 볼 수 있습니다."
+	},
+	"POINT": "포인트",
+	"USER_INFO": {
+		"TITLE": [
+			{
+				"declarations": ["input for"],
+				"selectors": ["for"],
+				"match": {
+					"for=REGISTRATION": "회원가입",
+					"for=INFO_VIEW": "사용자 정보",
+					"for=INFO_EDIT": "사용자 정보 변경"
+				}
+			}
+		],
+		"EMAIL": "이메일 주소",
+		"EMAIL_TO_RESET_PASSWORD": "비밀번호를 재설정할 이메일 주소",
+		"PASSWORD": "비밀번호",
+		"KEEP_OLD_PASSWORD": "(기존 비밀번호 유지)",
+		"INPUT_WHEN_CHANGE": "변경하려는 경우에만 입력",
+		"PASSWORD_MIN_LENGTH": "최소 8자 이상",
+		"PASSWORD_CONFIRM": "비밀번호 확인",
+		"USERNAME": "닉네임",
+		"USERNAME_MAX_LENGTH": "최대 20자",
+		"AUTHENTICATION": {
+			"TITLE": "본인인증",
+			"AUTHENTICATED": "본인인증 완료",
+			"UNAUTHENTICATED": "본인인증 해제",
+			"EXPIRES_AT": "{year}. {month}. {date}. 만료"
+		},
+		"AFTER_AUTHENTICATION": {
+			"TITLE": "본인인증을 완료하였습니다",
+			"DESCRIPTION": "관련 법령에 따라 본인인증은 1년 뒤 만료되나, 만료되더라도 다른 사람으로 재인증할 수 없습니다. 잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다."
+		},
+		"DISPLAY_ADULT_CONTENTS": {
+			"TOOLTIP": "관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 표시할 수 없습니다.",
+			"TITLE": "성인 콘텐츠를 표시합니다"
+		},
+		"DISPLAY_GROTESQUE_CONTENTS": {
+			"TOOLTIP": "관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 표시할 수 없습니다.",
+			"TITLE": "유혈 등 잔인한 콘텐츠를 표시합니다"
+		},
+		"AGREE_NOTIFICATION": {
+			"TITLE": "알림을 받겠습니다.",
+			"DESCRIPTION": "이 설정은 귀하가 뭐하지공방에 접속할 때 사용하는 모든 기기에 적용됩니다. 기기별로 설정하고자 하는 경우 앱 또는 브라우저의 설정을 확인하시기 바랍니다."
+		},
+		"AGREE_EULA": "뭐하지공방의 이용약관에 동의합니다.",
+		"AGREE_PRIVACY_POLICY": "뭐하지공방의 개인정보처리방침에 동의합니다.",
+		"AGREE_MARKETING": "뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.",
+		"REGISTER": "가입하기",
+		"EDIT": "변경하기",
+		"DEACTIVATE": "계정 비활성화하기",
+		"BEFORE_DEACTIVATION": {
+			"TITLE": "계정 비활성화 전 꼭 읽어보세요",
+			"WARNING_KEEPING_ARTICLES": "\u0003프로필과 남아있는 모든 게시물(커미션 타입, 의뢰 등)은 그대로 보존됩니다.\u0003 (단, 프로필 이미지와 닉네임은 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.) 이를 원하지 않으시는 경우 \u0002먼저 프로필을 초기화하고 게시물을 직접 삭제하시기 바랍니다.\u0002",
+			"WARNING_AUTO_REFUND": "다른 사용자와 진행하던 \u0002모든 커미션은 모두 취소되며, 즉시 환불 조치됩니다.\u0002",
+			"WARNING_AUTO_SETTLE_UP": "\u0002적립된 모든 수익금은 곧바로 정산이 진행됩니다.\u0002",
+			"WARNING_REMAIN_POINTS": "\u0003사용하지 않은 포인트는 환불되지 않으며, 뭐하지공방에 귀속됩니다.\u0003",
+			"WARNING_IRREVERSABLE": "한 번 비활성화된 계정은 \u0003복구가 불가능하며\u0003, 이 계정으로 다시 로그인할 수 없습니다.",
+			"ARE_YOU_SURE": "정말로 계정을 비활성화하시겠습니까?"
+		},
+		"AFTER_DEACTIVATION": {
+			"TITLE": "계정 비활성화 완료",
+			"DESCRIPTION": "계정을 비활성화하였습니다. 그동안 뭐하지공방과 함께해주셔서 감사합니다."
+		},
+		"WHILE": {
+			"DEACTIVATION": "계정 비활성화",
+			"SENDING_EMAIL": "이메일 전송"
+		},
+		"USER_NOT_FOUND": {
+			"TITLE": "해당 이메일을 사용하는 사용자가 없습니다.",
+			"INVALID": "입력하신 이메일 또는 비밀번호가 틀렸습니다.",
+			"DESCRIPTION_CHECK_EMAIL": "회원가입 시 사용한 이메일이 맞는지 다시 확인하시기 바랍니다.",
+			"DESCRIPTION_REGISTER": "회원가입을 하지 않으셨다면 \u0000/register\u0001회원가입\u0000을 하시기 바랍니다.",
+			"DESCRIPTION_RESET_PASSWORD": "비밀번호를 잊어버렸다면 \u0000/login/reset-password\u0001비밀번호를 재설정\u0000하시기 바랍니다."
+		},
+		"EMAIL_CONFIRM_INSTRUCTION": "아래 버튼을 클릭하여 인증 메일을 보낸 뒤, 메일에 기재된 인증 코드를 입력해주세요.",
+		"SEND_CONFIRM_EMAIL": "인증메일 보내기",
+		"CONFIRM_CODE": "인증 코드",
+		"EXPIRES_IN": "{minutes}:{seconds} 후 만료",
+		"COMPLETE_EMAIL_CONFIRM": "인증완료",
+		"EMAIL_CONFIRM": {
+			"TITLE": "이메일 인증",
+			"HEADING": "거의 다 되었습니다!",
+			"DESCRIPTION": "다른 악의적 사용자에 의해 이메일이 도용되었을 경우를 대비하여 최종적으로 이메일 인증을 진행합니다."
+		},
+		"RESET_PASSWORD": {
+			"TITLE": "비밀번호 재설정",
+			"HEADING": "비밀번호 재설정",
+			"DESCRIPTION": "다른 악의적 사용자에 의해 비밀번호가 재설정되지 않도록 이메일 인증을 진행합니다.",
+			"DESCRIPTION_RESET": "새로운 비밀번호를 입력하십시오",
+			"NEW_PASSWORD": "새 비밀번호",
+			"COMPLETED": {
+				"TITLE": "비밀번호가 재설정되었습니다.",
+				"DESCRIPTION": "변경된 비밀번호로 다시 로그인하시기 바랍니다."
+			}
+		},
+		"PASSWORD_AUTH": {
+			"TITLE": "비밀번호 확인",
+			"DESCRIPTION": "본인확인을 위해 비밀번호를 입력하십시오",
+			"INVALID": {
+				"TITLE": "입력하신 비밀번호가 틀렸습니다.",
+				"DESCRIPTION_CHECK": "비밀번호가 맞는지 다시 확인하시기 바랍니다.",
+				"DESCRIPTION_RESET_PASSWORD": "비밀번호를 잊어버렸다면 \u0000/logout\u0001로그아웃\u0000 후 비밀번호를 재설정하시기 바랍니다."
+			}
+		}
+	},
+	"ERROR_ALERT": {
+		"TITLE": "{while} 처리 도중 오류가 발생하였습니다",
+		"DESCRIPTION": "고객센터에 문의하시기 바랍니다"
+	},
+	"WELCOME": {
+		"TITLE": "환영합니다!",
+		"SHOUTOUT": "{username} 님!",
+		"WELCOME": "뭐하지공방에 오신 것을 환영합니다",
+		"SUGGESTION": "이제 로그인하여 뭐하지공방의 모든 서비스를 이용해보세요!"
+	},
+	"LINK_COPIED": {
+		"TITLE": "{item} 링크가 복사되었습니다.",
+		"DESCRIPTION": "원하는 곳에 붙여넣어 사용하시기 바랍니다."
+	},
+	"BLOCKED": {
+		"TITLE": "사용자를 차단하였습니다.",
+		"UNBLOCK_BUTTON": "차단 해제"
+	},
+	"UNBLOCKED": "사용자 차단을 해제하였습니다.",
+	"PROFILE": {
+		"THIS": "프로필",
+		"CHART": "커미션 수",
+		"HEADER_IMAGE": "헤더 이미지",
+		"HEADER_IMAGE_ALT": "{username} 님의 헤더 이미지",
+		"REMOVE_IMAGE": "이미지 제거",
+		"PROFILE_IMAGE": "프로필 이미지",
+		"PROFILE_IMAGE_ALT": "{username} 님의 프로필 이미지",
+		"PROFILE_IMAGE_DESCRIPTION": "변경된 프로필 이미지는 저장 후에 반영됩니다.",
+		"BLOCKED": "차단된 사용자",
+		"BLOCK": "차단하기",
+		"BLOCKING": {
+			"TITLE": "정말로 이 사용자를 차단하시겠습니까?",
+			"DESCRIPTION_INVISIBLE": "메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해 접속하는 경우 게시물을 볼 수는 있습니다.)",
+			"DESCRIPTION_HIDDEN": "이 사용자도 메인 페이지나 검색 결과 등에서 귀하의 게시물을 볼 수 없습니다. (다만, URL을 통해 접속하는 경우 게시물을 볼 수는 있습니다.)",
+			"DESCRIPTION_DM": "이 사용자와 메시지를 주고받을 수 없습니다.",
+			"DESCRIPTION_RECEIVE": "이 사용자로부터 커미션 의뢰 또는 커미션 제안을 받을 수 없습니다.",
+			"DESCRIPTION_GIVE": "이 사용자에게 커미션 의뢰 또는 커미션 제안을 할 수 없습니다.",
+			"DESCRIPTION_UNBLOCK": "차단 조치는 귀하가 원하는 시점에 해제할 수 있습니다."
+		},
+		"UNBLOCK": "차단 해제하기",
+		"CONTACT_AVAILABLE": {
+			"TITLE": "문의 가능 시간",
+			"UNDEFINED": "미설정",
+			"ALWAYS": "상시",
+			"CERTAIN_TIME": {
+				"THIS": "특정 시간",
+				"FROM": "시 ~",
+				"TO": "시"
+			}
+		},
+		"AVERAGE_RESPONSE_TIME": "평균 응답 시간",
+		"MAXIMUM_SLOTS": "최대 슬롯 갯수",
+		"SLOTS_UNIT": "개",
+		"OPENED_SLOTS": "남은 슬롯 갯수",
+		"STAT": {
+			"TITLE": "통계",
+			"DETAIL_TITLE": "상세 통계",
+			"DETAIL_DESCRIPTION": "{user.username} 님의 커미션 활동 통계입니다.",
+			"NUM_OF_COMMISSION": "총 커미션 수",
+			"NUM_OF_COMMISSION_UNIT": "건",
+			"COMMISSIONS_PER_TYPE": "타입별 커미션 수",
+			"AVERAGE_WORK_TIME": "평균 작업 시간",
+			"COMPLETION_RATIO": "완료율",
+			"OPEN_DIALOG": "자세히 보기"
+		},
+		"INTRODUCTION": "소개",
+		"NO_INTRODUCTION": "자기소개가 없습니다.",
+		"LINK": {
+			"THIS": "링크",
+			"LABEL": "표시 명칭",
+			"URL": "URL"
+		},
+		"ACCENT_COLOR": "프로필에서 사용할 강조색",
+		"ACCENT_COLOR_UNSET": "설정하지 않음",
+		"SAVE": "저장",
+		"EDIT_PROFILE": "프로필 수정",
+		"CROP_TITLE": "{image} 자르기",
+		"CROP_DESCRIPTION": "{image}로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 {image}은(는) 저장 후에 반영됩니다.",
+		"WHILE": {
+			"UPDATING": "프로필 업데이트",
+			"BLOCKING": "사용자 차단",
+			"UNBLOCKING": "사용자 차단 해제"
+		},
+		"ARTICLES": {
+			"ALL": "전체",
+			"CREATE": "새로 만들기"
+		}
+	},
+	"ANNOUNCEMENT": {
+		"THIS": "공지사항",
+		"NONE": "등록된 공지사항이 없습니다",
+		"OPEN_LIST": "과거 공지사항 보기",
+		"CREATE": "새 공지사항 쓰기",
+		"LIST_TITLE": "공지사항 변경 이력",
+		"LIST_DESCRIPTION": "{username} 님이 현재까지 작성한 공지사항 내역입니다.",
+		"TITLE": "제목",
+		"TITLE_PLACEHOLDER": "공지 제목을 입력하십시오.",
+		"CREATE_DATE": "작성일시",
+		"DELETE": "삭제",
+		"ERROR_LOADING": "불러오는 도중 오류가 발생했습니다.",
+		"CLOSE": "닫기",
+		"SAVE": "저장",
+		"DELETE_TITLE": "정말로 이 공지를 삭제하시겠습니까?",
+		"DELETE_DESCRIPTION": "삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다.",
+		"WHILE": "공지사항 관련"
+	},
+	"REPORT": "신고하기",
+	"PAGINATION": {
+		"PREVIOUS": "이전",
+		"NEXT": "다음"
+	},
+	"ARTICLE_LIST_MORE": "더 보기",
+	"EMOJI_LIST": {
+		"CANCEL": "선택을 취소하고 닫기"
+	},
+	"USED_DESIGN_BY": "{usedDesignBy} 등에서 디자인한 이미지 요소가 사용되었습니다."
 }

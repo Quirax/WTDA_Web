@@ -8,9 +8,9 @@ export const CategoryText = {
 };
 
 export const ArticleTypeText = {
-	REQUEST: m.ARTICLE_TYPE_REQUEST,
-	COMMISSION: m.ARTICLE_TYPE_COMMISSION,
-	PORTFOLIO: m.ARTICLE_TYPE_PORTFOLIO,
+	REQUEST: m['ARTICLE_TYPE.REQUEST'],
+	COMMISSION: m['ARTICLE_TYPE.COMMISSION'],
+	PORTFOLIO: m['ARTICLE_TYPE.PORTFOLIO'],
 };
 
 export const SearchRangeText = {

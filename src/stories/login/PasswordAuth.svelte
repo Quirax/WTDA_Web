@@ -13,6 +13,8 @@
 	import Ul from '$lib/components/typo/ul.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { replace } from '$lib/utils.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -39,24 +41,23 @@
 
 {#snippet userNotFoundDesc()}
 	<Ul>
-		<li>비밀번호가 맞는지 다시 확인하시기 바랍니다.</li>
+		<li>{m['USER_INFO.PASSWORD_AUTH.INVALID.DESCRIPTION_CHECK']()}</li>
 		<li>
-			비밀번호를 잊어버렸다면 <Button variant="link" href="/logout">로그아웃</Button> 후 비밀번호를 재설정하시기
-			바랍니다.
+			{@render replace.link(m['USER_INFO.PASSWORD_AUTH.INVALID.DESCRIPTION_RESET_PASSWORD']())}
 		</li>
 	</Ul>
 {/snippet}
 
-<Header title="사용자 정보 변경" />
+<Header title={m['USER_INFO.PASSWORD_AUTH.TITLE']()} />
 
 <Section>
-	<H2>비밀번호 확인</H2>
-	<P>본인확인을 위해 비밀번호를 입력하십시오</P>
+	<H2>{m['USER_INFO.PASSWORD_AUTH.TITLE']()}</H2>
+	<P>{m['USER_INFO.PASSWORD_AUTH.DESCRIPTION']()}</P>
 	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
-		<Form.Field {form} name="password" class="flex flex-col mt-4 space-y-1">
+		<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>비밀번호</Form.Label>
+					<Form.Label>{m['USER_INFO.PASSWORD']()}</Form.Label>
 					<Input
 						{...props}
 						type="password"
@@ -64,18 +65,18 @@
 						{...$constraints.password} />
 				{/snippet}
 			</Form.Control>
-			<Form.Description>최소 8자 이상</Form.Description>
+			<Form.Description>{m['USER_INFO.PASSWORD_MIN_LENGTH']()}</Form.Description>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Button>확인</Form.Button>
+		<Form.Button>{m['CONFIRM']()}</Form.Button>
 	</form>
 </Section>
 
 <AlertDialog
-	title="입력하신 비밀번호가 틀렸습니다."
+	title={m['USER_INFO.PASSWORD_AUTH.INVALID.TITLE']()}
 	description={userNotFoundDesc}
 	bind:open={openUserNotFoundAlert} />
 <AlertDialog
-	title="비밀번호 확인 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.PASSWORD_AUTH.TITLE']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openOtherErrorAlert} />

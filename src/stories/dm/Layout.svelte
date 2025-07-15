@@ -3,13 +3,14 @@
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import { cn, twemoji } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
-	import { beforeNavigate, invalidate, invalidateAll } from '$app/navigation';
+	import { beforeNavigate, invalidate } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';
 	import { tick } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
 	import SidebarLayout from '$stories/components/SidebarLayout.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		channels: (DMChannel & { participants?: App.User[]; latestMessage?: App.DM; read: boolean })[];
@@ -59,19 +60,19 @@
 					<strong>
 						{participants && participants.length > 0
 							? participants.map((v) => v!.username).join(', ')
-							: '다른 참여자 없음'}
+							: m['DM.NO_OTHER_PARTICIPANT']()}
 					</strong>
 					<span
 						class="text-muted-foreground w-full overflow-hidden text-sm text-ellipsis whitespace-nowrap"
 						use:twemoji>
 						{#if ch.latestMessage!.type === 'general'}
 							{ch.latestMessage!.sender!.id === user!.id
-								? '나'
+								? m['DM.ME']()
 								: ch.latestMessage!.sender!.username}: {ch.latestMessage!.message}
 						{:else if ch.latestMessage!.type === 'join'}
-							<i>{ch.latestMessage!.sender?.username} 님이 대화방에 들어왔습니다.</i>
+							<i>{m['DM.MESSAGE.JOIN']({ username: ch.latestMessage!.sender?.username || '' })}</i>
 						{:else if ch.latestMessage!.type === 'leave'}
-							<i>{ch.latestMessage!.sender?.username} 님이 대화방에서 나갔습니다.</i>
+							<i>{m['DM.MESSAGE.LEAVE']({ username: ch.latestMessage!.sender?.username || '' })}</i>
 						{/if}
 					</span>
 				</div>

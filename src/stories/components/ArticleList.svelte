@@ -4,7 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Avatar from './Avatar.svelte';
-	import { ArticleTypeText, CategoryText } from '$lib/messages';
+	import { ArticleTypeText, CategoryText, m } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
 	import { AdultContents, ArticleType } from '@app';
 	import { cn, getLinkPrefix } from '$lib/utils';
@@ -63,9 +63,13 @@
 						</Badge>
 						{#if article?.containsAdultContents}
 							{#if article.containsAdultContents === AdultContents.ADULT_RESTRICTED}
-								<Badge class="bg-destructive hover:bg-destructive/90">성인 콘텐츠</Badge>
+								<Badge class="bg-destructive hover:bg-destructive/90">
+									{m['ARTICLE.ADULT_CONTENTS']()}
+								</Badge>
 							{:else if article.containsAdultContents === AdultContents.GROTESQUE_RESTRICTED}
-								<Badge class="bg-destructive hover:bg-destructive/90">잔인한 콘텐츠</Badge>
+								<Badge class="bg-destructive hover:bg-destructive/90">
+									{m['ARTICLE.GROTESQUE_CONTENTS']()}
+								</Badge>
 							{/if}
 						{/if}
 					</div>
@@ -110,7 +114,7 @@
 {#if moreLink}
 	<div class="text-right">
 		<Button variant="link" class="text-(--primary-color)" href={moreLink}>
-			더 보기
+			{m['ARTICLE_LIST_MORE']()}
 			<ChevronRight class="size-4" />
 		</Button>
 	</div>

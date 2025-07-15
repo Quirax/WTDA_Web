@@ -2,6 +2,7 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		count: number;
@@ -19,7 +20,7 @@
 			<Pagination.Item>
 				<Pagination.PrevButton>
 					<ChevronLeft class="size-4" />
-					<span class="hidden sm:block">이전</span>
+					<span class="hidden sm:block">{m['PAGINATION.PREVIOUS']()}</span>
 				</Pagination.PrevButton>
 			</Pagination.Item>
 			{#each pages as page (page.key)}
@@ -37,7 +38,7 @@
 			{/each}
 			<Pagination.Item>
 				<Pagination.NextButton>
-					<span class="hidden sm:block">다음</span>
+					<span class="hidden sm:block">{m['PAGINATION.NEXT']()}</span>
 					<ChevronRight class="size-4" />
 				</Pagination.NextButton>
 			</Pagination.Item>

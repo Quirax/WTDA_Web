@@ -11,7 +11,7 @@
 	import Muted from '$lib/components/typo/muted.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { ArticleTypeText } from '$lib/messages';
+	import { ArticleTypeText, m } from '$lib/messages';
 	import { cn, formatDatetimeString, getLinkPrefix, sanitizeHTML, twemoji } from '$lib/utils';
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import type { EmojiEventHandler } from '$stories/components/EmojiList.svelte';
@@ -55,7 +55,7 @@
 		(dm.type === 'general' &&
 			dm.attachments?.map((medium, idx) => ({
 				src: medium,
-				alt: `첨부 이미지 ${idx + 1}`,
+				alt: m['DM.ATTACHED_IMAGE_ALT']({ idx: idx + 1 }),
 				height: 0,
 				width: 0,
 			}))) ||
@@ -159,7 +159,7 @@
 									{@html sanitizeHTML(
 										(
 											(dm.relatedMessage.type === 'general' && dm.relatedMessage.message) ||
-											'<i>내용 없음</i>'
+											`<i>${m['DM.NO_CONTENT']()}</i>`
 										).replace(/\n/g, '<br>'),
 									)}
 								</div>
@@ -178,7 +178,7 @@
 										<img
 											src={dm.relatedPost.article.thumbnail}
 											class="aspect-video h-full object-cover"
-											alt="이 의뢰의 썸네일" />
+											alt={m['DM.THUMBNAIL_ALT']({ articleType: dm.relatedPost.type })} />
 									{:else}
 										<div class="banner-pattern bg-primary aspect-video h-full"></div>
 									{/if}
@@ -281,10 +281,12 @@
 			</aside>
 		</div>
 	{:else if dm.type === 'join'}
-		<Muted class="w-full text-center">{dm.sender?.username} 님이 대화방에 들어왔습니다.</Muted>
+		<Muted class="w-full text-center">
+			{m['DM.MESSAGE.JOIN']({ username: dm.sender?.username || '' })}
+		</Muted>
 	{:else if dm.type === 'leave'}
 		<Muted class="w-full text-center">
-			{dm.sender?.username} 님이 대화방에서 나갔습니다.
+			{m['DM.MESSAGE.LEAVE']({ username: dm.sender?.username || '' })}
 		</Muted>
 	{/if}
 </article>
