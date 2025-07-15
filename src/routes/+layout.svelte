@@ -12,6 +12,7 @@
 	import { getFirebaseApp, getMessaging, getToken } from '$lib/firebase';
 	import { env } from '$env/dynamic/public';
 	import { deserialize } from '$app/forms';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		data: LayoutServerData;
@@ -82,18 +83,18 @@
 				requestNotificationPermission((reason) => {
 					switch (reason) {
 						case 'permission_rejected':
-							toast.info('데스크톱 알림을 받으시려면 알림을 허용해주세요.', {
+							toast.info(m['NOTIFICATION.PERMISSION_REJECTED.TITLE'](), {
 								action: {
-									label: '알림 허용',
+									label: m['NOTIFICATION.PERMISSION_REJECTED.ACTION'](),
 									onClick: () => requestNotificationPermission,
 								},
 							});
 							break;
 						case 'token_failed':
-							toast.error('데스크톱 알림 활성화를 위한 토큰을 얻지 못했습니다.', {
+							toast.error(m['NOTIFICATION.TOKEN_FAILED.TITLE'](), {
 								description:
 									// ref: https://stackoverflow.com/a/69624651/21742011
-									'Brave 브라우저를 사용하는 경우 설정에서 "푸시 메시지에 Google 서비스 사용"를 활성화해주세요.',
+									m['NOTIFICATION.TOKEN_FAILED.DESCRIPTION'](),
 							});
 							break;
 					}

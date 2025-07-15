@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte';
 	import { source } from 'sveltekit-sse';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props {
 		title?: string;
@@ -21,7 +22,7 @@
 		showUserPanel?: boolean;
 	}
 
-	const { title = '뭐하지공방', showSearchPanel = true, showUserPanel = true }: Props = $props();
+	const { title = m.SITE_NAME(), showSearchPanel = true, showUserPanel = true }: Props = $props();
 
 	let user = $state<App.User>(null);
 
@@ -64,7 +65,7 @@
 </script>
 
 <svelte:head>
-	<title>{title === '뭐하지공방' ? '' : title + ' - '}뭐하지공방</title>
+	<title>{title === m.SITE_NAME() ? '' : title + ' - '}{m.SITE_NAME()}</title>
 </svelte:head>
 
 <header class="bg-background fixed top-0 left-0 z-10 w-full border-b-2">
@@ -77,8 +78,8 @@
 				class="relative size-9 rounded-full"
 				aria-label="Logo">
 				<LogoAvatar.Root class="bg-white p-1">
-					<LogoAvatar.Image src="/logo.png" alt="뭐하지공방 로고" />
-					<LogoAvatar.Fallback>WA</LogoAvatar.Fallback>
+					<LogoAvatar.Image src="/logo.png" alt={m.SITE_LOGO_ALT()} />
+					<LogoAvatar.Fallback></LogoAvatar.Fallback>
 				</LogoAvatar.Root>
 			</Button>
 			<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
@@ -91,9 +92,9 @@
 					<Input
 						type="search"
 						name="query"
-						placeholder="검색..."
+						placeholder={m['SEARCH.PLACEHOLDER']()}
 						class="h-9 w-[100px] sm:flex lg:w-[300px]" />
-					<Button type="submit" class="h-9" aria-label="Search">검색</Button>
+					<Button type="submit" class="h-9" aria-label="Search">{m['SEARCH.BUTTON']()}</Button>
 				</form>
 			{/if}{#if showUserPanel}
 				{#if user}
@@ -130,20 +131,26 @@
 							</DropdownMenu.Label>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item onclick={() => goto('/user/@me')}>내 프로필</DropdownMenu.Item>
-								<DropdownMenu.Item onclick={() => goto('/dm')}>메시지</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/user/@me')}>
+									{m['HEADER_MENU.PROFILE']()}
+								</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/dm')}>
+									{m['HEADER_MENU.DM']()}
+								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
-								<DropdownMenu.Item onclick={() => goto('/settings')}>설정</DropdownMenu.Item>
+								<DropdownMenu.Item onclick={() => goto('/settings')}>
+									{m['HEADER_MENU.SETTINGS']()}
+								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item onclick={onLogout}>로그아웃</DropdownMenu.Item>
+							<DropdownMenu.Item onclick={onLogout}>{m['HEADER_MENU.LOGOUT']()}</DropdownMenu.Item>
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>로그인</Button>
-					<Button class="h-9 w-[6em]" aria-label="Sign up" href="/register">회원가입</Button>
+					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>{m.LOGIN()}</Button>
+					<Button class="h-9 w-[6em]" aria-label="Sign up" href="/register">{m.REGISTER()}</Button>
 				{/if}
 			{/if}
 		</div>

@@ -5,6 +5,7 @@
 	import * as Calendar from '$lib/components/ui/calendar/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { cn } from '$lib/utils.js';
+	import { m } from '$lib/messages';
 
 	let { value = $bindable(), ...restProps }: WithoutChildrenOrChild<CalendarPrimitive.RootProps> =
 		$props();
@@ -14,6 +15,7 @@
 	const currentDate = today(getLocalTimeZone());
 
 	const monthFmt = new DateFormatter('ko-KR', {
+		// TODO paraglide로부터 locale 가져오기
 		month: 'long',
 	});
 
@@ -44,7 +46,7 @@
 	);
 
 	const monthLabel = $derived(
-		monthOptions.find((m) => m.value === defaultMonth?.value)?.label ?? '월을 선택하세요',
+		monthOptions.find((mth) => mth.value === defaultMonth?.value)?.label ?? m.SELECT_MONTH(),
 	);
 </script>
 
@@ -61,7 +63,7 @@
 					placeholder = placeholder.set({ year: Number.parseInt(v) });
 				}}>
 				<Select.Trigger aria-label="Select year" class="w-[40%]">
-					{defaultYear?.label ?? 'Select year'}
+					{defaultYear?.label ?? m.SELECT_YEAR()}
 				</Select.Trigger>
 				<Select.Content class="max-h-[200px] overflow-y-auto">
 					{#each yearOptions as { value, label } (value)}
