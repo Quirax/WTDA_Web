@@ -2,9 +2,9 @@
 
 <script lang="ts" module>
 	export const enum UserInfoFor {
-		REGISTRATION,
-		INFO_VIEW,
-		INFO_EDIT,
+		REGISTRATION = 'REGISTRATION',
+		INFO_VIEW = 'INFO_VIEW',
+		INFO_EDIT = 'INFO_EDIT',
 	}
 </script>
 
@@ -37,6 +37,9 @@
 	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
 	import { deserialize } from '$app/forms';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import { m } from '$lib/messages';
+	import type { Snippet } from 'svelte';
+	import { replace } from '$lib/utils.svelte';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -52,23 +55,8 @@
 
 	let auth = $state(prevAuth);
 
-	let title = $state('');
+	let title = $derived(m['USER_INFO.TITLE']({ for: userInfoFor }));
 	let openErrorAlert = $state(false);
-
-	switch (userInfoFor) {
-		case UserInfoFor.REGISTRATION: {
-			title = '회원가입';
-			break;
-		}
-		case UserInfoFor.INFO_VIEW: {
-			title = '사용자 정보';
-			break;
-		}
-		case UserInfoFor.INFO_EDIT: {
-			title = '사용자 정보 변경';
-			break;
-		}
-	}
 
 	const form = superForm(data, {
 		validators: zodClient(userInfoFor === UserInfoFor.REGISTRATION ? formSchema : userSchema),
@@ -138,7 +126,10 @@
 			<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label><Badge variant="destructive">필수</Badge> 이메일</Form.Label>
+						<Form.Label>
+							<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+							{m['USER_INFO.EMAIL']()}
+						</Form.Label>
 						<!-- prettier-ignore -->
 						<Input
 								{...props}
@@ -155,22 +146,23 @@
 					{#snippet children({ props })}
 						<Form.Label>
 							{#if userInfoFor !== UserInfoFor.INFO_EDIT}
-								<Badge variant="destructive">필수</Badge>
+								<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
 							{/if}
-							비밀번호
+							{m['USER_INFO.PASSWORD']()}
 						</Form.Label>
 						<Input
 							{...props}
 							type="password"
 							bind:value={$formData.password}
 							{...$constraints.password}
-							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT && '(기존 비밀번호 유지)') ||
+							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT &&
+								m['USER_INFO.KEEP_OLD_PASSWORD']()) ||
 								''} />
 					{/snippet}
 				</Form.Control>
 				<Form.Description>
-					{(userInfoFor === UserInfoFor.INFO_EDIT && '변경하려는 경우에만 입력, ') || ''}최소 8자
-					이상
+					{(userInfoFor === UserInfoFor.INFO_EDIT && `${m['USER_INFO.INPUT_WHEN_CHANGE']()}, `) ||
+						''}{m['USER_INFO.PASSWORD_MIN_LENGTH']()}
 				</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
@@ -179,16 +171,17 @@
 					{#snippet children({ props })}
 						<Form.Label>
 							{#if userInfoFor !== UserInfoFor.INFO_EDIT}
-								<Badge variant="destructive">필수</Badge>
+								<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
 							{/if}
-							비밀번호 확인
+							{m['USER_INFO.PASSWORD_CONFIRM']()}
 						</Form.Label>
 						<Input
 							{...props}
 							type="password"
 							bind:value={$formData.passwordConfirm}
 							{...$constraints.passwordConfirm}
-							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT && '(기존 비밀번호 유지)') ||
+							placeholder={(userInfoFor === UserInfoFor.INFO_EDIT &&
+								m['USER_INFO.KEEP_OLD_PASSWORD']()) ||
 								''} />
 					{/snippet}
 				</Form.Control>
@@ -200,8 +193,8 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label>
-							<Badge variant="destructive">필수</Badge>
-							닉네임
+							<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+							{m['USER_INFO.USERNAME']()}
 						</Form.Label>
 						<!-- prettier-ignore -->
 						<Input
@@ -211,7 +204,7 @@
 							class="text-foreground opacity-100!" />
 					{/snippet}
 				</Form.Control>
-				<Form.Description>최대 20자</Form.Description>
+				<Form.Description>{m['USER_INFO.USERNAME_MAX_LENGTH']()}</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
@@ -227,13 +220,18 @@
 					<Button
 						onclick={() => (openAuthenticationDialog = true)}
 						disabled={userInfoFor === UserInfoFor.INFO_VIEW}>
-						본인인증
+						{m['USER_INFO.AUTHENTICATION.TITLE']()}
 					</Button>
 					<span class="text-sm">
-						본인인증 {isAuthenticated ? '완료' : '해제'}
+						{isAuthenticated
+							? m['USER_INFO.AUTHENTICATION.AUTHENTICATED']()
+							: m['USER_INFO.AUTHENTICATION.UNAUTHENTICATED']()}
 						{#if auth?.authExpiresAt}
-							({auth.authExpiresAt.getFullYear()}. {auth.authExpiresAt.getMonth() + 1}. {auth.authExpiresAt.getDate()}.
-							만료)
+							({m['USER_INFO.AUTHENTICATION.EXPIRES_AT']({
+								year: auth.authExpiresAt.getFullYear(),
+								month: auth.authExpiresAt.getMonth() + 1,
+								date: auth.authExpiresAt.getDate(),
+							})})
 						{/if}
 					</span>
 				</div>
@@ -248,9 +246,9 @@
 								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW} />
 								<div class="space-y-1 leading-none">
 									<Tooltip
-										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 표시할 수 없습니다."
+										text={m['USER_INFO.DISPLAY_ADULT_CONTENTS.TOOLTIP']()}
 										disabled={isAuthenticated && !isNotAdult}>
-										<Form.Label>성인 콘텐츠를 표시합니다</Form.Label>
+										<Form.Label>{m['USER_INFO.DISPLAY_ADULT_CONTENTS.TITLE']()}</Form.Label>
 									</Tooltip>
 								</div>
 								<input
@@ -272,9 +270,9 @@
 								}} disabled={!isAuthenticated || isNotAdult || userInfoFor === UserInfoFor.INFO_VIEW || !($formData as Infer<UserSchema>).display_adult_contents} />
 								<div class="space-y-1 leading-none">
 									<Tooltip
-										text="관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 잔인한 콘텐츠를 표시할 수 없습니다."
+										text={m['USER_INFO.DISPLAY_GROTESQUE_CONTENTS.TOOLTIP']()}
 										disabled={isAuthenticated && !isNotAdult}>
-										<Form.Label>유혈 등 잔인한 콘텐츠를 표시합니다</Form.Label>
+										<Form.Label>{m['USER_INFO.DISPLAY_GROTESQUE_CONTENTS.TITLE']()}</Form.Label>
 									</Tooltip>
 								</div>
 								<input
@@ -298,7 +296,7 @@
 									{...props}
 									bind:checked={($formData as Infer<UserSchema>).agree_notification} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>알림을 받겠습니다.</Form.Label>
+								<Form.Label>{m['USER_INFO.AGREE_NOTIFICATION.TITLE']()}</Form.Label>
 							</div>
 							<input
 								name={props.name}
@@ -307,8 +305,7 @@
 						{/snippet}
 					</Form.Control>
 					<Form.Description>
-						이 설정은 귀하가 뭐하지공방에 접속할 때 사용하는 모든 기기에 적용됩니다. 기기별로
-						설정하고자 하는 경우 앱 또는 브라우저의 설정을 확인하시기 바랍니다.
+						{m['USER_INFO.AGREE_NOTIFICATION.DESCRIPTION']()}
 					</Form.Description>
 				</div>
 				<Form.FieldErrors />
@@ -324,7 +321,8 @@
 								<Checkbox {...props} bind:checked={($formData as Infer<FormSchema>).agree_eula} />
 								<div class="space-y-1 leading-none">
 									<Form.Label>
-										<Badge variant="destructive">필수</Badge> 뭐하지공방의 이용약관에 동의합니다.
+										<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+										{m['USER_INFO.AGREE_EULA']()}
 									</Form.Label>
 								</div>
 								<!-- Checkbox 사용 시 별도의 hidden field 필요 -->
@@ -348,7 +346,8 @@
 										bind:checked={($formData as Infer<FormSchema>).agree_privacypolicy} />
 								<div class="space-y-1 leading-none">
 									<Form.Label>
-										<Badge variant="destructive">필수</Badge> 뭐하지공방의 개인정보처리방침에 동의합니다.
+										<Badge variant="destructive">{m['FORM.REQUIRED']()}</Badge>
+										{m['USER_INFO.AGREE_PRIVACY_POLICY']()}
 									</Form.Label>
 								</div>
 								<input
@@ -370,7 +369,7 @@
 										{...props}
 										bind:checked={($formData as Infer<FormSchema>).agree_marketing} disabled={userInfoFor === UserInfoFor.INFO_VIEW} />
 							<div class="space-y-1 leading-none">
-								<Form.Label>뭐하지공방에서 제공하는 마케팅 정보 알림을 받겠습니다.</Form.Label>
+								<Form.Label>{m['USER_INFO.AGREE_MARKETING']()}</Form.Label>
 							</div>
 							<input
 								name={props.name}
@@ -383,81 +382,82 @@
 			</Form.Field>
 		</div>
 		{#if userInfoFor === UserInfoFor.REGISTRATION}
-			<Form.Button>가입하기</Form.Button>
+			<Form.Button>{m['USER_INFO.REGISTER']()}</Form.Button>
 		{:else if userInfoFor === UserInfoFor.INFO_VIEW}
-			<Button href="/settings/info/auth">변경하기</Button>
+			<Button href="/settings/info/auth">{m['USER_INFO.EDIT']()}</Button>
 		{:else}
-			<Form.Button>저장하기</Form.Button>
+			<Form.Button>{m['FORM.SAVE']()}</Form.Button>
 			<Button variant="destructive" onclick={() => (openBeforeDeactivationAlert = true)}>
-				계정 비활성화하기
+				{m['USER_INFO.DEACTIVATE']()}
 			</Button>
 		{/if}
 	</form>
 </Section>
 
 {#snippet WarningBeforeDeactivation()}
+	{#snippet destructive(token: string)}
+		<span class="text-destructive font-bold">{token}</span>
+	{/snippet}
+	{#snippet exclamation(token: string)}
+		<span class="text-foreground font-bold">{token}</span>
+	{/snippet}
+	{#snippet complex(token: string)}
+		{@render replace.format(token, destructive, '\u0003')}
+	{/snippet}
+	{#snippet message(msg: string)}
+		{@render replace.format(msg, exclamation, '\u0002', complex)}
+	{/snippet}
 	<Ul>
 		<li>
-			<span class="text-destructive font-bold">
-				프로필과 남아있는 모든 게시물(커미션 타입, 의뢰 등)은 그대로 보존됩니다.
-			</span>
-			(단, 프로필 이미지와 닉네임은 삭제되며, 다른 사용자가 커미션 신청이나 의뢰 지원을 할 수 없습니다.)
-			이를 원하지 않으시는 경우
-			<span class="text-foreground font-bold">
-				먼저 프로필을 초기화하고 게시물을 직접 삭제하시기 바랍니다.
-			</span>
+			{@render message(m['USER_INFO.BEFORE_DEACTIVATION.WARNING_KEEPING_ARTICLES']())}
 		</li>
 		<li>
-			다른 사용자와 진행하던 <span class="text-foreground font-bold">
-				모든 커미션은 모두 취소되며, 즉시 환불 조치됩니다.
-			</span>
+			{@render message(m['USER_INFO.BEFORE_DEACTIVATION.WARNING_AUTO_REFUND']())}
 		</li>
 		<li>
-			<span class="text-foreground font-bold">적립된 모든 수익금은 곧바로 정산이 진행됩니다.</span>
+			{@render message(m['USER_INFO.BEFORE_DEACTIVATION.WARNING_AUTO_SETTLE_UP']())}
 		</li>
 		<li>
-			<span class="text-destructive font-bold">
-				사용하지 않은 포인트는 환불되지 않으며, 뭐하지공방에 귀속됩니다.
-			</span>
+			{@render message(m['USER_INFO.BEFORE_DEACTIVATION.WARNING_REMAIN_POINTS']())}
 		</li>
 		<li>
-			한 번 비활성화된 계정은 <span class="text-destructive font-bold">복구가 불가능하며,</span>
-			이 계정으로 다시 로그인할 수 없습니다.
+			{@render message(m['USER_INFO.BEFORE_DEACTIVATION.WARNING_IRREVERSABLE']())}
 		</li>
 	</Ul>
-	<P>정말로 계정을 비활성화하시겠습니까?</P>
+	<P>{m['USER_INFO.BEFORE_DEACTIVATION.ARE_YOU_SURE']()}</P>
 {/snippet}
 
 <AlertDialog
-	title={`${title} 처리 도중 오류가 발생했습니다.`}
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: title })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorAlert} />
 <AlertDialog
-	title="계정 비활성화 전 꼭 읽어보세요"
+	title={m['USER_INFO.BEFORE_DEACTIVATION.TITLE']()}
 	description={WarningBeforeDeactivation}
 	cancel={true}
 	onAction={onDeactivation}
 	bind:open={openBeforeDeactivationAlert} />
 <AlertDialog
-	title="계정 비활성화 완료"
-	description="계정을 비활성화하였습니다. 그동안 뭐하지공방과 함께해주셔서 감사합니다."
+	title={m['USER_INFO.AFTER_DEACTIVATION.TITLE']()}
+	description={m['USER_INFO.AFTER_DEACTIVATION.DESCRIPTION']()}
 	onAction={() => {
 		window.location.href = '/';
 	}}
 	bind:open={openAfterDeactivationAlert} />
 <AlertDialog
-	title="계정 비활성화 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.WHILE.DEACTIVATION']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnDeactivationAlert} />
 <AlertDialog
-	title="본인 인증을 완료하였습니다."
-	description="관련 법령에 따라 본인 인증은 1년 뒤 만료되나, 만료되더라도 다른 사람으로 재인증할 수 없습니다. 잘못 기입한 경우 고객센터에 문의하시어 정정하시기 바랍니다."
+	title={m['USER_INFO.AFTER_AUTHENTICATION.TITLE']()}
+	description={m['USER_INFO.AFTER_AUTHENTICATION.DESCRIPTION']()}
 	bind:open={openAuthenticationCompletedAlert} />
 <AlertDialog
-	title="본인 인증 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.AUTHENTICATION.TITLE']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnAuthenticateAlert} />
 
+<!-- XXX (여기부터) 1차 알파테스트 전용 -->
 <Dialog.Root bind:open={openAuthenticationDialog}>
 	<Dialog.Content
 		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
@@ -485,8 +485,9 @@
 		<section class="text-right">
 			<Button onclick={onAuthenticate}>인증하기</Button>
 			<Button variant="secondary" onclick={() => (openAuthenticationDialog = false)}>
-				취소하기
+				{m['FORM.CANCEL']()}
 			</Button>
 		</section>
 	</Dialog.Content>
 </Dialog.Root>
+<!-- XXX (여기까지) 1차 알파테스트 전용 -->
