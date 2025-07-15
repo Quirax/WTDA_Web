@@ -222,6 +222,7 @@
 		"NO_CONTENT": "세부 내용이 없습니다.",
 		"THUMBNAIL_SELECT_DESCRIPTION": "이미지 목록에서 체크 표시된 이미지가 썸네일로 사용됩니다.",
 		"TAG": "태그",
+		"ADULT_CONTENTS": "성인 콘텐츠",
 		"ADULT": [
 			{
 				"declarations": ["input articleType"],
@@ -234,6 +235,7 @@
 			}
 		],
 		"ADULT_RESTRICTED": "관계 법령에 따라 본인인증이 되지 않거나 미성년자인 경우 성인 콘텐츠를 작성할 수 없습니다.",
+		"GROTESQUE_CONTENTS": "잔인한 콘텐츠",
 		"GROTESQUE": [
 			{
 				"declarations": ["input articleType"],
@@ -525,5 +527,14 @@
 		"DELETE_DESCRIPTION": "삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다.",
 		"WHILE": "공지사항 관련"
 	},
-	"REPORT": "신고하기"
+	"REPORT": "신고하기",
+	"PAGINATION": {
+		"PREVIOUS": "이전",
+		"NEXT": "다음"
+	},
+	"ARTICLE_LIST_MORE": "더 보기",
+	"EMOJI_LIST": {
+		"CANCEL": "선택을 취소하고 닫기"
+	},
+	"USED_DESIGN_BY": "{usedDesignBy} 등에서 디자인한 이미지 요소가 사용되었습니다."
 }

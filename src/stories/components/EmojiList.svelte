@@ -13,6 +13,7 @@
 	import { Trash } from 'lucide-svelte';
 	import { untrack } from 'svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
+	import { m } from '$lib/messages';
 
 	interface Props {
 		x: number;
@@ -87,7 +88,7 @@
 		class={cn('bg-background absolute z-20 max-h-100 w-86 overflow-auto border p-2')}
 		style="top: {yFinal}px; left: {xFinal}px;">
 		{#if value}
-			<Tooltip text="선택을 취소하고 닫기">
+			<Tooltip text={m['EMOJI_LIST.CANCEL']()}>
 				{#snippet child({ props })}
 					<Button
 						size="icon"
