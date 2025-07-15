@@ -50,6 +50,7 @@
 	import { UserRelationship } from '@app';
 	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -247,8 +248,8 @@
 	// Profile link copy
 	const onCopyProfileLink = () => {
 		navigator.clipboard.writeText(location.href).then(() => {
-			toast.success('프로필 링크가 복사되었습니다.', {
-				description: '원하는 곳에 붙여넣어 사용하시기 바랍니다.',
+			toast.success(m['LINK_COPIED.TITLE']({ item: m['PROFILE.THIS']() }), {
+				description: m['LINK_COPIED.DESCRIPTION'](),
 			});
 		});
 	};
@@ -267,9 +268,9 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			toast.success('사용자를 차단하였습니다.', {
+			toast.success(m['BLOCKED.TITLE'](), {
 				action: {
-					label: '차단 해제',
+					label: m['BLOCKED.UNBLOCK_BUTTON'](),
 					onClick: onUnblock,
 				},
 			});
@@ -286,7 +287,7 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			toast.success('사용자 차단을 해제하였습니다.');
+			toast.success(m['BLOCKED']());
 			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
@@ -303,7 +304,7 @@
 		avgWorkTime = 7 * 24 * 60 * 60 * 1000,
 		completionRatio = 10 / 10;
 	const statChartData: echarts.SeriesOption = {
-		name: '커미션 수',
+		name: m['PROFILE.CHART'](),
 		type: 'pie',
 		radius: ['40%', '70%'],
 		avoidLabelOverlap: false,
@@ -331,8 +332,8 @@
 
 			if (channelId) goto(`/dm/${channelId}`);
 		} else {
-			toast.error('사용자와의 메시지 채널 처리 도중 오류가 발생했습니다.', {
-				description: '고객센터에 문의해주시기 바랍니다.',
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['DM.WHILE_BEGIN_DM']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
 			});
 		}
 	};
@@ -344,13 +345,16 @@
 	class="relative aspect-4/1 w-full"
 	style="--primary-color: {user.profile.accentColor || 'hsl(var(--primary));'}">
 	{#if $profileData.headerImage}
-		<img src={$profileData.headerImage} alt="{user.username} 님의 헤더 이미지" class="size-full" />
+		<img
+			src={$profileData.headerImage}
+			alt={m['PROFILE.HEADER_IMAGE_ALT']({ username: user.username })}
+			class="size-full" />
 		{#if profileEditMode}
 			<Button
 				onclick={removeHeaderImage}
 				variant="link"
 				class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100 active:opacity-100">
-				<span>이미지 제거</span>
+				<span>{m['PROFILE.REMOVE_IMAGE']()}</span>
 			</Button>
 		{/if}
 	{:else if profileEditMode}
@@ -359,7 +363,7 @@
 			on:drop={onDropHeaderImage}
 			multiple={false}
 			class="dropzone size-full justify-center">
-			<p>여기로 헤더 이미지를 드래그하거나, 클릭하여 헤더 이미지를 선택하세요.</p>
+			<p>{m['FORM.DROPZONE']({ media: m['PROFILE.HEADER_IMAGE']() })}</p>
 		</Dropzone>
 	{:else}
 		<div
@@ -389,14 +393,14 @@
 								{#if $profileData.profileImage}
 									<img
 										src={$profileData.profileImage}
-										alt="{user.username} 님의 프로필 이미지"
+										alt={m['PROFILE.PROFILE_IMAGE_ALT']({ username: user.username })}
 										class="size-full" />
 									{#if profileEditMode}
 										<Button
 											onclick={removeProfileImage}
 											variant="link"
 											class="absolute top-0 left-0 flex size-full items-center bg-zinc-950/60 text-center text-white opacity-0 hover:no-underline hover:opacity-100">
-											<span>이미지 제거</span>
+											<span>{m['PROFILE.REMOVE_IMAGE']()}</span>
 										</Button>
 										<input name={props.name} value={$profileData.profileImage} hidden />
 									{/if}
@@ -407,7 +411,7 @@
 							{#if relationshipToUser === UserRelationship.BLOCKED}
 								<div
 									class="bg-destructive text-destructive-foreground absolute right-1 bottom-1 size-7 rounded-full border p-1"
-									title="차단된 사용자">
+									title={m['PROFILE.BLOCKED']()}>
 									<UserX class="size-full" />
 								</div>
 							{/if}
@@ -419,14 +423,14 @@
 								accept={imageFormat}
 								on:drop={onDropProfileImage}
 								multiple={false}>
-								<p>여기로 프로필 이미지를 드래그하거나, 클릭하여 프로필 이미지를 선택하세요.</p>
+								<p>{m['FORM.DROPZONE']({ media: m['PROFILE.HEADER_IMAGE']() })}</p>
 							</Dropzone>
 							<input name={props.name} value="" hidden />
 						{/if}
 					{/snippet}
 				</Form.Control>
 				{#if profileEditMode}
-					<Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description>
+					<Form.Description>{m['PROFILE.PROFILE_IMAGE_DESCRIPTION']()}</Form.Description>
 					<Form.FieldErrors />
 				{/if}
 			</Form.Field>
@@ -438,13 +442,13 @@
 							<Input
 								{...props}
 								class="text-center text-2xl font-bold md:text-2xl"
-								placeholder="닉네임"
+								placeholder={m['USER_INFO.USERNAME']()}
 								bind:value={$profileData.username}
 								{...$profileConstraints.username} />
 						{/snippet}
 					</Form.Control>
 					{#if profileEditMode}
-						<Form.Description>최대 20자</Form.Description>
+						<Form.Description>{m['USER_INFO.USERNAME_MAX_LENGTH']()}</Form.Description>
 						<Form.FieldErrors />
 					{/if}
 				</Form.Field>
@@ -457,7 +461,7 @@
 			<section class="flex">
 				<Tooltip
 					class="w-full"
-					text="차단했거나 차단된 경우 메시지를 보낼 수 없습니다"
+					text={m['DM.UNABLE_TO_DM_WHEN_BLOCKED']()}
 					disabled={relationshipFromUser !== UserRelationship.BLOCKED &&
 						relationshipToUser !== UserRelationship.BLOCKED}>
 					{#snippet child({ props })}
@@ -469,7 +473,7 @@
 									relationshipToUser === UserRelationship.BLOCKED ||
 									user.id === me?.id}>
 								<MessageSquare />
-								메시지하기
+								{m['DM.BEGIN_DM']()}
 							</Button>
 						</div>
 					{/snippet}
@@ -484,7 +488,7 @@
 					<DropdownMenu.Content class="w-56" align="end">
 						{#if relationshipToUser === UserRelationship.BLOCKED}
 							<DropdownMenu.Item onclick={onUnblock} disabled={!!me && user.id === me.id}>
-								차단 해제하기
+								{m['PROFILE.UNBLOCK']()}
 							</DropdownMenu.Item>
 						{:else}
 							<DropdownMenu.Item
@@ -492,11 +496,11 @@
 									openBlockAlert = true;
 								}}
 								disabled={!!me && user.id === me.id}>
-								차단하기
+								{m['PROFILE.BLOCK']()}
 							</DropdownMenu.Item>
 						{/if}
 						<!-- TODO 구현 완료 시 재활성화
-						<DropdownMenu.Item onclick={() => {}}>신고하기</DropdownMenu.Item>
+						<DropdownMenu.Item onclick={() => {}}>{m['REPORT']()}</DropdownMenu.Item>
 						-->
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
@@ -507,7 +511,7 @@
 			<Form.Field form={profileForm} name="contactAvailable">
 				<Form.Control>
 					{#snippet children({ props })}
-						<H3 class="text-xl">문의 가능 시간</H3>
+						<H3 class="text-xl">{m['PROFILE.CONTACT_AVAILABLE.TITLE']()}</H3>
 						<RadioGroup.Root
 							name={props.name}
 							value={!user.profile.contactAvailable
@@ -520,14 +524,18 @@
 									value="undefined"
 									id="contact-available-undefined"
 									onclick={() => ($profileData.contactAvailable = false)} />
-								<Label for="contact-available-undefined">미설정</Label>
+								<Label for="contact-available-undefined">
+									{m['PROFILE.CONTACT_AVAILABLE.UNDEFINED']()}
+								</Label>
 							</div>
 							<div class="flex items-center space-x-2">
 								<RadioGroup.Item
 									value="always"
 									id="contact-available-always"
 									onclick={() => ($profileData.contactAvailable = true)} />
-								<Label for="contact-available-always">상시</Label>
+								<Label for="contact-available-always">
+									{m['PROFILE.CONTACT_AVAILABLE.ALWAYS']()}
+								</Label>
 							</div>
 							<div class="flex items-start space-x-2 max-lg:items-center">
 								<RadioGroup.Item
@@ -535,7 +543,7 @@
 									id="contact-available-certain-time"
 									onclick={() => ($profileData.contactAvailable = { from: 0, to: 23 })} />
 								<Label for="contact-available-certain-time" class="items-center max-lg:flex">
-									<div>특정 시간:&nbsp;</div>
+									<div>{m['PROFILE.CONTACT_AVAILABLE.CERTAIN_TIME.THIS']()}:&nbsp;</div>
 									<div class="mt-2 flex items-center">
 										<Select.Root
 											type="single"
@@ -558,7 +566,7 @@
 												{/each}
 											</Select.Content>
 										</Select.Root>
-										<span>시 ~</span>
+										<span>{m['PROFILE.CONTACT_AVAILABLE.CERTAIN_TIME.FROM']()}</span>
 										<Select.Root
 											type="single"
 											disabled={typeof $profileData.contactAvailable === 'boolean'}>
@@ -580,7 +588,7 @@
 												{/each}
 											</Select.Content>
 										</Select.Root>
-										<span>시</span>
+										<span>{m['PROFILE.CONTACT_AVAILABLE.CERTAIN_TIME.TO']()}</span>
 									</div>
 								</Label>
 							</div>
@@ -593,24 +601,25 @@
 			<Alert.Root>
 				<Clock class="size-4" />
 				<Alert.Title>
-					문의 가능 시간:
+					{m['PROFILE.CONTACT_AVAILABLE.TITLE']()}:
 					{#if !user.profile.contactAvailable}
-						미설정
+						{m['PROFILE.CONTACT_AVAILABLE.UNDEFINED']()}
 					{:else if typeof user.profile.contactAvailable === 'boolean'}
-						상시
+						{m['PROFILE.CONTACT_AVAILABLE.ALWAYS']()}
 					{:else}
-						{user.profile.contactAvailable.from}시 ~ {user.profile.contactAvailable.to}시
+						{user.profile.contactAvailable.from}{m['PROFILE.CONTACT_AVAILABLE.CERTAIN_TIME.FROM']()}
+						{user.profile.contactAvailable.to}{m['PROFILE.CONTACT_AVAILABLE.CERTAIN_TIME.TO']()}
 					{/if}
 				</Alert.Title>
 				<!-- TODO 2차 알파테스트 때 추가
-				<Alert.Description>평균 응답 시간: {durationString(avgRespTime)}</Alert.Description>
+				<Alert.Description>{m['PROFILE.AVERAGE_RESPONSE_TIME']()}: {durationString(avgRespTime)}</Alert.Description>
 				-->
 			</Alert.Root>
 		{/if}
 
 		<!-- TODO 2차 알파테스트 전에 추가
 		{#if profileEditMode}
-			<H3 class="text-xl">최대 슬롯 갯수</H3>
+			<H3 class="text-xl">{m['PROFILE.MAXIMUM_SLOTS']()}</H3>
 			<div class="mt-2 flex items-center">
 				<Select.Root type="single">
 					<Select.Trigger class="w-[5em]">{maxOpenSlot}</Select.Trigger>
@@ -620,12 +629,12 @@
 						{/each}
 					</Select.Content>
 				</Select.Root>
-				<span>개</span>
+				<span>{m['PROFILE.SLOTS_UNIT']()}</span>
 			</div>
 		{:else}
 			<section class="space-y-2">
 				<div class="flex items-center space-x-2">
-					<H3 class="inline-block text-xl">남은 슬롯 갯수</H3>
+					<H3 class="inline-block text-xl">{m['PROFILE.OPENED_SLOTS']()}</H3>
 					<Badge class="bg-(--primary-color) hover:bg-(--primary-color)/90">
 						{openedSlot}/{maxOpenSlot}
 					</Badge>
@@ -644,19 +653,19 @@
 		<!-- TODO 베타테스트 전에 추가
 		{#if !profileEditMode}
 			<section class="relative border p-4">
-				<H3 class="hidden">통계</H3>
+				<H3 class="hidden">{m['PROFILE.STAT.TITLE']()}</H3>
 				<Table.Root>
 					<Table.Body>
 						<Table.Row>
-							<Table.Head>총 커미션 수</Table.Head>
-							<Table.Cell>{numOfCommission}건</Table.Cell>
+							<Table.Head>{m['PROFILE.STAT.NUM_OF_COMMISSION']()}</Table.Head>
+							<Table.Cell>{numOfCommission}{m['PROFILE.STAT.NUM_OF_COMMISSION_UNIT']()}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Head>평균 작업 시간</Table.Head>
+							<Table.Head>{m['PROFILE.STAT.AVERAGE_WORK_TIME']()}</Table.Head>
 							<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
 						</Table.Row>
 						<Table.Row>
-							<Table.Head>완료율</Table.Head>
+							<Table.Head>{m['PROFILE.STAT.COMPLETION_RATIO']()}</Table.Head>
 							<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
 						</Table.Row>
 					</Table.Body>
@@ -666,7 +675,7 @@
 						variant="link"
 						onclick={() => (openStatDialog = true)}
 						class="text-(--primary-color)">
-						자세히 보기
+						{m['PROFILE.STAT.OPEN_DIALOG']()}
 						<ChevronRight class="size-4" />
 					</Button>
 				</div>
@@ -675,7 +684,7 @@
 		-->
 
 		<section class="space-y-2">
-			<H3 class="text-center text-xl">소개</H3>
+			<H3 class="text-center text-xl">{m['PROFILE.INTRODUCTION']()}</H3>
 			{#if profileEditMode}
 				<Form.Field form={profileForm} name="introduction">
 					<Form.Control>
@@ -693,7 +702,7 @@
 					{#if user.profile.introduction}
 						{@html sanitizeHTML(user.profile.introduction)}
 					{:else}
-						<span class="italic">자기소개가 없습니다.</span>
+						<span class="italic">{m['PROFILE.NO_INTRODUCTION']()}</span>
 					{/if}
 				</article>
 			{/if}
@@ -703,11 +712,15 @@
 			<Form.Field form={profileForm} name="links" class="space-y-2 border p-4">
 				<Form.Control>
 					{#snippet children({ props })}
-						<H3 class="text-xl">링크</H3>
+						<H3 class="text-xl">{m['PROFILE.LINK.THIS']()}</H3>
 						{#each $profileData.links || [] as _, idx (idx)}
 							<div class="flex items-center space-x-2">
-								<Input placeholder="표시 명칭" bind:value={$profileData.links![idx].text} />
-								<Input placeholder="URL" bind:value={$profileData.links![idx].href} />
+								<Input
+									placeholder={m['PROFILE.LINK.LABEL']()}
+									bind:value={$profileData.links![idx].text} />
+								<Input
+									placeholder={m['PROFILE.LINK.URL']()}
+									bind:value={$profileData.links![idx].href} />
 								<Button
 									variant="outline"
 									size="icon"
@@ -725,7 +738,7 @@
 								if (!$profileData.links) $profileData.links = [];
 								$profileData.links = [...$profileData.links, { href: '', text: '' }];
 							}}>
-							링크 추가
+							{m['FORM.ADD_ITEM']({ item: m['PROFILE.LINK.THIS']() })}
 						</Button>
 					{/snippet}
 				</Form.Control>
@@ -733,7 +746,7 @@
 			</Form.Field>
 		{:else if (user.profile.links || []).length > 0}
 			<section class="grid grid-cols-2 gap-2 border p-4">
-				<H3 class="hidden">링크</H3>
+				<H3 class="hidden">{m['PROFILE.LINK.THIS']()}</H3>
 				{#each user.profile.links || [] as link}
 					<div>
 						<Link class="inline-block size-5 rounded-full bg-(--primary-color) p-0.5 text-white" />
@@ -751,7 +764,7 @@
 
 		{#if profileEditMode}
 			<section class="space-y-2 border p-4">
-				<H3 class="text-xl">프로필에서 사용할 강조색</H3>
+				<H3 class="text-xl">{m['PROFILE.ACCENT_COLOR']()}</H3>
 				<Form.Field form={profileForm} name="accentColor">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -764,12 +777,11 @@
 								nullable={true}
 								texts={{
 									label: {
-										withoutColor: '설정하지 않음',
+										withoutColor: m['PROFILE.ACCENT_COLOR_UNSET'](),
 									},
 								}} />
 						{/snippet}
 					</Form.Control>
-					<!-- <Form.Description>변경된 프로필 이미지는 저장 후에 반영됩니다.</Form.Description> -->
 					<Form.FieldErrors />
 				</Form.Field>
 			</section>
@@ -779,16 +791,18 @@
 			{#if profileEditMode}
 				<div class="text-right">
 					<Form.Button variant="default" class="bg-(--primary-color) hover:bg-(--primary-color)/90">
-						저장
+						{m['PROFILE.SAVE']()}
 					</Form.Button>
-					<Button variant="secondary" onclick={() => (profileEditMode = false)}>취소</Button>
+					<Button variant="secondary" onclick={() => (profileEditMode = false)}>
+						{m['CANCEL']()}
+					</Button>
 				</div>
 			{:else}
 				<Button
 					size="icon"
 					variant="outline"
 					class="absolute top-6 right-6 rounded-full"
-					aria-label="프로필 수정"
+					aria-label={m['PROFILE.EDIT_PROFILE']()}
 					onclick={() => (profileEditMode = true)}>
 					<Pencil />
 				</Button>
@@ -805,33 +819,33 @@
 	<Dialog.Content
 		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>상세 통계</Dialog.Title>
+			<Dialog.Title>{m['PROFILE.STAT.DETAIL_TITLE']()}</Dialog.Title>
 			<Dialog.Description>
-				{user.username} 님의 커미션 활동 통계입니다.
+				{m['PROFILE.STAT.DETAIL_DESCRIPTION']({ username: user.username })}
 			</Dialog.Description>
 		</Dialog.Header>
 		<Table.Root>
 			<Table.Body>
 				<Table.Row>
-					<Table.Head>총 커미션 수</Table.Head>
-					<Table.Cell>{numOfCommission}건</Table.Cell>
+					<Table.Head>{m['PROFILE.STAT.NUM_OF_COMMISSION']()}</Table.Head>
+					<Table.Cell>{numOfCommission}{m['PROFILE.STAT.NUM_OF_COMMISSION_UNIT']()}</Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Head>타입별 커미션 수</Table.Head>
+					<Table.Head>{m['PROFILE.STAT.COMMISSIONS_PER_TYPE']()}</Table.Head>
 					<Table.Cell>
 						<Chart class="size-50" option={statChartOption} series={[statChartData]} />
 					</Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Head>평균 응답 시간</Table.Head>
+					<Table.Head>{m['PROFILE.AVERAGE_RESPONSE_TIME']()}</Table.Head>
 					<Table.Cell>{durationString(avgRespTime)}</Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Head>평균 작업 시간</Table.Head>
+					<Table.Head>{m['PROFILE.STAT.AVERAGE_WORK_TIME']()}</Table.Head>
 					<Table.Cell>{durationString(avgWorkTime)}</Table.Cell>
 				</Table.Row>
 				<Table.Row>
-					<Table.Head>완료율</Table.Head>
+					<Table.Head>{m['PROFILE.STAT.COMPLETION_RATIO']()}</Table.Head>
 					<Table.Cell class="font-bold">{(completionRatio * 100).toFixed(2)}%</Table.Cell>
 				</Table.Row>
 			</Table.Body>
@@ -843,10 +857,11 @@
 	<Dialog.Content
 		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>프로필 이미지 자르기</Dialog.Title>
+			<Dialog.Title>
+				{m['PROFILE.CROP_TITLE']({ image: m['PROFILE.PROFILE_IMAGE']() })}
+			</Dialog.Title>
 			<Dialog.Description>
-				프로필 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 프로필
-				이미지는 저장 후에 반영됩니다.
+				{m['PROFILE.CROP_DESCRIPTION']({ image: m['PROFILE.PROFILE_IMAGE']() })}
 			</Dialog.Description>
 		</Dialog.Header>
 		<Cropper
@@ -858,7 +873,7 @@
 			overlay_options={{ show_third_lines: true }}
 			bind:this={profileImageCropper.cropper} />
 		<Dialog.Footer>
-			<Button onclick={onSetProfileImage}>확인</Button>
+			<Button onclick={onSetProfileImage}>{m['CONFIRM']()}</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
@@ -867,10 +882,9 @@
 	<Dialog.Content
 		class="max-h-[100vh] overflow-x-hidden overflow-y-auto transition-none sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>헤더 이미지 자르기</Dialog.Title>
+			<Dialog.Title>{m['PROFILE.CROP_TITLE']({ image: m['PROFILE.HEADER_IMAGE']() })}</Dialog.Title>
 			<Dialog.Description>
-				헤더 이미지로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 헤더 이미지는
-				저장 후에 반영됩니다.
+				{m['PROFILE.CROP_DESCRIPTION']({ image: m['PROFILE.HEADER_IMAGE']() })}
 			</Dialog.Description>
 		</Dialog.Header>
 		<Cropper
@@ -882,46 +896,40 @@
 			overlay_options={{ show_third_lines: true }}
 			bind:this={headerImageCropper.cropper} />
 		<Dialog.Footer>
-			<Button onclick={onSetHeaderImage}>확인</Button>
+			<Button onclick={onSetHeaderImage}>{m['CONFIRM']()}</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
 
 <AlertDialog
-	title="프로필 업데이트 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UPDATING']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnProfileUpdateAlert} />
 
 {#snippet blockDescription()}
 	<Ul>
-		<li>
-			메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해
-			접속하는 경우 게시물을 볼 수는 있습니다.)
-		</li>
-		<li>
-			이 사용자도 메인 페이지나 검색 결과 등에서 귀하의 게시물을 볼 수 없습니다. (다만, URL을 통해
-			접속하는 경우 게시물을 볼 수는 있습니다.)
-		</li>
-		<li>이 사용자와 메시지를 주고받을 수 없습니다.</li>
-		<li>이 사용자로부터 커미션 의뢰 또는 커미션 제안을 받을 수 없습니다.</li>
-		<li>이 사용자에게 커미션 의뢰 또는 커미션 제안을 할 수 없습니다.</li>
-		<li>차단 조치는 귀하가 원하는 시점에 해제할 수 있습니다.</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_INVISIBLE']()}</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_HIDDEN']()}</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_DM']()}</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_RECEIVE']()}</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_GIVE']()}</li>
+		<li>{m['PROFILE.BLOCKING.DESCRIPTION_UNBLOCK']()}</li>
 	</Ul>
 {/snippet}
 
 <AlertDialog
-	title="정말로 이 사용자를 차단하시겠습니까?"
+	title={m['PROFILE.BLOCKING.TITLE']()}
 	description={blockDescription}
 	cancel={true}
 	onAction={onBlock}
 	bind:open={openBlockAlert} />
 <AlertDialog
-	title="사용자 차단 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.BLOCKING']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnBlock} />
 <AlertDialog
-	title="사용자 차단 해제 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UNBLOCKING']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnUnblock} />
 
 <style lang="scss">

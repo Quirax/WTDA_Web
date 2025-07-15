@@ -21,6 +21,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Editor from '$lib/components/editor/editor.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
+	import { m } from '$lib/messages';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -175,7 +176,7 @@
 </script>
 
 <section class="bg-accent text-accent-foreground flex border p-2">
-	<h3 class="flex-none font-bold">공지사항</h3>
+	<h3 class="flex-none font-bold">{m['ANNOUNCEMENT.THIS']()}</h3>
 	<Separator orientation="vertical" class="mx-2 flex-none" />
 	<div class="flex w-full flex-col overflow-hidden">
 		{#if announcements}
@@ -191,7 +192,7 @@
 		{:else}
 			<p
 				class="text-muted-foreground w-full overflow-hidden text-ellipsis whitespace-nowrap italic">
-				등록된 공지사항이 없습니다
+				{m['ANNOUNCEMENT.NONE']()}
 			</p>
 		{/if}
 		<Separator orientation="horizontal" class="my-2 flex-none" />
@@ -200,7 +201,7 @@
 				variant="link"
 				class="flex-none text-(--primary-color)"
 				onclick={onOpenAnnouncementsListDrawer}>
-				과거 공지사항 보기
+				{m['ANNOUNCEMENT.OPEN_LIST']()}
 				<ChevronRight class="size-4" />
 			</Button>
 			{#if me && me.id === user.id}
@@ -211,7 +212,7 @@
 					variant="link"
 					class="flex-none text-(--primary-color) max-sm:mt-2"
 					onclick={() => (openAnnouncementEditor = true)}>
-					<Pencil />새 공지사항 쓰기
+					<Pencil />{m['ANNOUNCEMENT.CREATE']()}
 				</Button>
 			{/if}
 		</div>
@@ -221,9 +222,9 @@
 <Drawer.Root bind:open={announcementsListDrawerState.open}>
 	<Drawer.Content class="transition-none">
 		<Drawer.Header>
-			<Drawer.Title>공지사항 변경 이력</Drawer.Title>
+			<Drawer.Title>{m['ANNOUNCEMENT.LIST_TITLE']()}</Drawer.Title>
 			<Drawer.Description>
-				{user.username} 님이 현재까지 작성한 공지사항 내역입니다.
+				{m['ANNOUNCEMENT.LIST_DESCRIPTION']({ username: user.username })}
 			</Drawer.Description>
 		</Drawer.Header>
 		<div
@@ -233,10 +234,10 @@
 					<Table.Root class="table-fixed">
 						<Table.Header>
 							<Table.Row>
-								<Table.Head>제목</Table.Head>
-								<Table.Head class="w-[13em]">작성일자</Table.Head>
+								<Table.Head>{m['ANNOUNCEMENT.TITLE']()}</Table.Head>
+								<Table.Head class="w-[13em]">{m['ANNOUNCEMENT.CREATE_DATE']()}</Table.Head>
 								{#if me && me.id === user.id}
-									<Table.Head class="w-20 text-center">삭제</Table.Head>
+									<Table.Head class="w-20 text-center">{m['ANNOUNCEMENT.DELETE']()}</Table.Head>
 								{/if}
 							</Table.Row>
 						</Table.Header>
@@ -273,15 +274,15 @@
 				{:else}
 					<div class="text-muted-foreground flex flex-col items-center space-y-2">
 						<NotepadTextDashed class="size-12" />
-						<span>등록된 공지사항이 없습니다</span>
+						<span>{m['ANNOUNCEMENT.NONE']()}</span>
 					</div>
 				{/if}
 			{:else if announcementsListDrawerState.status === FetchStatus.LOADING}
 				<Table.Root>
 					<Table.Header>
 						<Table.Row>
-							<Table.Head>제목</Table.Head>
-							<Table.Head class="w-[13em]">작성일자</Table.Head>
+							<Table.Head>{m['ANNOUNCEMENT.TITLE']()}</Table.Head>
+							<Table.Head class="w-[13em]">{m['ANNOUNCEMENT.CREATE_DATE']()}</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -300,7 +301,7 @@
 			{:else}
 				<div class="text-muted-foreground flex flex-col items-center space-y-2">
 					<TriangleAlert class="size-12" />
-					<span>불러오는 도중 오류가 발생했습니다.</span>
+					<span>{m['ANNOUNCEMENT.ERROR_LOADING']()}</span>
 				</div>
 			{/if}
 		</div>
@@ -312,7 +313,7 @@
 				siblingCount={isDesktop() ? 1 : 0} />
 		{/if}
 		<Drawer.Footer>
-			<Drawer.Close>닫기</Drawer.Close>
+			<Drawer.Close>{m['ANNOUNCEMENT.CLOSE']()}</Drawer.Close>
 		</Drawer.Footer>
 	</Drawer.Content>
 </Drawer.Root>
@@ -331,7 +332,7 @@
 				{/if}
 			</Dialog.Title>
 			<Dialog.Description style="--height: calc(var(--text-sm--line-height) * var(--text-sm));">
-				작성일시: {#if announcementDialogState.status === FetchStatus.COMPLETED}
+				{m['ANNOUNCEMENT.CREATE_DATE']()}: {#if announcementDialogState.status === FetchStatus.COMPLETED}
 					{formatDatetimeString(announcementDialogState.announcement.createDate)}
 				{:else}
 					<Skeleton class="inline-block h-(--height) w-[11em]" />
@@ -345,7 +346,7 @@
 				<div
 					class="text-muted-foreground flex size-full flex-col items-center justify-center space-y-2">
 					<TriangleAlert class="size-12" />
-					<span>불러오는 도중 오류가 발생했습니다.</span>
+					<span>{m['ANNOUNCEMENT.ERROR_LOADING']()}</span>
 				</div>
 			{:else}
 				<Skeleton class="size-full" />
@@ -366,7 +367,7 @@
 								<Input
 									{...props}
 									bind:value={$announcementData.title}
-									placeholder="공지 제목을 입력하십시오."
+									placeholder={m['ANNOUNCEMENT.TITLE_PLACEHOLDER']()}
 									class="mt-4"
 									{...$announcementConstraints.title} />
 							{/snippet}
@@ -384,13 +385,13 @@
 				<Form.FieldErrors />
 			</Form.Field>
 			<Dialog.Footer>
-				<Form.Button variant="default">저장</Form.Button>
+				<Form.Button variant="default">{m['ANNOUNCEMENT.SAVE']()}</Form.Button>
 				<Button
 					onclick={() => {
 						openAnnouncementEditor = false;
 					}}
 					variant="secondary">
-					취소
+					{m['CANCEL']()}
 				</Button>
 			</Dialog.Footer>
 		</form>
@@ -398,12 +399,12 @@
 </Dialog.Root>
 
 <AlertDialog
-	title="정말로 이 공지를 삭제하시겠습니까?"
-	description="삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다."
+	title={m['ANNOUNCEMENT.DELETE_TITLE']()}
+	description={m['ANNOUNCEMENT.DELETE_DESCRIPTION']()}
 	cancel={true}
 	onAction={deleteAnnouncement}
 	bind:open={deleteAnnouncementAlertState.open} />
 <AlertDialog
-	title="공지사항 관련 처리 도중 오류가 발생했습니다."
-	description="고객센터에 문의해주시기 바랍니다."
+	title={m['ERROR_ALERT.TITLE']({ while: m['ANNOUNCEMENT.WHILE']() })}
+	description={m['ERROR_ALERT.DESCRIPTION']()}
 	bind:open={openErrorOnAnnouncementAlert} />

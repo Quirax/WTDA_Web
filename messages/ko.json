@@ -158,6 +158,20 @@
 					"articleType=PORTFOLIO": "이 포트폴리오의 썸네일"
 				}
 			}
+		],
+		"WHILE_BEGIN_DM": "사용자와의 메시지 채널 개설",
+		"UNABLE_TO_DM_WHEN_BLOCKED": "차단했거나 차단된 경우 메시지를 보낼 수 없습니다",
+		"BEGIN_DM": "메시지하기",
+		"BEGIN_DM_ABOUT": [
+			{
+				"declarations": ["input articleType"],
+				"selectors": ["articleType"],
+				"match": {
+					"articleType=REQUEST": "이 의뢰에 관해 메시지하기",
+					"articleType=COMMISSION": "이 커미션 타입에 관해 메시지하기",
+					"articleType=PORTFOLIO": "이 포트폴리오에 관해 메시지하기"
+				}
+			}
 		]
 	},
 	"HTTP_ERROR": {
@@ -180,9 +194,11 @@
 		"DATE": "날짜",
 		"CURRENCY": "금액",
 		"CANCEL": "취소하기",
-		"SAVE": "저장하기"
+		"SAVE": "저장하기",
+		"DROPZONE": "여기로 {media}을(를) 드래그하거나 클릭하여 선택하세요."
 	},
 	"ARTICLE": {
+		"THIS": "게시물",
 		"FORM_TITLE": [
 			{
 				"declarations": ["input articleType"],
@@ -412,5 +428,102 @@
 		"SHOUTOUT": "{username} 님!",
 		"WELCOME": "뭐하지공방에 오신 것을 환영합니다",
 		"SUGGESTION": "이제 로그인하여 뭐하지공방의 모든 서비스를 이용해보세요!"
-	}
+	},
+	"LINK_COPIED": {
+		"TITLE": "{item} 링크가 복사되었습니다.",
+		"DESCRIPTION": "원하는 곳에 붙여넣어 사용하시기 바랍니다."
+	},
+	"BLOCKED": {
+		"TITLE": "사용자를 차단하였습니다.",
+		"UNBLOCK_BUTTON": "차단 해제"
+	},
+	"UNBLOCKED": "사용자 차단을 해제하였습니다.",
+	"PROFILE": {
+		"THIS": "프로필",
+		"CHART": "커미션 수",
+		"HEADER_IMAGE": "헤더 이미지",
+		"HEADER_IMAGE_ALT": "{username} 님의 헤더 이미지",
+		"REMOVE_IMAGE": "이미지 제거",
+		"PROFILE_IMAGE": "프로필 이미지",
+		"PROFILE_IMAGE_ALT": "{username} 님의 프로필 이미지",
+		"PROFILE_IMAGE_DESCRIPTION": "변경된 프로필 이미지는 저장 후에 반영됩니다.",
+		"BLOCKED": "차단된 사용자",
+		"BLOCK": "차단하기",
+		"BLOCKING": {
+			"TITLE": "정말로 이 사용자를 차단하시겠습니까?",
+			"DESCRIPTION_INVISIBLE": "메인 페이지나 검색 결과 등에서 이 사용자의 게시물이 표시되지 않습니다. (다만, URL을 통해 접속하는 경우 게시물을 볼 수는 있습니다.)",
+			"DESCRIPTION_HIDDEN": "이 사용자도 메인 페이지나 검색 결과 등에서 귀하의 게시물을 볼 수 없습니다. (다만, URL을 통해 접속하는 경우 게시물을 볼 수는 있습니다.)",
+			"DESCRIPTION_DM": "이 사용자와 메시지를 주고받을 수 없습니다.",
+			"DESCRIPTION_RECEIVE": "이 사용자로부터 커미션 의뢰 또는 커미션 제안을 받을 수 없습니다.",
+			"DESCRIPTION_GIVE": "이 사용자에게 커미션 의뢰 또는 커미션 제안을 할 수 없습니다.",
+			"DESCRIPTION_UNBLOCK": "차단 조치는 귀하가 원하는 시점에 해제할 수 있습니다."
+		},
+		"UNBLOCK": "차단 해제하기",
+		"CONTACT_AVAILABLE": {
+			"TITLE": "문의 가능 시간",
+			"UNDEFINED": "미설정",
+			"ALWAYS": "상시",
+			"CERTAIN_TIME": {
+				"THIS": "특정 시간",
+				"FROM": "시 ~",
+				"TO": "시"
+			}
+		},
+		"AVERAGE_RESPONSE_TIME": "평균 응답 시간",
+		"MAXIMUM_SLOTS": "최대 슬롯 갯수",
+		"SLOTS_UNIT": "개",
+		"OPENED_SLOTS": "남은 슬롯 갯수",
+		"STAT": {
+			"TITLE": "통계",
+			"DETAIL_TITLE": "상세 통계",
+			"DETAIL_DESCRIPTION": "{user.username} 님의 커미션 활동 통계입니다.",
+			"NUM_OF_COMMISSION": "총 커미션 수",
+			"NUM_OF_COMMISSION_UNIT": "건",
+			"COMMISSIONS_PER_TYPE": "타입별 커미션 수",
+			"AVERAGE_WORK_TIME": "평균 작업 시간",
+			"COMPLETION_RATIO": "완료율",
+			"OPEN_DIALOG": "자세히 보기"
+		},
+		"INTRODUCTION": "소개",
+		"NO_INTRODUCTION": "자기소개가 없습니다.",
+		"LINK": {
+			"THIS": "링크",
+			"LABEL": "표시 명칭",
+			"URL": "URL"
+		},
+		"ACCENT_COLOR": "프로필에서 사용할 강조색",
+		"ACCENT_COLOR_UNSET": "설정하지 않음",
+		"SAVE": "저장",
+		"EDIT_PROFILE": "프로필 수정",
+		"CROP_TITLE": "{image} 자르기",
+		"CROP_DESCRIPTION": "{image}로 사용할 영역을 선택한 뒤 '완료' 버튼을 누르면 지정됩니다. 변경된 {image}은(는) 저장 후에 반영됩니다.",
+		"WHILE": {
+			"UPDATING": "프로필 업데이트",
+			"BLOCKING": "사용자 차단",
+			"UNBLOCKING": "사용자 차단 해제"
+		},
+		"ARTICLES": {
+			"ALL": "전체",
+			"CREATE": "새로 만들기"
+		}
+	},
+	"ANNOUNCEMENT": {
+		"THIS": "공지사항",
+		"NONE": "등록된 공지사항이 없습니다",
+		"OPEN_LIST": "과거 공지사항 보기",
+		"CREATE": "새 공지사항 쓰기",
+		"LIST_TITLE": "공지사항 변경 이력",
+		"LIST_DESCRIPTION": "{username} 님이 현재까지 작성한 공지사항 내역입니다.",
+		"TITLE": "제목",
+		"TITLE_PLACEHOLDER": "공지 제목을 입력하십시오.",
+		"CREATE_DATE": "작성일시",
+		"DELETE": "삭제",
+		"ERROR_LOADING": "불러오는 도중 오류가 발생했습니다.",
+		"CLOSE": "닫기",
+		"SAVE": "저장",
+		"DELETE_TITLE": "정말로 이 공지를 삭제하시겠습니까?",
+		"DELETE_DESCRIPTION": "삭제 후 복구할 수 없으며, 이 공지를 보고 다른 사용자가 커미션을 신청한 경우 그에 따른 책임이 발생할 수 있습니다.",
+		"WHILE": "공지사항 관련"
+	},
+	"REPORT": "신고하기"
 }
