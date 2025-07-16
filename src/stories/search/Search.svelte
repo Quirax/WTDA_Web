@@ -128,9 +128,9 @@
 	<form
 		bind:this={formElement}
 		method="GET"
-		class="my-2 space-y-2 border pt-2 pl-2"
+		class="my-2 space-y-2 border pt-2 pr-2 pl-2"
 		action="/search">
-		<Form.Field {form} name="query" class="mr-2 flex">
+		<Form.Field {form} name="query" class="flex">
 			<Form.Control>
 				{#snippet children({ props })}
 					<Input

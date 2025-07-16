@@ -101,12 +101,9 @@
 				variant="link"
 				size="icon"
 				href="/"
-				class="relative size-9 rounded-full"
+				class="relative size-9 rounded-full bg-white"
 				aria-label="Logo">
-				<LogoAvatar.Root class="bg-white p-1">
-					<LogoAvatar.Image src="/logo.png" alt={m.SITE_LOGO_ALT()} />
-					<LogoAvatar.Fallback></LogoAvatar.Fallback>
-				</LogoAvatar.Root>
+				<img src="/logo.png" alt={m.SITE_LOGO_ALT()} class="p-1" />
 			</Button>
 			<div class="mx-6 hidden items-center space-x-4 font-bold sm:flex lg:space-x-6">
 				{title}
