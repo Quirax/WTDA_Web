@@ -40,6 +40,7 @@
 	import { m } from '$lib/messages';
 	import type { Snippet } from 'svelte';
 	import { replace } from '$lib/utils.svelte';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		data: SuperValidated<Infer<FormSchema | UserSchema>>;
@@ -56,14 +57,15 @@
 	let auth = $state(prevAuth);
 
 	let title = $derived(m['USER_INFO.TITLE']({ for: userInfoFor }));
-	let openErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(userInfoFor === UserInfoFor.REGISTRATION ? formSchema : userSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				console.error(result);
-				openErrorAlert = true;
+				toast.error(m['ERROR_ALERT.TITLE']({ while: title }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
+				});
 				cancel();
 			}
 		},
@@ -72,7 +74,6 @@
 
 	let openBeforeDeactivationAlert = $state(false);
 	let openAfterDeactivationAlert = $state(false);
-	let openErrorOnDeactivationAlert = $state(false);
 
 	const onDeactivation = async () => {
 		const result = await fetch('?/deactivate', {
@@ -81,7 +82,10 @@
 		}).then((r) => r.json());
 
 		if ([200, 204].indexOf(result.status || 0) === -1) {
-			if (result.status !== 302) openErrorOnDeactivationAlert = true;
+			if (result.status !== 302)
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.WHILE.DEACTIVATION']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
+				});
 			return;
 		}
 
@@ -89,8 +93,6 @@
 	};
 
 	let openAuthenticationDialog = $state(false);
-	let openAuthenticationCompletedAlert = $state(false);
-	let openErrorOnAuthenticateAlert = $state(false);
 	let birthday = $state(prevAuth?.birthday ?? new Date());
 
 	const onAuthenticate = async () => {
@@ -109,10 +111,14 @@
 
 		if (result.type === 'success') {
 			auth = result.data!.auth as typeof auth;
-			openAuthenticationCompletedAlert = true;
+			toast.success(m['USER_INFO.AFTER_AUTHENTICATION.TITLE'](), {
+				description: m['USER_INFO.AFTER_AUTHENTICATION.DESCRIPTION'](),
+			});
 		} else {
 			console.error(result);
-			openErrorOnAuthenticateAlert = true;
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.AUTHENTICATION.TITLE']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
+			});
 		}
 	};
 </script>
@@ -428,10 +434,6 @@
 {/snippet}
 
 <AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: title })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorAlert} />
-<AlertDialog
 	title={m['USER_INFO.BEFORE_DEACTIVATION.TITLE']()}
 	description={WarningBeforeDeactivation}
 	cancel={true}
@@ -444,18 +446,6 @@
 		window.location.href = '/';
 	}}
 	bind:open={openAfterDeactivationAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.WHILE.DEACTIVATION']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnDeactivationAlert} />
-<AlertDialog
-	title={m['USER_INFO.AFTER_AUTHENTICATION.TITLE']()}
-	description={m['USER_INFO.AFTER_AUTHENTICATION.DESCRIPTION']()}
-	bind:open={openAuthenticationCompletedAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.AUTHENTICATION.TITLE']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnAuthenticateAlert} />
 
 <!-- XXX (여기부터) 1차 알파테스트 전용 -->
 <Dialog.Root bind:open={openAuthenticationDialog}>

@@ -13,6 +13,7 @@
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { m } from '$lib/messages';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -22,7 +23,6 @@
 
 	let disableButton = $state(false);
 
-	let openFailedAlert = $state(false);
 	let openSucceedAlert = $state(false);
 
 	const form = superForm(data, {
@@ -32,7 +32,9 @@
 		},
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				openFailedAlert = true;
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.RESET_PASSWORD.TITLE']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
+				});
 				disableButton = false;
 				cancel();
 			} else {
@@ -83,10 +85,6 @@
 	</form>
 </Section>
 
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.RESET_PASSWORD.TITLE']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openFailedAlert} />
 <AlertDialog
 	title={m['USER_INFO.RESET_PASSWORD.COMPLETED.TITLE']()}
 	description={m['USER_INFO.RESET_PASSWORD.COMPLETED.DESCRIPTION']()}

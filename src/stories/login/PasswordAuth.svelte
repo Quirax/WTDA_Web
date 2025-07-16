@@ -15,6 +15,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { replace } from '$lib/utils.svelte';
 	import { m } from '$lib/messages';
+	import { toast } from 'svelte-sonner';
 
 	interface Props {
 		data: SuperValidated<Infer<PasswordSchema>>;
@@ -23,14 +24,16 @@
 	const { data }: Props = $props();
 
 	let openUserNotFoundAlert = $state(false);
-	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(passwordSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				if (result.status === 404) openUserNotFoundAlert = true;
-				else openOtherErrorAlert = true;
+				else
+					toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.PASSWORD_AUTH.TITLE']() }), {
+						description: m['ERROR_ALERT.DESCRIPTION'](),
+					});
 
 				cancel();
 			}
@@ -76,7 +79,3 @@
 	title={m['USER_INFO.PASSWORD_AUTH.INVALID.TITLE']()}
 	description={userNotFoundDesc}
 	bind:open={openUserNotFoundAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.PASSWORD_AUTH.TITLE']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openOtherErrorAlert} />
