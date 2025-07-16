@@ -162,6 +162,22 @@
 								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
+							<DropdownMenu.Group>
+								<DropdownMenu.Sub>
+									<DropdownMenu.SubTrigger>
+										{m['PROFILE.ARTICLES.CREATE']()}
+									</DropdownMenu.SubTrigger>
+									<DropdownMenu.SubContent>
+										<DropdownMenu.Item onclick={() => goto('/r/create')}>
+											{m['ARTICLE_TYPE.REQUEST']()}
+										</DropdownMenu.Item>
+										<DropdownMenu.Item onclick={() => goto('/pf/create')}>
+											{m['ARTICLE_TYPE.PORTFOLIO']()}
+										</DropdownMenu.Item>
+									</DropdownMenu.SubContent>
+								</DropdownMenu.Sub>
+							</DropdownMenu.Group>
+							<DropdownMenu.Separator />
 							{@render CommonMenu()}
 							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
