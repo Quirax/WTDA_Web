@@ -138,12 +138,14 @@
 					<section
 						class={cn(
 							'relative size-fit p-4 text-left',
-							dir === Direction.SEND ? 'bg-primary mr-3' : 'bg-secondary ml-2',
+							dir === Direction.SEND
+								? 'bg-primary text-primary-foreground mr-3'
+								: 'bg-secondary text-secondary-foreground ml-2',
 						)}
 						use:twemoji>
 						{#if dm.relatedMessage}
 							<a
-								class="bg-secondary relative mb-2 block cursor-pointer space-y-2 border p-2 text-left"
+								class="bg-secondary text-secondary-foreground relative mb-2 block cursor-pointer space-y-2 border p-2 text-left"
 								href="#dm-{dm.relatedMessage.id}"
 								onclick={(event) => {
 									event.preventDefault(); // 화면 전체 스크롤을 차단
@@ -170,7 +172,7 @@
 								? `/${getLinkPrefix(dm.relatedPost.type)}/${dm.relatedPost.article.id}`
 								: ''}
 							<a
-								class="bg-secondary relative flex cursor-pointer border p-2 text-left"
+								class="bg-secondary text-secondary-foreground relative flex cursor-pointer border p-2 text-left"
 								{href}
 								target="_blank">
 								<div class="mr-2 aspect-video h-16 max-sm:hidden">
@@ -261,9 +263,9 @@
 			{/if}
 			<aside
 				class={cn(
-					'bg-background absolute -bottom-10 z-2 border p-2',
+					'bg-background absolute -bottom-10 z-2 border p-2 whitespace-nowrap',
 					!(isFocused || isMouseHover) && 'hidden',
-					dir === Direction.SEND ? '-left-2' : '-right-2',
+					dir === Direction.SEND ? 'right-2' : 'left-2',
 				)}>
 				<Button size="icon" variant="ghost" class="size-8 border" onclick={() => onReply(dm)}>
 					<!-- 답글 -->
