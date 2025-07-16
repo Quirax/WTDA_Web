@@ -20,8 +20,8 @@
 	import { m } from '$lib/messages';
 
 	interface Props {
-		recentCommissionTypes?: App.CommisionType[];
-		recentRequests?: App.Request[];
+		recentCommissionTypes?: App.Articles[];
+		recentRequests?: App.Articles[];
 		introductions?: { src: string; alt: string }[];
 	}
 

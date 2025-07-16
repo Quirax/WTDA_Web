@@ -38,6 +38,7 @@ export const load = (async ({ params, locals, depends }) => {
 					id: table.user.id,
 					birthday: table.user.birthday,
 					authExpiresAt: table.user.authExpiresAt,
+					role: table.user.role,
 				})
 				.from(table.user)
 				.where(eq(table.user.id, id))

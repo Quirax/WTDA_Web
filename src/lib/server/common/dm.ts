@@ -351,6 +351,7 @@ export const getDMChannelInfo = async (channelId: string, sender: NonNullable<Ap
 							profile: table.user.profile,
 							birthday: table.user.birthday,
 							authExpiresAt: table.user.authExpiresAt,
+							role: table.user.role,
 						},
 						category: table.commissionRequest.category,
 						tags: table.commissionRequest.tags,
