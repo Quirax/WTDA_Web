@@ -85,7 +85,7 @@
 
 <Section>
 	<H2>{m['ARTICLE.FORM_TITLE']({ doString, articleType: ArticleType.PORTFOLIO })}</H2>
-	<form method="POST" use:enhance class="w-full sm:w-2/3">
+	<form method="POST" use:enhance class="w-full lg:w-2/3">
 		<Form.Field {form} name="title" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
@@ -296,7 +296,10 @@
 											: AdultContents.NORMAL)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip text={m['ARTICLE.ADULT_RESTRICTED']()} disabled={isAdult(me)}>
+								<Tooltip
+									text={m['ARTICLE.ADULT_RESTRICTED']()}
+									disabled={isAdult(me)}
+									class="text-left">
 									<Form.Label>
 										{m['ARTICLE.ADULT']({ articleType: ArticleType.PORTFOLIO })}
 									</Form.Label>
@@ -315,7 +318,10 @@
 											: AdultContents.ADULT_RESTRICTED)
 								} />
 							<div class="space-y-1 leading-none">
-								<Tooltip text={m['ARTICLE.GROTESQUE_RESTRICTED']()} disabled={isAdult(me)}>
+								<Tooltip
+									text={m['ARTICLE.GROTESQUE_RESTRICTED']()}
+									disabled={isAdult(me)}
+									class="text-left">
 									<Form.Label>
 										{m['ARTICLE.GROTESQUE']({ articleType: ArticleType.PORTFOLIO })}
 									</Form.Label>

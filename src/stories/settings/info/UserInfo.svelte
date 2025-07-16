@@ -121,7 +121,7 @@
 
 <Section>
 	<H2>{title}</H2>
-	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
+	<form method="POST" use:enhance class="w-full lg:w-2/3" action="?/do">
 		{#if userInfoFor === UserInfoFor.REGISTRATION}
 			<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>

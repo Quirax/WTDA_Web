@@ -287,7 +287,7 @@
 			.then((r) => deserialize(r));
 
 		if (result.type === 'success') {
-			toast.success(m['BLOCKED']());
+			toast.success(m['UNBLOCKED']());
 			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {

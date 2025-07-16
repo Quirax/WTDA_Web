@@ -85,7 +85,7 @@
 			{/each}
 		</div>
 	</section>
-	<section class="flex-none space-y-2 border p-4 max-md:mt-8 md:w-80">
+	<section class="flex-none space-y-2 border p-4 max-lg:mt-8 lg:w-80">
 		<div>
 			{#if article.thumbnail}
 				<img

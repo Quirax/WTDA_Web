@@ -102,6 +102,22 @@
 	@apply font-sans text-base;
 }
 
+.ql-toolbar {
+	@apply bg-secondary;
+}
+
+.ql-toolbar .ql-picker {
+	@apply text-secondary-foreground;
+}
+
+.ql-toolbar .ql-stroke {
+	@apply stroke-secondary-foreground;
+}
+
+.ql-toolbar .ql-fill {
+	@apply fill-secondary-foreground;
+}
+
 .ql-editor {
 	@apply text-base;
 }
