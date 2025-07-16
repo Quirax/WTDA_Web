@@ -1,4 +1,4 @@
-import { enumToPgEnum, type InferSelectModelPartial } from '../../utils';
+import { enumToPgEnum } from '../../utils';
 import {
 	pgTable,
 	text,
@@ -8,7 +8,6 @@ import {
 	integer,
 	boolean,
 	index,
-	date,
 	unique,
 	type PgColumnBuilderBase,
 	type PgTableExtraConfigValue,

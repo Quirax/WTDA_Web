@@ -3,12 +3,10 @@
 	import UserAvatar from '$stories/components/Avatar.svelte';
 	import { cn, twemoji } from '$lib/utils';
 	import type { DMChannel } from '$lib/server/db/schema';
-	import { beforeNavigate, invalidate } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { User } from 'lucide-svelte';
 	import { source } from 'sveltekit-sse';
 	import { page } from '$app/state';
-	import { tick } from 'svelte';
-	import type { Unsubscriber } from 'svelte/store';
 	import SidebarLayout from '$stories/components/SidebarLayout.svelte';
 	import { m } from '$lib/messages';
 

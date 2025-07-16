@@ -1,6 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
+import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import * as env from '$env/static/public';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries

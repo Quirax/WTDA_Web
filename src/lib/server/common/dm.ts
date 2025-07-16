@@ -17,8 +17,8 @@ import {
 	type ExtractTablesWithRelations,
 } from 'drizzle-orm';
 import { getRelationship } from './relationship';
-import { alias, intersect, PgTransaction, union } from 'drizzle-orm/pg-core';
-import type { DMChannel, dmChannel, DMParticipant, User } from '../db/schema';
+import { alias, intersect, PgTransaction } from 'drizzle-orm/pg-core';
+import type { DMChannel, User } from '../db/schema';
 import * as telecom from './telecom';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { Emoji } from 'emoji-type';

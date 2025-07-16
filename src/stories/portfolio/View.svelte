@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { CategoryText, m } from '$lib/messages';
-	import { cn, formatDateString, formatDatetimeString, sanitizeHTML } from '$lib/utils';
+	import { formatDateString, formatDatetimeString, sanitizeHTML } from '$lib/utils';
 	import Avatar from '$stories/components/Avatar.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
@@ -11,12 +11,8 @@
 	import { userStore } from '$lib/context';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { goto } from '$app/navigation';
-	import Ul from '$lib/components/typo/ul.svelte';
 	import { AdultContents, ArticleType } from '@app';
 	import { page } from '$app/state';
-	import * as Card from '$lib/components/ui/card';
-	import * as Carousel from '$lib/components/ui/carousel';
-	import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 	import MediaGallery from '$stories/components/MediaGallery.svelte';
 	import { toast } from 'svelte-sonner';
 

@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { ArticleCategory, UserStatus } from '../app';
-
 	import MainPage from '../stories/MainPage.svelte';
 
 	import DocsImage from '../stories/assets/docs.png';
-	import ProfileImage from '../stories/assets/profile_example.png';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

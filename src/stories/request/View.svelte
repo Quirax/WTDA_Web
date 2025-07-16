@@ -15,8 +15,7 @@
 	import { AdultContents, ArticleType, UserRelationship } from '@app';
 	import { page } from '$app/state';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
-	import { EllipsisVertical, MessageSquare, Share2 } from 'lucide-svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { MessageSquare, Share2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { deserialize } from '$app/forms';
 	import { source } from 'sveltekit-sse';

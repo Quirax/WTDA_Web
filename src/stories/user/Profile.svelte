@@ -8,11 +8,9 @@
 		User,
 		EllipsisVertical,
 		Pencil,
-		CircleCheck,
 		MessageSquare,
 		Clock,
 		Link,
-		CircleDashed,
 		UserX,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
@@ -22,7 +20,6 @@
 	import { dataURLToFile, durationString, sanitizeHTML, uploadImage } from '$lib/utils';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { userStore } from '$lib/context';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Chart from '$lib/components/chart/chart.svelte';
 	import { imageFormat } from '$lib/config';
@@ -43,12 +40,11 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import UserArticles from './UserArticles.svelte';
 	import Announcements from './Announcements.svelte';
-	import P from '$lib/components/typo/p.svelte';
 	import Ul from '$lib/components/typo/ul.svelte';
 	import { deserialize } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import { UserRelationship } from '@app';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import { m } from '$lib/messages';
 

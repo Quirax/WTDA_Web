@@ -1,7 +1,7 @@
 import type { RequestEvent } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import * as auth from '../auth';

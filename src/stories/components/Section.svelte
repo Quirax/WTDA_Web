@@ -9,8 +9,6 @@
 	import { fn } from '@storybook/test';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	type $$Props = HTMLAttributes<HTMLDivElement>;
-
 	const { children = fn(), class: className = undefined, ...restProps } = $props();
 </script>
 

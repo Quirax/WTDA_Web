@@ -1,4 +1,4 @@
-import { AdultContents, ArticleType, UserRelationship, UserStatus } from '@app';
+import { AdultContents, ArticleType, UserRelationship } from '@app';
 import { db } from '.';
 import * as table from './schema';
 import {
@@ -14,7 +14,6 @@ import {
 	type AnyColumn,
 	type GetColumnData,
 } from 'drizzle-orm';
-import { unionAll } from 'drizzle-orm/pg-core';
 import { isAdult } from '$lib/utils';
 
 const generateCommonWhere = (

@@ -16,11 +16,9 @@
 	import { cn, isAdult, uploadImage } from '$lib/utils';
 	import { CalendarIcon, X } from 'lucide-svelte';
 	import { DateFormatter, fromDate, getLocalTimeZone, today } from '@internationalized/date';
-	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { CategoryText, m } from '$lib/messages';
 	import Editor from '$lib/components/editor/editor.svelte';
-	import * as Carousel from '$lib/components/ui/carousel';
 	import * as Card from '$lib/components/ui/card';
 	import { AdultContents, ArticleType } from '@app';
 	import { userStore } from '$lib/context';

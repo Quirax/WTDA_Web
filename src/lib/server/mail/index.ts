@@ -1,9 +1,7 @@
 import nodemailer from 'nodemailer';
 import { env } from '$env/dynamic/private';
-import type SMTPPool from 'nodemailer/lib/smtp-pool';
 import type Mail from 'nodemailer/lib/mailer';
 import type { Component, ComponentProps } from 'svelte';
-import type { HTMLSlotAttributes } from 'svelte/elements';
 import { render } from 'svelte/server';
 import { SESv2Client, SendEmailCommand } from '@aws-sdk/client-sesv2';
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as LogoAvatar from '$lib/components/ui/avatar';
 	import { Input } from '$lib/components/ui/input';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
@@ -8,7 +7,7 @@
 
 	import './header.css';
 	import { userStore } from '$lib/context';
-	import { goto, onNavigate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { MessageSquare, User } from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
 	import { onMount } from 'svelte';

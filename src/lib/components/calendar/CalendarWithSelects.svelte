@@ -4,7 +4,6 @@
 	import { DateFormatter, getLocalTimeZone, today, type DateValue } from '@internationalized/date';
 	import * as Calendar from '$lib/components/ui/calendar/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { cn } from '$lib/utils.js';
 	import { m } from '$lib/messages';
 
 	let { value = $bindable(), ...restProps }: WithoutChildrenOrChild<CalendarPrimitive.RootProps> =

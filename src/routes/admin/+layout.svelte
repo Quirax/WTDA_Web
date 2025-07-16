@@ -3,7 +3,7 @@
 	import type { LayoutData } from './$types';
 	import Layout from '$stories/admin/Layout.svelte';
 
-	let { data, children }: { data: LayoutData; children: Snippet } = $props();
+	let { children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <Layout>

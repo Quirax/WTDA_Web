@@ -7,9 +7,9 @@
 	import { EllipsisVertical, Paperclip, SendHorizontal, SmilePlus, X } from 'lucide-svelte';
 	import Message, { Direction } from './Message.svelte';
 	import { userStore } from '$lib/context';
-	import { ArticleCategory, ArticleType, DMChannelType, UserRelationship } from '@app';
+	import { ArticleType, DMChannelType } from '@app';
 	import EmojiList, { type EmojiEventHandler } from '$stories/components/EmojiList.svelte';
-	import { goto, invalidate, invalidateAll, onNavigate } from '$app/navigation';
+	import { goto, invalidate, onNavigate } from '$app/navigation';
 	import type { Emoji } from 'emoji-type';
 	import {
 		cn,

@@ -1,5 +1,5 @@
 import { listen } from '$lib/server/common/telecom';
-import { error, fail } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { produce } from 'sveltekit-sse';
 
 export const POST = ({ locals }) => {

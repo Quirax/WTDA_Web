@@ -12,7 +12,6 @@
 	import type { Emoji } from 'emoji-type';
 	import { Trash } from 'lucide-svelte';
 	import { untrack } from 'svelte';
-	import type { MouseEventHandler } from 'svelte/elements';
 	import { m } from '$lib/messages';
 
 	interface Props {

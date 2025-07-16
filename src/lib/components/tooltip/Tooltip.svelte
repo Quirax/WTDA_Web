@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
-	import type { TooltipTriggerProps } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 	import type { MouseEventHandler } from 'svelte/elements';
 
