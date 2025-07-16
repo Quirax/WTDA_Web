@@ -1,7 +1,7 @@
 <svelte:options runes />
 
 <script lang="ts">
-	import type { PageData, ActionData } from './$types';
+	import type { PageData } from './$types';
 	import EmailConfirm from '../../../stories/register/EmailConfirm.svelte';
 	import type { HTMLSlotAttributes } from 'svelte/elements';
 	import { EmailConfirmFor } from '../../../app';

@@ -1,17 +1,12 @@
 <svelte:options runes />
 
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import * as Carousel from '$lib/components/ui/carousel';
-	import * as Tabs from '$lib/components/ui/tabs';
 	import { Input } from '$lib/components/ui/input';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Button } from '$lib/components/ui/button';
 
-	import { H1, H2, P } from '$lib/components/typo';
+	import { H1, H2 } from '$lib/components/typo';
 
 	import Section from './components/Section.svelte';
-	import Avatar from './components/Avatar.svelte';
 
 	import './MainPage.css';
 	import Header from './components/Header.svelte';
@@ -20,8 +15,8 @@
 	import { m } from '$lib/messages';
 
 	interface Props {
-		recentCommissionTypes?: App.CommisionType[];
-		recentRequests?: App.Request[];
+		recentCommissionTypes?: App.Articles[];
+		recentRequests?: App.Articles[];
 		introductions?: { src: string; alt: string }[];
 	}
 

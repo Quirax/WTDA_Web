@@ -25,6 +25,7 @@ export const load = (async ({ params, locals }) => {
 					profile: table.user.profile,
 					birthday: table.user.birthday,
 					authExpiresAt: table.user.authExpiresAt,
+					role: table.user.role,
 				},
 				category: table.portfolio.category,
 				tags: table.portfolio.tags,

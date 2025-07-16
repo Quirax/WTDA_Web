@@ -1,7 +1,7 @@
-import { AdultContents, ArticleType } from '@app';
+import { AdultContents } from '@app';
 import type { PageServerLoad } from './$types';
 import { formSchema, type FormSchema } from '$lib/schema/search';
-import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, ZodType, type ZodTypeAny } from 'zod';
+import { ZodArray, ZodBoolean, ZodDate, ZodNumber, ZodObject, type ZodTypeAny } from 'zod';
 import { superValidate, type Infer } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail } from '@sveltejs/kit';
@@ -17,12 +17,9 @@ import {
 	lte,
 	ne,
 	or,
-	sql,
-	type TableConfig,
 } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { union, unionAll } from 'drizzle-orm/pg-core';
 import { allArticles } from '$lib/server/db/shorthands';
 import { searchResultsPerPage } from '$lib/config';
 

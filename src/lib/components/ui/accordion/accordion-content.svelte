@@ -8,7 +8,7 @@
 		children,
 		child: nestedChild,
 		...restProps
-	}: WithoutChild<AccordionPrimitive.ContentProps> = $props();
+	}: AccordionPrimitive.ContentProps = $props();
 </script>
 
 <AccordionPrimitive.Content

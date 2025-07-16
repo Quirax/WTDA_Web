@@ -1,4 +1,4 @@
-import { AdultContents, ArticleType, UserRelationship, UserStatus } from '@app';
+import { AdultContents, ArticleType, UserRelationship } from '@app';
 import { db } from '.';
 import * as table from './schema';
 import {
@@ -14,7 +14,6 @@ import {
 	type AnyColumn,
 	type GetColumnData,
 } from 'drizzle-orm';
-import { unionAll } from 'drizzle-orm/pg-core';
 import { isAdult } from '$lib/utils';
 
 const generateCommonWhere = (
@@ -81,6 +80,7 @@ export const articlesPerType = (
 							profile: table.user.profile,
 							birthday: table.user.birthday,
 							authExpiresAt: table.user.authExpiresAt,
+							role: table.user.role,
 						},
 						category: table.commissionRequest.category,
 						tags: table.commissionRequest.tags,
@@ -108,6 +108,7 @@ export const articlesPerType = (
 							profile: table.user.profile,
 							birthday: table.user.birthday,
 							authExpiresAt: table.user.authExpiresAt,
+							role: table.user.role,
 						},
 						category: table.portfolio.category,
 						tags: table.portfolio.tags,

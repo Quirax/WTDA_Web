@@ -1,11 +1,10 @@
 import { error, fail, redirect } from '@sveltejs/kit';
-import { AdultContents, ArticleType, UserStatus } from '../app';
+import { ArticleType, UserStatus } from '../app';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { eq, desc, sql, ne, and } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { articlesPerType } from '$lib/server/db/shorthands';
-import { firebaseAdmin } from '$lib/server/firebase';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.user?.status === UserStatus.REQUIRED_EMAIL_CONFIRM)

@@ -8,12 +8,9 @@
 	import { cn, isAdult as adultCheck, isDesktop } from '$lib/utils';
 	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import RangeCalendar from '$lib/components/ui/range-calendar/range-calendar.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import ArticleList from '$stories/components/ArticleList.svelte';
-	import { ArticleCategory, UserStatus, type SearchFlag } from '@app';
-	import DocsImage from '$stories/assets/docs.png';
-	import ProfileImage from '$stories/assets/profile_example.png';
+	import { type SearchFlag } from '@app';
 	import Pagination from '$lib/components/pagination/pagination.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { formSchema, type FormSchema } from '$lib/schema/search';

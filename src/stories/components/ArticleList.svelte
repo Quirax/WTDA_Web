@@ -6,7 +6,7 @@
 	import Avatar from './Avatar.svelte';
 	import { ArticleTypeText, CategoryText, m } from '$lib/messages';
 	import tinycolor from 'tinycolor2';
-	import { AdultContents, ArticleType } from '@app';
+	import { AdultContents } from '@app';
 	import { cn, getLinkPrefix } from '$lib/utils';
 
 	interface Props extends ReturnType<typeof $props> {

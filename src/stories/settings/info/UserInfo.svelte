@@ -19,26 +19,17 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import User from 'lucide-svelte/icons/user';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { imageFormat } from '$lib/config';
-	import Cropper from '$lib/components/cropper';
-	import Dropzone from 'svelte-file-dropzone';
-	import { X } from 'lucide-svelte';
 	import Header from '$stories/components/Header.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import Ul from '$lib/components/typo/ul.svelte';
 	import P from '$lib/components/typo/p.svelte';
-	import { goto } from '$app/navigation';
 	import { UserStatus } from '@app';
-	import { H3 } from '$lib/components/typo';
-	import Calendar from '$lib/components/ui/calendar/calendar.svelte';
 	import { fromDate, getLocalTimeZone, today } from '@internationalized/date';
 	import CalendarWithSelects from '$lib/components/calendar/CalendarWithSelects.svelte';
 	import { deserialize } from '$app/forms';
 	import Tooltip from '$lib/components/tooltip/Tooltip.svelte';
 	import { m } from '$lib/messages';
-	import type { Snippet } from 'svelte';
 	import { replace } from '$lib/utils.svelte';
 	import { toast } from 'svelte-sonner';
 
