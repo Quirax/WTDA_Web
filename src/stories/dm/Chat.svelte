@@ -186,8 +186,8 @@
 					description: m['DM.NO_RECEIVER.DESCRIPTION'](),
 				});
 			else
-				toast.error(m['DM.ERROR_ON_SEND.TITLE'](), {
-					description: m['DM.ERROR_ON_SEND.DESCRIPTION'](),
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['DM.WHILE_SEND']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
 				});
 		}
 	};

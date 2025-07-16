@@ -58,13 +58,13 @@
 
 	let descriptions = $derived(setDescriptions());
 
-	let openOtherErrorAlert = $state(false);
-
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
-				openOtherErrorAlert = true;
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.EMAIL_CONFIRM.TITLE']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
+				});
 				cancel();
 			}
 		},
@@ -221,7 +221,3 @@
 	title={m['USER_INFO.USER_NOT_FOUND.TITLE']()}
 	description={userNotFoundDesc}
 	bind:open={openUserNotFoundAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['USER_INFO.EMAIL_CONFIRM.TITLE']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openOtherErrorAlert} />

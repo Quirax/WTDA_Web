@@ -32,8 +32,6 @@
 	let me = $state<App.User>(null);
 	userStore.subscribe((v) => (me = v));
 
-	let openErrorAlert = $state(false);
-
 	// 삭제
 	let openBeforeDeletionAlert = $state(false);
 	let openAfterDeletionAlert = $state(false);
@@ -45,7 +43,10 @@
 		}).then((r) => r.json());
 
 		if ([200, 204].indexOf(result.status || 0) === -1) {
-			if (result.status !== 302) openErrorAlert = true;
+			if (result.status !== 302)
+				toast.error(m['ERROR_ALERT.TITLE']({ while: m['ARTICLE.WHILE']() }), {
+					description: m['ERROR_ALERT.DESCRIPTION'](),
+				});
 			return;
 		}
 
@@ -270,8 +271,3 @@
 		goto('/');
 	}}
 	bind:open={openAfterDeletionAlert} />
-
-<AlertDialog
-	title={m['ARTICLE.ERROR_ALERT.TITLE']()}
-	description={m['ARTICLE.ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorAlert} />

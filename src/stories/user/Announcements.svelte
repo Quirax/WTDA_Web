@@ -22,6 +22,7 @@
 	import Editor from '$lib/components/editor/editor.svelte';
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import { m } from '$lib/messages';
+	import { toast } from 'svelte-sonner';
 
 	interface Props extends ReturnType<typeof $props> {
 		user: Omit<NonNullable<App.User>, 'status'>;
@@ -35,7 +36,11 @@
 	userStore.subscribe((v) => (me = v));
 
 	// Announcements List
-	let openErrorOnAnnouncementAlert = $state(false);
+	const onErrorOnAnnouncement = () => {
+		toast.error(m['ERROR_ALERT.TITLE']({ while: m['ANNOUNCEMENT.WHILE']() }), {
+			description: m['ERROR_ALERT.DESCRIPTION'](),
+		});
+	};
 
 	let announcementsListDrawerState = $state({
 		open: false,
@@ -70,7 +75,7 @@
 			announcementsListDrawerState.total = 0;
 
 			console.error(result);
-			openErrorOnAnnouncementAlert = true;
+			onErrorOnAnnouncement();
 		}
 	};
 
@@ -115,7 +120,7 @@
 			announcementDialogState.status = FetchStatus.FAILED;
 
 			console.error(result);
-			openErrorOnAnnouncementAlert = true;
+			onErrorOnAnnouncement();
 		}
 	};
 
@@ -141,7 +146,7 @@
 			invalidate('user:info');
 		} else {
 			console.error(result);
-			openErrorOnAnnouncementAlert = true;
+			onErrorOnAnnouncement();
 		}
 	};
 
@@ -159,7 +164,7 @@
 					cancel();
 
 					console.error(result);
-					openErrorOnAnnouncementAlert = true;
+					onErrorOnAnnouncement();
 				}
 			} else {
 				invalidate('user:info');
@@ -404,7 +409,3 @@
 	cancel={true}
 	onAction={deleteAnnouncement}
 	bind:open={deleteAnnouncementAlertState.open} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['ANNOUNCEMENT.WHILE']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnAnnouncementAlert} />

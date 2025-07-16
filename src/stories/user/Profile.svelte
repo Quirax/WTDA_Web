@@ -81,7 +81,12 @@
 	);
 
 	// Profile form
-	let openErrorOnProfileUpdateAlert = $state(false);
+	// let openErrorOnProfileUpdateAlert = $state(false);
+	const onErrorOnProfileUpdate = () => {
+		toast.error(m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UPDATING']() }), {
+			description: m['ERROR_ALERT.DESCRIPTION'](),
+		});
+	};
 
 	const profileForm = superForm(profileFormData, {
 		validators: zodClient(profileSchema),
@@ -94,7 +99,7 @@
 					cancel();
 
 					console.error(result);
-					openErrorOnProfileUpdateAlert = true;
+					onErrorOnProfileUpdate();
 				}
 			} else {
 				// Distribute updated user info
@@ -159,7 +164,7 @@
 				profileImageCropper.open = false;
 			} catch (err) {
 				console.error(err);
-				openErrorOnProfileUpdateAlert = true;
+				onErrorOnProfileUpdate();
 				return;
 			}
 		});
@@ -221,7 +226,7 @@
 				headerImageCropper.open = false;
 			} catch (err) {
 				console.error(err);
-				openErrorOnProfileUpdateAlert = true;
+				onErrorOnProfileUpdate();
 			}
 		});
 	};
@@ -256,8 +261,8 @@
 
 	// Block
 	let openBlockAlert = $state(false);
-	let openErrorOnBlock = $state(false);
-	let openErrorOnUnblock = $state(false);
+	// let openErrorOnBlock = $state(false);
+	// let openErrorOnUnblock = $state(false);
 
 	let userArticlesKey = $state(Date.now());
 
@@ -277,7 +282,9 @@
 			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
-			openErrorOnBlock = true;
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.BLOCKING']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
+			});
 		}
 	};
 
@@ -291,7 +298,9 @@
 			invalidate('user:info');
 			userArticlesKey = Date.now(); // 사용자 게시물 목록 갱신
 		} else {
-			openErrorOnBlock = true;
+			toast.error(m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UNBLOCKING']() }), {
+				description: m['ERROR_ALERT.DESCRIPTION'](),
+			});
 		}
 	};
 
@@ -901,11 +910,6 @@
 	</Dialog.Content>
 </Dialog.Root>
 
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UPDATING']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnProfileUpdateAlert} />
-
 {#snippet blockDescription()}
 	<Ul>
 		<li>{m['PROFILE.BLOCKING.DESCRIPTION_INVISIBLE']()}</li>
@@ -923,14 +927,6 @@
 	cancel={true}
 	onAction={onBlock}
 	bind:open={openBlockAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.BLOCKING']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnBlock} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['PROFILE.WHILE.UNBLOCKING']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openErrorOnUnblock} />
 
 <style lang="scss">
 	:global([aria-label='color picker']) {

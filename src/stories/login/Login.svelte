@@ -12,6 +12,7 @@
 	import AlertDialog from '$stories/components/AlertDialog.svelte';
 	import Header from '$stories/components/Header.svelte';
 	import Section from '$stories/components/Section.svelte';
+	import { toast } from 'svelte-sonner';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -33,14 +34,16 @@
 	}: Props = $props();
 
 	let openUserNotFoundAlert = $state(false);
-	let openOtherErrorAlert = $state(false);
 
 	const form = superForm(data, {
 		validators: zodClient(formSchema),
 		onResult({ result, cancel }) {
 			if ([200, 204, 302].indexOf(result.status || 0) === -1) {
 				if (result.status === 404) openUserNotFoundAlert = true;
-				else openOtherErrorAlert = true;
+				else
+					toast.error(m['ERROR_ALERT.TITLE']({ while: m['LOGIN']() }), {
+						description: m['ERROR_ALERT.DESCRIPTION'](),
+					});
 				cancel();
 			}
 		},
@@ -92,7 +95,3 @@
 	title={m['USER_INFO.USER_NOT_FOUND.INVALID']()}
 	description={userNotFoundDesc}
 	bind:open={openUserNotFoundAlert} />
-<AlertDialog
-	title={m['ERROR_ALERT.TITLE']({ while: m['LOGIN']() })}
-	description={m['ERROR_ALERT.DESCRIPTION']()}
-	bind:open={openOtherErrorAlert} />
