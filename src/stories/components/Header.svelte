@@ -9,12 +9,13 @@
 	import './header.css';
 	import { userStore } from '$lib/context';
 	import { goto, onNavigate } from '$app/navigation';
-	import { MessageSquare } from 'lucide-svelte';
+	import { MessageSquare, User } from 'lucide-svelte';
 	import { deserialize } from '$app/forms';
 	import { onMount } from 'svelte';
 	import { source } from 'sveltekit-sse';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { m } from '$lib/messages';
+	import { setMode, userPrefersMode } from 'mode-watcher';
 
 	interface Props {
 		title?: string;
@@ -67,6 +68,31 @@
 <svelte:head>
 	<title>{title === m.SITE_NAME() ? '' : title + ' - '}{m.SITE_NAME()}</title>
 </svelte:head>
+
+{#snippet CommonMenu()}
+	<DropdownMenu.Group>
+		<DropdownMenu.Sub>
+			<DropdownMenu.SubTrigger>{m['HEADER_MENU.THEME.THIS']()}</DropdownMenu.SubTrigger>
+			<DropdownMenu.SubContent>
+				<DropdownMenu.CheckboxItem
+					checked={userPrefersMode.current === 'system'}
+					onclick={() => setMode('system')}>
+					{m['HEADER_MENU.THEME.SYSTEM']()}
+				</DropdownMenu.CheckboxItem>
+				<DropdownMenu.CheckboxItem
+					checked={userPrefersMode.current === 'light'}
+					onclick={() => setMode('light')}>
+					{m['HEADER_MENU.THEME.LIGHT']()}
+				</DropdownMenu.CheckboxItem>
+				<DropdownMenu.CheckboxItem
+					checked={userPrefersMode.current === 'dark'}
+					onclick={() => setMode('dark')}>
+					{m['HEADER_MENU.THEME.DARK']()}
+				</DropdownMenu.CheckboxItem>
+			</DropdownMenu.SubContent>
+		</DropdownMenu.Sub>
+	</DropdownMenu.Group>
+{/snippet}
 
 <header class="bg-background fixed top-0 left-0 z-10 w-full border-b-2">
 	<div class="flex h-16 items-center justify-between px-4">
@@ -139,6 +165,8 @@
 								</DropdownMenu.Item>
 							</DropdownMenu.Group>
 							<DropdownMenu.Separator />
+							{@render CommonMenu()}
+							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
 								<DropdownMenu.Item onclick={() => goto('/settings')}>
 									{m['HEADER_MENU.SETTINGS']()}
@@ -149,8 +177,32 @@
 						</DropdownMenu.Content>
 					</DropdownMenu.Root>
 				{:else}
-					<Button class="h-9 w-[6em]" aria-label="Log in" onclick={onLogin}>{m.LOGIN()}</Button>
-					<Button class="h-9 w-[6em]" aria-label="Sign up" href="/register">{m.REGISTER()}</Button>
+					<DropdownMenu.Root>
+						<DropdownMenu.Trigger class="m-0 p-0">
+							{#snippet child({ props })}
+								<Button
+									{...props}
+									variant="ghost"
+									class="size-9 rounded-full p-0"
+									aria-label="User Menu">
+									<User class="size-9" />
+								</Button>
+							{/snippet}
+						</DropdownMenu.Trigger>
+						<DropdownMenu.Content class="w-56" align="end">
+							<DropdownMenu.Separator />
+							<DropdownMenu.Group>
+								<DropdownMenu.Item aria-label="Log in" onclick={onLogin}>
+									{m.LOGIN()}
+								</DropdownMenu.Item>
+								<DropdownMenu.Item aria-label="Sign up" onclick={() => goto('/register')}>
+									{m.REGISTER()}
+								</DropdownMenu.Item>
+							</DropdownMenu.Group>
+							<DropdownMenu.Separator />
+							{@render CommonMenu()}
+						</DropdownMenu.Content>
+					</DropdownMenu.Root>
 				{/if}
 			{/if}
 		</div>

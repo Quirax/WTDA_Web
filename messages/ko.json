@@ -108,7 +108,13 @@
 		"PROFILE": "내 프로필",
 		"DM": "메시지",
 		"SETTINGS": "설정",
-		"LOGOUT": "로그아웃"
+		"LOGOUT": "로그아웃",
+		"THEME": {
+			"THIS": "테마",
+			"SYSTEM": "기기 설정",
+			"LIGHT": "밝은 모드",
+			"DARK": "어두운 모드"
+		}
 	},
 	"LOGIN": "로그인",
 	"REGISTER": "회원가입",
