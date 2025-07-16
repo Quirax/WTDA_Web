@@ -277,9 +277,14 @@
 
 			if (parsed.channelId !== page.params.id) return;
 
-			const new_dms = parsed.dms.map((dm: App.DM) => ({ ...dm, sentAt: new Date(dm.sentAt) })) as
-				| App.DM[]
-				| undefined;
+			const new_dms = parsed.dms.map((dm: App.DM & App.GeneralDM) => ({
+				...dm,
+				sentAt: new Date(dm.sentAt),
+				relatedMessage: dm.relatedMessage && {
+					...dm.relatedMessage,
+					sentAt: new Date(dm.relatedMessage.sentAt),
+				},
+			})) as App.DM[] | undefined;
 
 			if (new_dms && new_dms.length > 0) {
 				dms = [...dms, ...new_dms];
@@ -373,7 +378,7 @@
 	<section
 		bind:this={container}
 		onscroll={onScrollContainer}
-		class="bg-background relative mt-4 size-full space-y-2 overflow-y-auto border p-2">
+		class="bg-background relative mt-4 size-full space-y-2 overflow-x-hidden overflow-y-auto border p-2">
 		{#each dms as dm, i}
 			<Message
 				dir={dm.sender!.id === user!.id ? Direction.SEND : Direction.RECEIVE}

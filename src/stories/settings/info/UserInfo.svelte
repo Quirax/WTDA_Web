@@ -121,7 +121,7 @@
 
 <Section>
 	<H2>{title}</H2>
-	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?/do">
+	<form method="POST" use:enhance class="w-full lg:w-2/3" action="?/do">
 		{#if userInfoFor === UserInfoFor.REGISTRATION}
 			<Form.Field {form} name="email" class="mt-4 flex flex-col space-y-1">
 				<Form.Control>
@@ -304,10 +304,10 @@
 								hidden />
 						{/snippet}
 					</Form.Control>
-					<Form.Description>
-						{m['USER_INFO.AGREE_NOTIFICATION.DESCRIPTION']()}
-					</Form.Description>
 				</div>
+				<Form.Description>
+					{m['USER_INFO.AGREE_NOTIFICATION.DESCRIPTION']()}
+				</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 		{/if}
@@ -396,7 +396,7 @@
 
 {#snippet WarningBeforeDeactivation()}
 	{#snippet destructive(token: string)}
-		<span class="text-destructive font-bold">{token}</span>
+		<span class="text-primary font-bold">{token}</span>
 	{/snippet}
 	{#snippet exclamation(token: string)}
 		<span class="text-foreground font-bold">{token}</span>

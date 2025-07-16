@@ -75,8 +75,8 @@
 </script>
 
 <section class="space-y-4">
-	<div class="flex justify-between">
-		<Tabs.Root bind:value={articleListTab} class="md:w-[400px]">
+	<div class="flex flex-wrap justify-between">
+		<Tabs.Root bind:value={articleListTab}>
 			<Tabs.List class="[&>*]:text-lg [&>*]:font-bold">
 				<Tabs.Trigger value="all">{m['PROFILE.ARTICLES.ALL']()}</Tabs.Trigger>
 				<!-- <Tabs.Trigger value="commission_types">{m['ARTICLE_TYPE.COMMISSION']()}</Tabs.Trigger> -->
@@ -86,9 +86,12 @@
 		</Tabs.Root>
 
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger class="m-0 p-0">
+			<DropdownMenu.Trigger class="m-0 p-0 max-sm:w-full">
 				{#snippet child({ props })}
-					<Button {...props} variant="default" class="px-4">
+					<Button
+						{...props}
+						variant="default"
+						class="bg-(--primary-color) px-4 max-sm:mt-4 max-sm:ml-auto">
 						<CirclePlus />
 						{m['PROFILE.ARTICLES.CREATE']()}
 					</Button>

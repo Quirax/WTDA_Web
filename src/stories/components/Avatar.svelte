@@ -24,7 +24,7 @@
 {#snippet content()}
 	<Avatar.Root class={className}>
 		<Avatar.Image src={user?.profileImage} alt={user?.username} />
-		<Avatar.Fallback><User /></Avatar.Fallback>
+		<Avatar.Fallback><User class="text-secondary-foreground" /></Avatar.Fallback>
 	</Avatar.Root>
 {/snippet}
 

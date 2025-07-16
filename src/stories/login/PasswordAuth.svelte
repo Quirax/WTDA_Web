@@ -53,7 +53,7 @@
 <Section>
 	<H2>{m['USER_INFO.PASSWORD_AUTH.TITLE']()}</H2>
 	<P>{m['USER_INFO.PASSWORD_AUTH.DESCRIPTION']()}</P>
-	<form method="POST" use:enhance class="w-full sm:w-2/3" action="?">
+	<form method="POST" use:enhance class="w-full lg:w-2/3" action="?">
 		<Form.Field {form} name="password" class="mt-4 flex flex-col space-y-1">
 			<Form.Control>
 				{#snippet children({ props })}
