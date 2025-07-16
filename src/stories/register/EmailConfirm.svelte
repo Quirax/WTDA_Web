@@ -144,7 +144,7 @@
 <Section>
 	<H2>{descriptions.heading}</H2>
 	<P>{descriptions.desc}</P>
-	<form method="POST" class="w-full sm:w-2/3" action="?/do" use:enhance>
+	<form method="POST" class="w-full lg:w-2/3" action="?/do" use:enhance>
 		{#if confirmFor === EmailConfirmFor.RESET_PASSWORD}
 			<Form.Field {form} name="email" class="my-4 flex flex-col space-y-1">
 				<Form.Control>

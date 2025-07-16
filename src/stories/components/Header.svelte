@@ -187,7 +187,6 @@
 							{/snippet}
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content class="w-56" align="end">
-							<DropdownMenu.Separator />
 							<DropdownMenu.Group>
 								<DropdownMenu.Item aria-label="Log in" onclick={onLogin}>
 									{m.LOGIN()}
