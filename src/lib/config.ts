@@ -28,7 +28,7 @@ export const footerInfo: {
 		{ href: 'https://ofc.whattodo.at/notice', target: '_blank', text: '공지사항' },
 		{ href: '.', text: '고객센터' },
 		{ href: '/tos', text: m['TOS']() },
-		{ href: '.', text: '개인정보처리방침' },
+		{ href: '/privacy', text: m['PRIVACY_POLICY']() },
 	],
 	sns: [
 		{

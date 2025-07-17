@@ -5,6 +5,7 @@
 	import Heading from './Heading.svelte';
 	import List from './List.svelte';
 	import Paragraph from './Paragraph.svelte';
+	import Link from './Link.svelte';
 
 	interface Props {
 		md: string;
@@ -22,7 +23,8 @@
 		// table: ,
 		tablerow: Typo.Table.Tr,
 		// tablecell: ,
+		link: Link,
 	};
 </script>
 
-<SvelteMarkdown source={md} {renderers} />
+<SvelteMarkdown source={md} {renderers} options={{ mangle: false }} />
