@@ -1,5 +1,6 @@
 import type { SimpleIcon } from 'simple-icons';
 import { siX, siMastodon, siBluesky, siTistory } from 'simple-icons';
+import { m } from './messages';
 
 export type Link = {
 	href: string;
@@ -26,7 +27,7 @@ export const footerInfo: {
 	links: [
 		{ href: 'https://ofc.whattodo.at/notice', target: '_blank', text: '공지사항' },
 		{ href: '.', text: '고객센터' },
-		{ href: '.', text: '이용약관' },
+		{ href: '/tos', text: m['TOS']() },
 		{ href: '.', text: '개인정보처리방침' },
 	],
 	sns: [
