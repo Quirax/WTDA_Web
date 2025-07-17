@@ -26,7 +26,6 @@ export const footerInfo: {
 } = {
 	links: [
 		{ href: 'https://ofc.whattodo.at/notice', target: '_blank', text: '공지사항' },
-		{ href: '.', text: '고객센터' },
 		{ href: '/tos', text: m['TOS']() },
 		{ href: '/privacy', text: m['PRIVACY_POLICY']() },
 	],
@@ -55,15 +54,10 @@ export const footerInfo: {
 		{ subject: '상호', info: '뭐하지공방' },
 		{ subject: '대표', info: '홍길동' },
 		{ subject: '개인정보관리책임자', info: '홍길동' },
-		{ subject: '사업자등록번호', info: { href: '.', text: '123-45-67890' } },
-		{ subject: '통신판매업신고', info: '2025-경기남양주-1234' },
-		{ subject: '주소', info: '경기도 남양주시 호평로68번길 21' },
 		{ subject: '이메일', info: { href: '.', text: 'support@whattodo.at' } },
-		{ subject: '전화', info: '031-1234-5678' },
 	],
 	usedDesignBy: [{ href: 'http://www.freepik.com/', target: '_blank', text: 'Freepik' }],
-	disclaimar:
-		'뭐하지공방은 통신판매중개자이며, 통신판매의 당사자가 아닙니다. 상품, 상품정보, 거래에 관한 의무와 책임은 계약 당사자 각자에게 있습니다.',
+	disclaimar: '이 사이트는 데모용 샘플로, 실제 운영되는 사이트가 아닙니다.',
 };
 
 export const emailExpiresIn = 180; // 3 minutes = 180 seconds

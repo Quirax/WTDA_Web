@@ -39,15 +39,15 @@
 			{/each}
 		</div>
 	</div>
-	<div class="flex flex-wrap items-center space-y-1 space-x-4 leading-7 [&:not(:first-child)]:mt-6">
+	<div class="flex flex-wrap items-center space-x-4 leading-7 [&:not(:first-child)]:mt-6">
 		{#each footerInfo.info as info}
 			{#if isLink(info.info)}
-				<span>
+				<span class="mb-1">
 					{info.subject}:
 					<a href={info.info.href} target={info.info.target} {...anchorProps}>{info.info.text}</a>
 				</span>
 			{:else}
-				<span>{info.subject}: {info.info}</span>
+				<span class="mb-1">{info.subject}: {info.info}</span>
 			{/if}
 		{/each}
 	</div>
@@ -61,7 +61,7 @@
 			link,
 		)}
 	</div>
-	<div class=" leading-7 [&:not(:first-child)]:mt-6">
+	<div class="text-primary leading-7 font-bold [&:not(:first-child)]:mt-6">
 		{footerInfo.disclaimar}
 	</div>
 </footer>
