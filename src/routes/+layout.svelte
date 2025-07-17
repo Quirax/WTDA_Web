@@ -13,6 +13,7 @@
 	import { env } from '$env/dynamic/public';
 	import { deserialize } from '$app/forms';
 	import { m } from '$lib/messages';
+	import AlertDialog from '$stories/components/AlertDialog.svelte';
 
 	interface Props extends ReturnType<typeof $props> {
 		data: LayoutServerData;
@@ -102,6 +103,14 @@
 			}
 		});
 	}
+
+	let openDemoAlert = $state(false);
+
+	onMount(() => {
+		const affirmed = sessionStorage.getItem('demo');
+
+		if (!affirmed) openDemoAlert = true;
+	});
 </script>
 
 <ModeWatcher />
@@ -110,3 +119,11 @@
 <Layout>
 	{@render children()}
 </Layout>
+
+<AlertDialog
+	title="이 사이트는 데모용 샘플입니다."
+	description="이 사이트는 데모용으로, 실제 운영되는 사이트가 아닙니다. 다만, 게시물 작성 등 세부적인 체험을 위해 개발자에게 계정을 신청할 수 있습니다. 이 점 참고하여 주시기 바랍니다."
+	bind:open={openDemoAlert}
+	onAction={() => {
+		sessionStorage.setItem('demo', 'demo');
+	}} />

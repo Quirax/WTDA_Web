@@ -536,5 +536,7 @@
 	"EMOJI_LIST": {
 		"CANCEL": "선택을 취소하고 닫기"
 	},
-	"USED_DESIGN_BY": "{usedDesignBy} 등에서 디자인한 이미지 요소가 사용되었습니다."
+	"USED_DESIGN_BY": "{usedDesignBy} 등에서 디자인한 이미지 요소가 사용되었습니다.",
+	"TOS": "이용약관",
+	"PRIVACY_POLICY": "개인정보처리방침"
 }
