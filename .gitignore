@@ -33,3 +33,5 @@ yarn.lock
 
 .fuse_hidden*
 .firebase-admin-credential.json
+
+/cert/*.pem
