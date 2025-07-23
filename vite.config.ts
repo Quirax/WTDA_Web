@@ -17,7 +17,7 @@ export default defineConfig({
 	assetsInclude: ['**/*.md'],
 	plugins: [
 		sveltekit(),
-		topLevelAwait(),
+		// topLevelAwait(),
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		tailwindcss(),
 		process.env.NODE_ENV === 'development'
