@@ -7,7 +7,7 @@ export const POST = ({ locals }) => {
 
 	return produce(
 		async ({ emit, lock }) => {
-			if (!locals.user) throw error(401);
+			if (!locals.user) return;
 
 			unlisten = await listen(locals.user.id, 'sse', (message) => {
 				// ref: https://github.com/razshare/sveltekit-sse/issues/47#issuecomment-2371823805
