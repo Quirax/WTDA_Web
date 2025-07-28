@@ -70,7 +70,7 @@ What-to-do Atelier: the Platform of Intermediary between Requests and Commission
 - [x] DM
 - [x] 초대코드
 
-<details><summary>프로젝트 중단으로 더 이상 진행되지 않는 항목들<summary>
+<details><summary>프로젝트 중단으로 더 이상 진행되지 않는 항목들</summary>
 
 ### 2차 알파테스트
 
